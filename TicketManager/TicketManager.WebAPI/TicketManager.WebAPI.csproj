@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Notifications\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

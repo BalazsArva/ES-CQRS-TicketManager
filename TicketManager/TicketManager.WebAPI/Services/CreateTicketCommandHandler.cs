@@ -6,6 +6,7 @@ using MediatR;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Commands;
+using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Validation;
 
 namespace TicketManager.WebAPI.Services
@@ -31,6 +32,7 @@ namespace TicketManager.WebAPI.Services
                 throw new ValidationException(validationResult.Errors);
             }
 
+            int ticketId;
             using (var context = eventsContextFactory.CreateContext())
             {
                 var now = DateTime.UtcNow;
@@ -55,8 +57,12 @@ namespace TicketManager.WebAPI.Services
 
                 await context.SaveChangesAsync();
 
-                return ticketCreatedEvent.Id;
+                ticketId = ticketCreatedEvent.Id;
             }
+
+            await mediator.Publish(new TicketCreatedNotification(ticketId));
+
+            return ticketId;
         }
     }
 }
