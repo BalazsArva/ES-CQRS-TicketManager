@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -30,12 +29,14 @@ namespace TicketManager.WebAPI.Services
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(notification.TicketId);
+                var ticketId = notification.TicketId;
+
+                var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(ticketId);
                 var ticketEditedEvent = await context.TicketDetailsChangedEvents
-                    .Where(evt => evt.TicketCreatedEventId == notification.TicketId)
+                    .OfTicket(ticketId)
                     .LatestAsync();
                 var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
-                    .Where(evt => evt.TicketCreatedEventId == notification.TicketId)
+                    .OfTicket(ticketId)
                     .LatestAsync();
 
                 var lastUpdate = EventHelper.Latest(ticketEditedEvent, ticketStatusChangedEvent);
@@ -53,7 +54,7 @@ namespace TicketManager.WebAPI.Services
                     TicketStatus = ticketStatusChangedEvent.TicketStatus
                 };
 
-                ticket.Id = session.GeneratePrefixedDocumentId(ticket, ticketCreatedEvent.Id.ToString());
+                ticket.Id = session.GeneratePrefixedDocumentId(ticket, ticketId.ToString());
 
                 await session.StoreAsync(ticket);
                 await session.SaveChangesAsync();
