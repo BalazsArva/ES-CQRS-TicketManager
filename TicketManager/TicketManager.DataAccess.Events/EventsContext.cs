@@ -18,10 +18,27 @@ namespace TicketManager.DataAccess.Events
 
         public DbSet<TicketDetailsChangedEvent> TicketDetailsChangedEvents { get; set; }
 
-        public DbSet<TicketLinkedEvent> TicketLinkedEvents { get; set; }
+        public DbSet<TicketLinkChangedEvent> TicketLinkChangedEvents { get; set; }
 
         public DbSet<TicketStatusChangedEvent> TicketStatusChangedEvents { get; set; }
 
         public DbSet<TicketTagChangedEvent> TicketTagChangedEvents { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder
+                .Entity<TicketLinkChangedEvent>()
+                .HasOne(x => x.SourceTicketCreatedEvent)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder
+                .Entity<TicketLinkChangedEvent>()
+                .HasOne(x => x.TargetTicketCreatedEvent)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }
