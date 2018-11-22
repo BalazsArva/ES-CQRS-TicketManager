@@ -1,4 +1,4 @@
-﻿namespace TicketManager.DataAccess.Events.DataModel
+﻿namespace TicketManager.Domain.Common
 {
     public enum Priority
     {
