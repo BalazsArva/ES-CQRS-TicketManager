@@ -38,8 +38,11 @@ namespace TicketManager.WebAPI.Services
                 var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
                     .OfTicket(ticketId)
                     .LatestAsync();
+                var ticketAssignedEvent = await context.TicketAssignedEvents
+                    .OfTicket(ticketId)
+                    .LatestAsync();
 
-                var lastUpdate = EventHelper.Latest(ticketEditedEvent, ticketStatusChangedEvent);
+                var lastUpdate = EventHelper.Latest(ticketEditedEvent, ticketStatusChangedEvent, ticketAssignedEvent);
 
                 var ticket = new Ticket
                 {
@@ -51,7 +54,8 @@ namespace TicketManager.WebAPI.Services
                     Priority = ticketEditedEvent.Priority,
                     TicketType = ticketEditedEvent.TicketType,
                     UtcDateLastEdited = lastUpdate.UtcDateRecorded,
-                    TicketStatus = ticketStatusChangedEvent.TicketStatus
+                    TicketStatus = ticketStatusChangedEvent.TicketStatus,
+                    AssignedTo = ticketAssignedEvent.AssignedTo
                 };
 
                 ticket.Id = session.GeneratePrefixedDocumentId(ticket, ticketId.ToString());
