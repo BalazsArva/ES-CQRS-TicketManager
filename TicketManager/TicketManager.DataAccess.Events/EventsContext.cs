@@ -10,7 +10,7 @@ namespace TicketManager.DataAccess.Events
         {
         }
 
-        // TODO: Add TicketAssignedEvent and create indexes on date of creation.
+        public DbSet<TicketAssignedEvent> TicketAssignedEvents { get; set; }
 
         public DbSet<TicketCommentEditedEvent> TicketCommentEditedEvents { get; set; }
 
@@ -41,6 +41,23 @@ namespace TicketManager.DataAccess.Events
                 .HasOne(x => x.TargetTicketCreatedEvent)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
+
+            SetupDateIndex<TicketAssignedEvent>(modelBuilder);
+            SetupDateIndex<TicketCommentEditedEvent>(modelBuilder);
+            SetupDateIndex<TicketCommentPostedEvent>(modelBuilder);
+            SetupDateIndex<TicketCreatedEvent>(modelBuilder);
+            SetupDateIndex<TicketDetailsChangedEvent>(modelBuilder);
+            SetupDateIndex<TicketLinkChangedEvent>(modelBuilder);
+            SetupDateIndex<TicketStatusChangedEvent>(modelBuilder);
+            SetupDateIndex<TicketTagChangedEvent>(modelBuilder);
+        }
+
+        private void SetupDateIndex<TEvent>(ModelBuilder modelBuilder)
+            where TEvent : EventBase
+        {
+            modelBuilder
+                .Entity<TEvent>()
+                .HasIndex(x => x.UtcDateRecorded);
         }
     }
 }
