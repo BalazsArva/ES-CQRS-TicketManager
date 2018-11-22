@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Raven.Client.Documents;
+using TicketManager.DataAccess.Events;
 
 namespace TicketManager.WebAPI
 {
@@ -25,6 +21,27 @@ namespace TicketManager.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var sqlConnectionString = Configuration["DataAccess:SQL"];
+            var ravenDbUrls = Configuration.GetSection("DataAccess:RavenDb:Urls").Get<string[]>();
+            var ravenDbDatabase = Configuration["DataAccess:RavenDb:Database"];
+
+            var options = new DbContextOptionsBuilder<EventsContext>()
+                .UseSqlServer(sqlConnectionString)
+                .Options;
+
+            services.AddSingleton(options);
+            services.AddDbContext<EventsContext>(opts => opts.UseSqlServer(sqlConnectionString));
+            services.AddSingleton<IEventsContextFactory>(svcProvider =>
+            {
+                return new EventsContextFactory(options);
+            });
+
+            services.AddSingleton(new DocumentStore
+            {
+                Urls = ravenDbUrls,
+                Database = ravenDbDatabase
+            }.Initialize());
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

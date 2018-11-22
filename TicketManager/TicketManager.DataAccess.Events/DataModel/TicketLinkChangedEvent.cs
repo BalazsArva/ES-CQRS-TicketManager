@@ -3,7 +3,7 @@ using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Events.DataModel
 {
-    public class TicketLinkedEvent : EventBase
+    public class TicketLinkChangedEvent : EventBase
     {
         public int SourceTicketCreatedEventId { get; set; }
 
@@ -16,5 +16,7 @@ namespace TicketManager.DataAccess.Events.DataModel
         public virtual TicketCreatedEvent TargetTicketCreatedEvent { get; set; }
 
         public LinkType LinkType { get; set; }
+
+        public bool ConnectionIsActive { get; set; }
     }
 }
