@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Raven.Client.Documents;
+using TicketManager.DataAccess.Documents.DataModel;
+using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Notifications;
@@ -43,10 +45,8 @@ namespace TicketManager.WebAPI.Services
                     ticketStatusChangedEvent
                 }.OrderByDescending(x => x.UtcDateRecorded).First();
 
-                var ticket = new
+                var ticket = new Ticket
                 {
-                    // TODO: Use RavenDB ID generation
-                    Id = ticketCreatedEvent.Id,
                     CreatedBy = ticketCreatedEvent.CausedBy,
                     UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
                     Title = ticketEditedEvent.Title,
@@ -57,6 +57,11 @@ namespace TicketManager.WebAPI.Services
                     UtcDateLastEdited = lastUpdate.UtcDateRecorded,
                     TicketStatus = ticketStatusChangedEvent.TicketStatus
                 };
+
+                ticket.Id = session.GeneratePrefixedDocumentId(ticket, ticketCreatedEvent.Id.ToString());
+
+                await session.StoreAsync(ticket);
+                await session.SaveChangesAsync();
             }
         }
     }
