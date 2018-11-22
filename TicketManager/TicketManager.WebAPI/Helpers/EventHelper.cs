@@ -2,7 +2,7 @@
 using System.Linq;
 using TicketManager.DataAccess.Events.DataModel;
 
-namespace TicketManager.WebAPI.Extensions
+namespace TicketManager.WebAPI.Helpers
 {
     public static class EventHelper
     {

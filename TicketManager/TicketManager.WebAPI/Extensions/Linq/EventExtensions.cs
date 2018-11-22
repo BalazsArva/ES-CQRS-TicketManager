@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Events.DataModel;
 
-namespace TicketManager.WebAPI.Extensions
+namespace TicketManager.WebAPI.Extensions.Linq
 {
     public static class EventExtensions
     {
