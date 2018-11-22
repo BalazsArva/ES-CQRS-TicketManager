@@ -7,8 +7,8 @@ using Raven.Client.Documents;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
-using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Notifications;
+using TicketManager.WebAPI.Extensions;
 
 namespace TicketManager.WebAPI.Services
 {
@@ -32,18 +32,12 @@ namespace TicketManager.WebAPI.Services
                 var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(notification.TicketId);
                 var ticketEditedEvent = await context.TicketDetailsChangedEvents
                     .Where(evt => evt.TicketCreatedEventId == notification.TicketId)
-                    .OrderByDescending(evt => evt.UtcDateRecorded)
-                    .FirstAsync();
+                    .LatestAsync();
                 var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
                     .Where(evt => evt.TicketCreatedEventId == notification.TicketId)
-                    .OrderByDescending(evt => evt.UtcDateRecorded)
-                    .FirstAsync();
+                    .LatestAsync();
 
-                var lastUpdate = new EventBase[]
-                {
-                    ticketEditedEvent,
-                    ticketStatusChangedEvent
-                }.OrderByDescending(x => x.UtcDateRecorded).First();
+                var lastUpdate = EventHelper.Latest(ticketEditedEvent, ticketStatusChangedEvent);
 
                 var ticket = new Ticket
                 {
