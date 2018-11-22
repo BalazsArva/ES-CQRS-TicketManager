@@ -11,5 +11,13 @@ namespace TicketManager.DataAccess.Documents.Extensions
 
             return string.Concat(collectionName, separator, customIdValue);
         }
+
+        public static string GeneratePrefixedDocumentId<TDocument>(this IAsyncDocumentSession documentSession, string customIdValue)
+        {
+            var separator = documentSession.Advanced.DocumentStore.Conventions.IdentityPartsSeparator;
+            var collectionName = documentSession.Advanced.DocumentStore.Conventions.GetCollectionName(typeof(TDocument));
+
+            return string.Concat(collectionName, separator, customIdValue);
+        }
     }
 }
