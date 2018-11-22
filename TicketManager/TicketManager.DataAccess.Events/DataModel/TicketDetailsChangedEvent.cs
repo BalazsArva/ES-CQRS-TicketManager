@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Events.DataModel
 {
