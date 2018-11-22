@@ -2,7 +2,7 @@
 
 namespace TicketManager.DataAccess.Events.DataModel
 {
-    public class TicketCommentPostedEvent : EventBase
+    public class TicketCommentPostedEvent : EventBase, ITicketEvent
     {
         public int TicketCreatedEventId { get; set; }
 

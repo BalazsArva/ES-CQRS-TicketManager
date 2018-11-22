@@ -3,7 +3,7 @@ using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Events.DataModel
 {
-    public class TicketStatusChangedEvent : EventBase
+    public class TicketStatusChangedEvent : EventBase, ITicketEvent
     {
         public int TicketCreatedEventId { get; set; }
 

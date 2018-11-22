@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TicketManager.DataAccess.Events.DataModel
 {
-    public class TicketTagChangedEvent : EventBase
+    public class TicketTagChangedEvent : EventBase, ITicketEvent
     {
         public int TicketCreatedEventId { get; set; }
 
