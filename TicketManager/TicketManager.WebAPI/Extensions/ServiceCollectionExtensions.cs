@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Events;
+using TicketManager.WebAPI.Validation;
 
 namespace TicketManager.WebAPI.Extensions
 {
@@ -38,6 +39,12 @@ namespace TicketManager.WebAPI.Extensions
             });
 
             return services;
+        }
+
+        public static IServiceCollection AddValidators(this IServiceCollection services)
+        {
+            return services
+                .AddTransient<CreateTicketCommandValidator>();
         }
     }
 }

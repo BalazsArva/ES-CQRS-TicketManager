@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,9 @@ namespace TicketManager.WebAPI
         {
             services.AddRavenDb(Configuration);
             services.AddEventsContext(Configuration);
+
+            services.AddValidators();
+            services.AddMediatR(typeof(Startup).Assembly);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
