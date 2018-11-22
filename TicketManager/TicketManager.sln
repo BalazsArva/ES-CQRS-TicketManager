@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Contracts.Que
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Contracts.CommandApi", "TicketManager.Contracts.CommandApi\TicketManager.Contracts.CommandApi.csproj", "{D14976CA-395C-4E1A-828F-6B8993662F94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.WebAPI", "TicketManager.WebAPI\TicketManager.WebAPI.csproj", "{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{D14976CA-395C-4E1A-828F-6B8993662F94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D14976CA-395C-4E1A-828F-6B8993662F94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D14976CA-395C-4E1A-828F-6B8993662F94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{7F9CA671-355D-4497-840F-5CC81DB11145} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
 		{495AE17B-B62B-423C-BA58-2990A29CDE9E} = {ECAFD88E-E879-4165-B09E-C7D8323FB674}
 		{D14976CA-395C-4E1A-828F-6B8993662F94} = {ECAFD88E-E879-4165-B09E-C7D8323FB674}
+		{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0} = {71D60599-1F09-434F-8CCB-4A0828D45B90}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05F4388B-9026-4AC2-BF48-6D615D2CECBA}
