@@ -5,6 +5,7 @@ using FluentValidation;
 using MediatR;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
+using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Validation;
@@ -58,7 +59,7 @@ namespace TicketManager.WebAPI.Services
                 {
                     TicketCreatedEvent = ticketCreatedEvent,
                     CausedBy = request.Creator,
-                    TicketStatus = Domain.Common.TicketStatus.NotStarted,
+                    TicketStatus = TicketStatus.NotStarted,
                     UtcDateRecorded = now
                 });
 

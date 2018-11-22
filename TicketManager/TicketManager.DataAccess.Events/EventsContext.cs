@@ -10,6 +10,8 @@ namespace TicketManager.DataAccess.Events
         {
         }
 
+        // TODO: Add TicketAssignedEvent and create indexes on date of creation.
+
         public DbSet<TicketCommentEditedEvent> TicketCommentEditedEvents { get; set; }
 
         public DbSet<TicketCommentPostedEvent> TicketCommentPostedEvents { get; set; }

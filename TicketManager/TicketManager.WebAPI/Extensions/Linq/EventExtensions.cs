@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,18 @@ namespace TicketManager.WebAPI.Extensions.Linq
             where TEvent : ITicketEvent
         {
             return events.Where(x => x.TicketCreatedEventId == ticketId);
+        }
+
+        public static IQueryable<TEvent> After<TEvent>(this IQueryable<TEvent> events, int lastKnownEventId)
+             where TEvent : EventBase
+        {
+            return events.Where(x => x.Id > lastKnownEventId);
+        }
+
+        public static IQueryable<TEvent> After<TEvent>(this IQueryable<TEvent> events, DateTime lastKnownEventDateTime)
+             where TEvent : EventBase
+        {
+            return events.Where(x => x.UtcDateRecorded > lastKnownEventDateTime);
         }
     }
 }
