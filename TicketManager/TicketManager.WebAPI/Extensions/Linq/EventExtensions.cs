@@ -18,5 +18,11 @@ namespace TicketManager.WebAPI.Extensions.Linq
         {
             return events.OrderByDescending(x => x.UtcDateRecorded).First();
         }
+
+        public static IQueryable<TEvent> OfTicket<TEvent>(this IQueryable<TEvent> events, int ticketId)
+            where TEvent : ITicketEvent
+        {
+            return events.Where(x => x.TicketCreatedEventId == ticketId);
+        }
     }
 }
