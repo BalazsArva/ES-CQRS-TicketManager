@@ -62,6 +62,13 @@ namespace TicketManager.WebAPI.Services
                     TicketStatus = TicketStatus.NotStarted,
                     UtcDateRecorded = now
                 });
+                context.TicketAssignedEvents.Add(new TicketAssignedEvent
+                {
+                    AssignedTo = null,
+                    CausedBy = request.Creator,
+                    TicketCreatedEvent = ticketCreatedEvent,
+                    UtcDateRecorded = now
+                });
 
                 await context.SaveChangesAsync();
 

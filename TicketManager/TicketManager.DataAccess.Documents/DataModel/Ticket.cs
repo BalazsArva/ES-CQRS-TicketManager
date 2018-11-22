@@ -9,6 +9,8 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public string CreatedBy { get; set; }
 
+        public string AssignedTo { get; set; }
+
         public DateTime UtcDateCreated { get; set; }
 
         public string Title { get; set; }
