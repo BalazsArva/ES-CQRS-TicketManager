@@ -23,7 +23,8 @@ namespace TicketManager.WebAPI.Services
         INotificationHandler<TicketTagAddedNotification>,
         INotificationHandler<TicketTagRemovedNotification>,
         INotificationHandler<TicketLinkAddedNotification>,
-        INotificationHandler<TicketLinkRemovedNotification>
+        INotificationHandler<TicketLinkRemovedNotification>,
+        INotificationHandler<TicketDetailsChangedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -206,6 +207,28 @@ namespace TicketManager.WebAPI.Services
                 // The change affects the last update of both ends of the link
                 await PatchLastUpdateToNewer(documentStore, sourceTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
                 await PatchLastUpdateToNewer(documentStore, targetTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
+            }
+        }
+
+        public async Task Handle(TicketDetailsChangedNotification notification, CancellationToken cancellationToken)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketDetailsChangedEvent = await context.TicketDetailsChangedEvents
+                    .OfTicket(notification.TicketId)
+                    .LatestAsync();
+
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(notification.TicketId.ToString());
+
+                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Description, ticketDetailsChangedEvent.Description);
+                session.Advanced.Patch<Ticket, Priority>(ticketDocumentId, t => t.Priority, ticketDetailsChangedEvent.Priority);
+                session.Advanced.Patch<Ticket, TicketType>(ticketDocumentId, t => t.TicketType, ticketDetailsChangedEvent.TicketType);
+                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Title, ticketDetailsChangedEvent.Title);
+
+                await session.SaveChangesAsync();
+
+                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketDetailsChangedEvent.CausedBy, ticketDetailsChangedEvent.UtcDateRecorded);
             }
         }
 
