@@ -11,8 +11,8 @@ namespace TicketManager.WebAPI.Validation
             // TODO: Use the query model (once it is implemented) to verify the existence of the Ticket.
 
             RuleFor(cmd => cmd.User)
-              .NotEmpty()
-              .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(ChangeTicketStatusCommand.User)));
+                .NotEmpty()
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(ChangeTicketStatusCommand.User)));
 
             RuleFor(cmd => cmd.NewStatus)
                 .IsInEnum()
