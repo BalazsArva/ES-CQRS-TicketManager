@@ -24,7 +24,8 @@ namespace TicketManager.WebAPI.Services
         INotificationHandler<TicketTagRemovedNotification>,
         INotificationHandler<TicketLinkAddedNotification>,
         INotificationHandler<TicketLinkRemovedNotification>,
-        INotificationHandler<TicketDetailsChangedNotification>
+        INotificationHandler<TicketDetailsChangedNotification>,
+        INotificationHandler<TicketCommentPostedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -229,6 +230,34 @@ namespace TicketManager.WebAPI.Services
                 await session.SaveChangesAsync();
 
                 await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketDetailsChangedEvent.CausedBy, ticketDetailsChangedEvent.UtcDateRecorded);
+            }
+        }
+
+        public async Task Handle(TicketCommentPostedNotification notification, CancellationToken cancellationToken)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var commentPostedEvent = await context.TicketCommentPostedEvents.FindAsync(notification.CommentId);
+                var commentEditedEvent = await context.TicketCommentEditedEvents
+                    .Where(c => c.TicketCommentPostedEventId == notification.CommentId)
+                    .LatestAsync();
+
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(commentPostedEvent.TicketCreatedEventId.ToString());
+                var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(notification.CommentId.ToString());
+
+                var commentDocument = new Comment
+                {
+                    CommentText = commentEditedEvent.CommentText,
+                    Id = commentDocumentId,
+                    UtcDatePosted = commentPostedEvent.UtcDateRecorded,
+                    UtcDateLastUpdated = commentEditedEvent.UtcDateRecorded,
+                    User = commentPostedEvent.CausedBy,
+                    TicketId = ticketDocumentId
+                };
+
+                await session.StoreAsync(commentDocument);
+                await session.SaveChangesAsync();
             }
         }
 
