@@ -8,7 +8,6 @@ using Raven.Client.Documents.Operations;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
-using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Extensions.Linq;
@@ -62,13 +61,16 @@ namespace TicketManager.WebAPI.Services
                     CreatedBy = ticketCreatedEvent.CausedBy,
                     UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
                     Title = ticketEditedEvent.Title,
-                    LastEditedBy = lastUpdate.CausedBy,
                     Description = ticketEditedEvent.Description,
                     Priority = ticketEditedEvent.Priority,
                     TicketType = ticketEditedEvent.TicketType,
-                    UtcDateLastEdited = lastUpdate.UtcDateRecorded,
                     TicketStatus = ticketStatusChangedEvent.TicketStatus,
-                    AssignedTo = ticketAssignedEvent.AssignedTo
+                    AssignedTo = ticketAssignedEvent.AssignedTo,
+                    LastUpdate = new DocumentUpdate
+                    {
+                        UpdatedBy = lastUpdate.CausedBy,
+                        UtcDateUpdated = lastUpdate.UtcDateRecorded
+                    }
                 };
 
                 ticket.Id = session.GeneratePrefixedDocumentId(ticket, ticketId.ToString());
@@ -90,12 +92,11 @@ namespace TicketManager.WebAPI.Services
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
 
-                // These assume optimistic concurrency (i.e. no other update will occur while processing and the assign event represents the latest update)
                 session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.AssignedTo, ticketAssignedEvent.AssignedTo);
-                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.LastEditedBy, ticketAssignedEvent.CausedBy);
-                session.Advanced.Patch<Ticket, DateTime>(ticketDocumentId, t => t.UtcDateLastEdited, ticketAssignedEvent.UtcDateRecorded);
 
                 await session.SaveChangesAsync();
+
+                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketAssignedEvent.CausedBy, ticketAssignedEvent.UtcDateRecorded);
             }
         }
 
@@ -111,12 +112,11 @@ namespace TicketManager.WebAPI.Services
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
 
-                // These assume optimistic concurrency (i.e. no other update will occur while processing and the assign event represents the latest update)
                 session.Advanced.Patch<Ticket, TicketStatus>(ticketDocumentId, t => t.TicketStatus, ticketStatusChangedEvent.TicketStatus);
-                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.LastEditedBy, ticketStatusChangedEvent.CausedBy);
-                session.Advanced.Patch<Ticket, DateTime>(ticketDocumentId, t => t.UtcDateLastEdited, ticketStatusChangedEvent.UtcDateRecorded);
 
                 await session.SaveChangesAsync();
+
+                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketStatusChangedEvent.CausedBy, ticketStatusChangedEvent.UtcDateRecorded);
             }
         }
 
@@ -241,7 +241,7 @@ namespace TicketManager.WebAPI.Services
             {
                 var commentPostedEvent = await context.TicketCommentPostedEvents.FindAsync(notification.CommentId);
                 var commentEditedEvent = await context.TicketCommentEditedEvents
-                    .Where(c => c.TicketCommentPostedEventId == notification.CommentId)
+                    .OfComment(notification.CommentId)
                     .LatestAsync();
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(commentPostedEvent.TicketCreatedEventId.ToString());
@@ -271,7 +271,7 @@ namespace TicketManager.WebAPI.Services
             using (var session = documentStore.OpenAsyncSession())
             {
                 var commentEditedEvent = await context.TicketCommentEditedEvents
-                    .Where(c => c.TicketCommentPostedEventId == notification.CommentId)
+                    .OfComment(notification.CommentId)
                     .LatestAsync();
 
                 var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(notification.CommentId.ToString());
@@ -284,25 +284,63 @@ namespace TicketManager.WebAPI.Services
             }
         }
 
-        private async Task<EventBase> GetLatestUpdate(EventsContext context, int ticketId)
+        private async Task<DocumentUpdate> GetLatestUpdate(EventsContext context, int ticketId)
         {
-            // TODO: EF will probably not be able to translate (EventBase) cast.
             var ticketDetailsChangedEvents = context.TicketDetailsChangedEvents
                 .OfTicket(ticketId)
-                .Select(evt => (EventBase)evt);
+                .Select(evt => new DocumentUpdate
+                {
+                    UpdatedBy = evt.CausedBy,
+                    UtcDateUpdated = evt.UtcDateRecorded
+                });
 
             var ticketStatusChangedEvents = context.TicketStatusChangedEvents
                 .OfTicket(ticketId)
-                .Select(evt => (EventBase)evt);
+                .Select(evt => new DocumentUpdate
+                {
+                    UpdatedBy = evt.CausedBy,
+                    UtcDateUpdated = evt.UtcDateRecorded
+                });
 
             var ticketAssignedEvents = context.TicketAssignedEvents
                 .OfTicket(ticketId)
-                .Select(evt => (EventBase)evt);
+                .Select(evt => new DocumentUpdate
+                {
+                    UpdatedBy = evt.CausedBy,
+                    UtcDateUpdated = evt.UtcDateRecorded
+                });
+
+            var ticketTagChangedEvents = context.TicketTagChangedEvents
+                .OfTicket(ticketId)
+                .Select(evt => new DocumentUpdate
+                {
+                    UpdatedBy = evt.CausedBy,
+                    UtcDateUpdated = evt.UtcDateRecorded
+                });
+
+            var ticketLinkChangedEvents = context.TicketLinkChangedEvents
+                .Where(evt => evt.SourceTicketCreatedEventId == ticketId || evt.TargetTicketCreatedEventId == ticketId)
+                .Select(evt => new DocumentUpdate
+                {
+                    UpdatedBy = evt.CausedBy,
+                    UtcDateUpdated = evt.UtcDateRecorded
+                });
+
+            var ticketCommentEditedEvents = context.TicketCommentEditedEvents
+                .Where(evt => evt.TicketCommentPostedEvent.TicketCreatedEventId == ticketId)
+                .Select(evt => new DocumentUpdate
+                {
+                    UpdatedBy = evt.CausedBy,
+                    UtcDateUpdated = evt.UtcDateRecorded
+                });
 
             return await ticketDetailsChangedEvents
                 .Concat(ticketStatusChangedEvents)
                 .Concat(ticketAssignedEvents)
-                .LatestAsync();
+                .Concat(ticketTagChangedEvents)
+                .Concat(ticketLinkChangedEvents)
+                .Concat(ticketCommentEditedEvents)
+                .OrderByDescending(evt => evt.UtcDateUpdated).FirstAsync();
         }
 
         private async Task PatchLastUpdateToNewer(IDocumentStore store, string id, string updater, DateTime dateUpdated)

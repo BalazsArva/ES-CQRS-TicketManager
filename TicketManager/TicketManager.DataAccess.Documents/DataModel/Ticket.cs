@@ -15,15 +15,11 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public string Title { get; set; }
 
-        public string LastEditedBy { get; set; }
-
         public string Description { get; set; }
 
         public Priority Priority { get; set; }
 
         public TicketType TicketType { get; set; }
-
-        public DateTime UtcDateLastEdited { get; set; }
 
         public TicketStatus TicketStatus { get; set; }
 

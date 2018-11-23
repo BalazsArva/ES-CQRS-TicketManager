@@ -26,6 +26,11 @@ namespace TicketManager.WebAPI.Extensions.Linq
             return events.Where(x => x.TicketCreatedEventId == ticketId);
         }
 
+        public static IQueryable<TicketCommentEditedEvent> OfComment(this IQueryable<TicketCommentEditedEvent> ticketCommentEditedEvents, int commentId)
+        {
+            return ticketCommentEditedEvents.Where(x => x.TicketCommentPostedEventId == commentId);
+        }
+
         public static IQueryable<TEvent> After<TEvent>(this IQueryable<TEvent> events, int lastKnownEventId)
              where TEvent : EventBase
         {
