@@ -22,7 +22,8 @@ namespace TicketManager.WebAPI.Services
         INotificationHandler<TicketStatusChangedNotification>,
         INotificationHandler<TicketTagAddedNotification>,
         INotificationHandler<TicketTagRemovedNotification>,
-        INotificationHandler<TicketLinkAddedNotification>
+        INotificationHandler<TicketLinkAddedNotification>,
+        INotificationHandler<TicketLinkRemovedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -175,6 +176,30 @@ namespace TicketManager.WebAPI.Services
                         LinkType = ticketLinkChangedEvent.LinkType,
                         TargetTicketId = targetTicketDocumentId
                     }));
+
+                await session.SaveChangesAsync();
+
+                // The change affects the last update of both ends of the link
+                await PatchLastUpdateToNewer(documentStore, sourceTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
+                await PatchLastUpdateToNewer(documentStore, targetTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
+            }
+        }
+
+        public async Task Handle(TicketLinkRemovedNotification notification, CancellationToken cancellationToken)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketLinkChangedEvent = await context.TicketLinkChangedEvents.FindAsync(notification.TicketLinkChangedEventId);
+
+                var sourceTicketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.SourceTicketCreatedEventId.ToString());
+                var targetTicketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.TargetTicketCreatedEventId.ToString());
+
+                // Remove possibly existing ones with same target and type
+                session.Advanced.Patch<Ticket, TicketLink>(
+                    sourceTicketDocumentId,
+                    t => t.Links,
+                    links => links.RemoveAll(t => t.TargetTicketId == targetTicketDocumentId && t.LinkType == ticketLinkChangedEvent.LinkType));
 
                 await session.SaveChangesAsync();
 
