@@ -10,7 +10,9 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public string CommentText { get; set; }
 
-        public string User { get; set; }
+        public string CreatedBy { get; set; }
+
+        public string LastModifiedBy { get; set; }
 
         public DateTime UtcDatePosted { get; set; }
 

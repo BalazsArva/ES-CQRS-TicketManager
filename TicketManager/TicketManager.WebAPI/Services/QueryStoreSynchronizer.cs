@@ -25,7 +25,8 @@ namespace TicketManager.WebAPI.Services
         INotificationHandler<TicketLinkAddedNotification>,
         INotificationHandler<TicketLinkRemovedNotification>,
         INotificationHandler<TicketDetailsChangedNotification>,
-        INotificationHandler<TicketCommentPostedNotification>
+        INotificationHandler<TicketCommentPostedNotification>,
+        INotificationHandler<TicketCommentEditedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -252,11 +253,33 @@ namespace TicketManager.WebAPI.Services
                     Id = commentDocumentId,
                     UtcDatePosted = commentPostedEvent.UtcDateRecorded,
                     UtcDateLastUpdated = commentEditedEvent.UtcDateRecorded,
-                    User = commentPostedEvent.CausedBy,
+                    CreatedBy = commentPostedEvent.CausedBy,
+                    LastModifiedBy = commentPostedEvent.CausedBy,
                     TicketId = ticketDocumentId
                 };
 
+                // No need to use the last updated patch because the comment can only be edited by its owner so it's not as prone to concurrency.
+                // If we did that, the comment text would also need to be updated by the patch to ensure the comment text is the latest.
                 await session.StoreAsync(commentDocument);
+                await session.SaveChangesAsync();
+            }
+        }
+
+        public async Task Handle(TicketCommentEditedNotification notification, CancellationToken cancellationToken)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var commentEditedEvent = await context.TicketCommentEditedEvents
+                    .Where(c => c.TicketCommentPostedEventId == notification.CommentId)
+                    .LatestAsync();
+
+                var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(notification.CommentId.ToString());
+
+                session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.CommentText, commentEditedEvent.CommentText);
+                session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.LastModifiedBy, commentEditedEvent.CausedBy);
+                session.Advanced.Patch<Comment, DateTime>(commentDocumentId, c => c.UtcDateLastUpdated, commentEditedEvent.UtcDateRecorded);
+
                 await session.SaveChangesAsync();
             }
         }
