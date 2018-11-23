@@ -21,7 +21,8 @@ namespace TicketManager.WebAPI.Services
         INotificationHandler<TicketAssignedNotification>,
         INotificationHandler<TicketStatusChangedNotification>,
         INotificationHandler<TicketTagAddedNotification>,
-        INotificationHandler<TicketTagRemovedNotification>
+        INotificationHandler<TicketTagRemovedNotification>,
+        INotificationHandler<TicketLinkAddedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -129,7 +130,7 @@ namespace TicketManager.WebAPI.Services
 
                 await session.SaveChangesAsync();
 
-                await PatchLastUpdateIfNewer(documentStore, ticketDocumentId, ticketTagChangedEvent.CausedBy, ticketTagChangedEvent.UtcDateRecorded);
+                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketTagChangedEvent.CausedBy, ticketTagChangedEvent.UtcDateRecorded);
             }
         }
 
@@ -146,7 +147,40 @@ namespace TicketManager.WebAPI.Services
 
                 await session.SaveChangesAsync();
 
-                await PatchLastUpdateIfNewer(documentStore, ticketDocumentId, ticketTagChangedEvent.CausedBy, ticketTagChangedEvent.UtcDateRecorded);
+                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketTagChangedEvent.CausedBy, ticketTagChangedEvent.UtcDateRecorded);
+            }
+        }
+
+        public async Task Handle(TicketLinkAddedNotification notification, CancellationToken cancellationToken)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketLinkChangedEvent = await context.TicketLinkChangedEvents.FindAsync(notification.TicketLinkChangedEventId);
+
+                var sourceTicketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.SourceTicketCreatedEventId.ToString());
+                var targetTicketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.TargetTicketCreatedEventId.ToString());
+
+                // Remove possibly existing ones with same target and type
+                session.Advanced.Patch<Ticket, TicketLink>(
+                    sourceTicketDocumentId,
+                    t => t.Links,
+                    links => links.RemoveAll(t => t.TargetTicketId == targetTicketDocumentId && t.LinkType == ticketLinkChangedEvent.LinkType));
+
+                session.Advanced.Patch<Ticket, TicketLink>(
+                    sourceTicketDocumentId,
+                    t => t.Links,
+                    links => links.Add(new TicketLink
+                    {
+                        LinkType = ticketLinkChangedEvent.LinkType,
+                        TargetTicketId = targetTicketDocumentId
+                    }));
+
+                await session.SaveChangesAsync();
+
+                // The change affects the last update of both ends of the link
+                await PatchLastUpdateToNewer(documentStore, sourceTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
+                await PatchLastUpdateToNewer(documentStore, targetTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
             }
         }
 
@@ -171,27 +205,24 @@ namespace TicketManager.WebAPI.Services
                 .LatestAsync();
         }
 
-        private async Task PatchLastUpdateIfNewer(IDocumentStore store, string id, string updater, DateTime dateUpdated)
+        private async Task PatchLastUpdateToNewer(IDocumentStore store, string id, string updater, DateTime dateUpdated)
         {
             const string script =
                 "this.LastUpdate = this.LastUpdate || {};" +
                 "this.LastUpdate.UtcDateUpdated = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.DateUpdated : this.LastUpdate.UtcDateUpdated;" +
                 "this.LastUpdate.UpdatedBy      = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.UpdatedBy   : this.LastUpdate.UpdatedBy;";
 
-            await store.Operations.SendAsync(new PatchOperation(
-                id,
-                null,
-                new PatchRequest
+            var patchRequest = new PatchRequest
+            {
+                Script = script,
+                Values =
                 {
-                    Script = script,
-                    Values =
-                    {
-                        ["DateUpdated"] = dateUpdated.ToUniversalTime(),
-                        ["UpdatedBy"] = updater
-                    }
-                },
-                null,
-                false));
+                    ["DateUpdated"] = dateUpdated.ToUniversalTime(),
+                    ["UpdatedBy"] = updater
+                }
+            };
+
+            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
         }
     }
 }

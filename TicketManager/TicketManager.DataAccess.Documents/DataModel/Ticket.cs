@@ -29,6 +29,8 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public string[] Tags { get; set; } = new string[0];
 
+        public TicketLink[] Links { get; set; } = new TicketLink[0];
+
         public DocumentUpdate LastUpdate { get; set; }
     }
 }
