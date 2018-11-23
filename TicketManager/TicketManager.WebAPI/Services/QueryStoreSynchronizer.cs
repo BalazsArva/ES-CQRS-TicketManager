@@ -20,7 +20,8 @@ namespace TicketManager.WebAPI.Services
         INotificationHandler<TicketCreatedNotification>,
         INotificationHandler<TicketAssignedNotification>,
         INotificationHandler<TicketStatusChangedNotification>,
-        INotificationHandler<TicketTagAddedNotification>
+        INotificationHandler<TicketTagAddedNotification>,
+        INotificationHandler<TicketTagRemovedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -125,6 +126,23 @@ namespace TicketManager.WebAPI.Services
 
                 session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Tags, tags => tags.RemoveAll(t => t == ticketTagChangedEvent.Tag));
                 session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Tags, tags => tags.Add(ticketTagChangedEvent.Tag));
+
+                await session.SaveChangesAsync();
+
+                await PatchLastUpdateIfNewer(documentStore, ticketDocumentId, ticketTagChangedEvent.CausedBy, ticketTagChangedEvent.UtcDateRecorded);
+            }
+        }
+
+        public async Task Handle(TicketTagRemovedNotification notification, CancellationToken cancellationToken)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketTagChangedEvent = await context.TicketTagChangedEvents.FindAsync(notification.TagChangedEventId);
+
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketTagChangedEvent.TicketCreatedEventId.ToString());
+
+                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Tags, tags => tags.RemoveAll(t => t == ticketTagChangedEvent.Tag));
 
                 await session.SaveChangesAsync();
 
