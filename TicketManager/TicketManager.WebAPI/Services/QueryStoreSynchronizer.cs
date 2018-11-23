@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Operations;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
@@ -18,7 +19,8 @@ namespace TicketManager.WebAPI.Services
     public class QueryStoreSynchronizer :
         INotificationHandler<TicketCreatedNotification>,
         INotificationHandler<TicketAssignedNotification>,
-        INotificationHandler<TicketStatusChangedNotification>
+        INotificationHandler<TicketStatusChangedNotification>,
+        INotificationHandler<TicketTagAddedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -112,6 +114,24 @@ namespace TicketManager.WebAPI.Services
             }
         }
 
+        public async Task Handle(TicketTagAddedNotification notification, CancellationToken cancellationToken)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketTagChangedEvent = await context.TicketTagChangedEvents.FindAsync(notification.TagChangedEventId);
+
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketTagChangedEvent.TicketCreatedEventId.ToString());
+
+                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Tags, tags => tags.RemoveAll(t => t == ticketTagChangedEvent.Tag));
+                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Tags, tags => tags.Add(ticketTagChangedEvent.Tag));
+
+                await session.SaveChangesAsync();
+
+                await PatchLastUpdateIfNewer(documentStore, ticketDocumentId, ticketTagChangedEvent.CausedBy, ticketTagChangedEvent.UtcDateRecorded);
+            }
+        }
+
         private async Task<EventBase> GetLatestUpdate(EventsContext context, int ticketId)
         {
             // TODO: EF will probably not be able to translate (EventBase) cast.
@@ -131,6 +151,29 @@ namespace TicketManager.WebAPI.Services
                 .Concat(ticketStatusChangedEvents)
                 .Concat(ticketAssignedEvents)
                 .LatestAsync();
+        }
+
+        private async Task PatchLastUpdateIfNewer(IDocumentStore store, string id, string updater, DateTime dateUpdated)
+        {
+            const string script =
+                "this.LastUpdate = this.LastUpdate || {};" +
+                "this.LastUpdate.UtcDateUpdated = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.DateUpdated : this.LastUpdate.UtcDateUpdated;" +
+                "this.LastUpdate.UpdatedBy      = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.UpdatedBy   : this.LastUpdate.UpdatedBy;";
+
+            await store.Operations.SendAsync(new PatchOperation(
+                id,
+                null,
+                new PatchRequest
+                {
+                    Script = script,
+                    Values =
+                    {
+                        ["DateUpdated"] = dateUpdated.ToUniversalTime(),
+                        ["UpdatedBy"] = updater
+                    }
+                },
+                null,
+                false));
         }
     }
 }

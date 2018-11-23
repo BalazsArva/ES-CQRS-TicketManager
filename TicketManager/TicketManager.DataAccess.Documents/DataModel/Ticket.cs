@@ -26,5 +26,9 @@ namespace TicketManager.DataAccess.Documents.DataModel
         public DateTime UtcDateLastEdited { get; set; }
 
         public TicketStatus TicketStatus { get; set; }
+
+        public string[] Tags { get; set; } = new string[0];
+
+        public DocumentUpdate LastUpdate { get; set; }
     }
 }
