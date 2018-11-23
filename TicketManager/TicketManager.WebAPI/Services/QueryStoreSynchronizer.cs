@@ -8,6 +8,7 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
+using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Extensions.Linq;
 using TicketManager.WebAPI.Helpers;
@@ -16,7 +17,8 @@ namespace TicketManager.WebAPI.Services
 {
     public class QueryStoreSynchronizer :
         INotificationHandler<TicketCreatedNotification>,
-        INotificationHandler<TicketAssignedNotification>
+        INotificationHandler<TicketAssignedNotification>,
+        INotificationHandler<TicketStatusChangedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -84,6 +86,27 @@ namespace TicketManager.WebAPI.Services
                 session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.AssignedTo, ticketAssignedEvent.AssignedTo);
                 session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.LastEditedBy, ticketAssignedEvent.CausedBy);
                 session.Advanced.Patch<Ticket, DateTime>(ticketDocumentId, t => t.UtcDateLastEdited, ticketAssignedEvent.UtcDateRecorded);
+
+                await session.SaveChangesAsync();
+            }
+        }
+
+        public async Task Handle(TicketStatusChangedNotification notification, CancellationToken cancellationToken)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketId = notification.TicketId;
+                var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
+                    .OfTicket(ticketId)
+                    .LatestAsync();
+
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
+
+                // These assume optimistic concurrency (i.e. no other update will occur while processing and the assign event represents the latest update)
+                session.Advanced.Patch<Ticket, TicketStatus>(ticketDocumentId, t => t.TicketStatus, ticketStatusChangedEvent.TicketStatus);
+                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.LastEditedBy, ticketStatusChangedEvent.CausedBy);
+                session.Advanced.Patch<Ticket, DateTime>(ticketDocumentId, t => t.UtcDateLastEdited, ticketStatusChangedEvent.UtcDateRecorded);
 
                 await session.SaveChangesAsync();
             }
