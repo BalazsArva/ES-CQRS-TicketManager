@@ -8,6 +8,8 @@
 
         ClonedBy,
 
-        PartOf
+        PartOf,
+
+        BlockedBy
     }
 }
