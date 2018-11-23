@@ -12,6 +12,8 @@
 
         UnderReview,
 
-        Done
+        Done,
+
+        Removed
     }
 }
