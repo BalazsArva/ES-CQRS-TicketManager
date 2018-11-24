@@ -59,14 +59,11 @@ namespace TicketManager.WebAPI.Services
 
                 var ticket = new Ticket
                 {
+                    Id = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString()),
                     CreatedBy = ticketCreatedEvent.CausedBy,
                     UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
-                    Title = ticketEditedEvent.Title,
-                    Description = ticketEditedEvent.Description,
-                    Priority = ticketEditedEvent.Priority,
-                    TicketType = ticketEditedEvent.TicketType,
                     TicketStatus = ticketStatusChangedEvent.TicketStatus,
-                    Assignment = new Assignment
+                    Assignment =
                     {
                         AssignedBy = ticketAssignedEvent.CausedBy,
                         AssignedTo = ticketAssignedEvent.AssignedTo,
@@ -76,10 +73,17 @@ namespace TicketManager.WebAPI.Services
                     {
                         UpdatedBy = lastUpdate.CausedBy,
                         UtcDateUpdated = lastUpdate.UtcDateRecorded
+                    },
+                    Details =
+                    {
+                        ChangedBy=ticketEditedEvent.CausedBy,
+                        Description=ticketEditedEvent.Description,
+                        Title=ticketEditedEvent.Title,
+                        UtcDateUpdated=ticketEditedEvent.UtcDateRecorded,
+                        Priority = ticketEditedEvent.Priority,
+                        TicketType = ticketEditedEvent.TicketType
                     }
                 };
-
-                ticket.Id = session.GeneratePrefixedDocumentId(ticket, ticketId.ToString());
 
                 await session.StoreAsync(ticket);
                 await session.SaveChangesAsync();
@@ -233,14 +237,18 @@ namespace TicketManager.WebAPI.Services
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(notification.TicketId.ToString());
 
-                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Description, ticketDetailsChangedEvent.Description);
-                session.Advanced.Patch<Ticket, Priority>(ticketDocumentId, t => t.Priority, ticketDetailsChangedEvent.Priority);
-                session.Advanced.Patch<Ticket, TicketType>(ticketDocumentId, t => t.TicketType, ticketDetailsChangedEvent.TicketType);
-                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Title, ticketDetailsChangedEvent.Title);
+                var updates = new PropertyUpdateBatch<Ticket>()
+                    .Add(t => t.Details.ChangedBy, ticketDetailsChangedEvent.CausedBy)
+                    .Add(t => t.Details.Title, ticketDetailsChangedEvent.Title)
+                    .Add(t => t.Details.Description, ticketDetailsChangedEvent.Description)
+                    .Add(t => t.Details.Priority, ticketDetailsChangedEvent.Priority)
+                    .Add(t => t.Details.TicketType, ticketDetailsChangedEvent.TicketType);
 
-                await session.SaveChangesAsync();
-
-                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketDetailsChangedEvent.CausedBy, ticketDetailsChangedEvent.UtcDateRecorded);
+                await documentStore.PatchToNewer(
+                    ticketDocumentId,
+                    updates,
+                    t => t.Assignment.UtcDateUpdated,
+                    ticketDetailsChangedEvent.UtcDateRecorded);
             }
         }
 
@@ -367,28 +375,6 @@ namespace TicketManager.WebAPI.Services
                 {
                     ["DateUpdated"] = utcDateUpdated,
                     ["UpdatedBy"] = updater
-                }
-            };
-
-            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
-        }
-
-        private async Task PatchAssignmentToNewer(IDocumentStore store, string id, string assigner, string assignedTo, DateTime utcDateUpdated)
-        {
-            const string script =
-                "var isOlder                    = this.Assignment.UtcDateUpdated < args.DateUpdated;" +
-                "this.Assignment.AssignedTo     = isOlder ? args.AssignedTo  : this.Assignment.AssignedTo;" +
-                "this.Assignment.UtcDateUpdated = isOlder ? args.DateUpdated : this.Assignment.UtcDateUpdated;" +
-                "this.Assignment.AssignedBy     = isOlder ? args.AssignedBy  : this.Assignment.AssignedBy;";
-
-            var patchRequest = new PatchRequest
-            {
-                Script = script,
-                Values =
-                {
-                    ["DateUpdated"] = utcDateUpdated,
-                    ["AssignedBy"] = assigner,
-                    ["AssignedTo"] = assignedTo,
                 }
             };
 

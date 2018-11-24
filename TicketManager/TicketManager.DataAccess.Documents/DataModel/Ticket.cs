@@ -11,14 +11,6 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public DateTime UtcDateCreated { get; set; }
 
-        public string Title { get; set; }
-
-        public string Description { get; set; }
-
-        public Priority Priority { get; set; }
-
-        public TicketType TicketType { get; set; }
-
         public TicketStatus TicketStatus { get; set; }
 
         public string[] Tags { get; set; } = new string[0];
@@ -27,6 +19,8 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public DocumentUpdate LastUpdate { get; set; }
 
-        public Assignment Assignment { get; set; }
+        public Assignment Assignment { get; set; } = new Assignment();
+
+        public TicketDetails Details { get; set; } = new TicketDetails();
     }
 }
