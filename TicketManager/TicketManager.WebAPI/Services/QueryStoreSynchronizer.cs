@@ -9,7 +9,6 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
-using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Extensions.Linq;
 using TicketManager.WebAPI.Helpers;
@@ -62,7 +61,12 @@ namespace TicketManager.WebAPI.Services
                     Id = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString()),
                     CreatedBy = ticketCreatedEvent.CausedBy,
                     UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
-                    TicketStatus = ticketStatusChangedEvent.TicketStatus,
+                    TicketStatus =
+                    {
+                        ChangedBy=ticketStatusChangedEvent.CausedBy,
+                        Status=ticketStatusChangedEvent.TicketStatus,
+                        UtcDateUpdated=ticketStatusChangedEvent.UtcDateRecorded
+                    },
                     Assignment =
                     {
                         AssignedBy = ticketAssignedEvent.CausedBy,
@@ -126,11 +130,16 @@ namespace TicketManager.WebAPI.Services
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
 
-                session.Advanced.Patch<Ticket, TicketStatus>(ticketDocumentId, t => t.TicketStatus, ticketStatusChangedEvent.TicketStatus);
+                var updates = new PropertyUpdateBatch<Ticket>()
+                    .Add(t => t.TicketStatus.ChangedBy, ticketStatusChangedEvent.CausedBy)
+                    .Add(t => t.TicketStatus.Status, ticketStatusChangedEvent.TicketStatus)
+                    .Add(t => t.TicketStatus.UtcDateUpdated, ticketStatusChangedEvent.UtcDateRecorded);
 
-                await session.SaveChangesAsync();
-
-                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketStatusChangedEvent.CausedBy, ticketStatusChangedEvent.UtcDateRecorded);
+                await documentStore.PatchToNewer(
+                    ticketDocumentId,
+                    updates,
+                    t => t.Assignment.UtcDateUpdated,
+                    ticketStatusChangedEvent.UtcDateRecorded);
             }
         }
 

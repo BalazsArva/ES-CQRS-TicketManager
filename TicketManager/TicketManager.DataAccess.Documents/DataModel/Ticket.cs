@@ -1,5 +1,4 @@
 ﻿using System;
-using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Documents.DataModel
 {
@@ -11,8 +10,6 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public DateTime UtcDateCreated { get; set; }
 
-        public TicketStatus TicketStatus { get; set; }
-
         public string[] Tags { get; set; } = new string[0];
 
         public TicketLink[] Links { get; set; } = new TicketLink[0];
@@ -22,5 +19,7 @@ namespace TicketManager.DataAccess.Documents.DataModel
         public Assignment Assignment { get; set; } = new Assignment();
 
         public TicketDetails Details { get; set; } = new TicketDetails();
+
+        public TicketStatus TicketStatus { get; set; } = new TicketStatus();
     }
 }
