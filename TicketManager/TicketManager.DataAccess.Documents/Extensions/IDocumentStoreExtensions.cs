@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Operations;
+using TicketManager.Common.Linq.Expressions;
 
 namespace TicketManager.DataAccess.Documents.Extensions
 {
@@ -32,16 +33,16 @@ namespace TicketManager.DataAccess.Documents.Extensions
         }
         */
 
-        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate,
-            params PropertyUpdate[] propertyUpdates)
+        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate, params PropertyUpdate[] propertyUpdates)
         {
-            var members = ExpressionHelper.GetMemberList((MemberExpression)timestampSelector.Body);
-            members.Insert(0, "this");
+            // If the expression is something like doc => doc.LastUpdate.UtcDateUpdated, this returns [ "LastUpdate", "UtcDateUpdated" ], so it omits the "doc" parameter.
+            var pathToTimestampProperty = ExpressionHelper.GetMemberList(timestampSelector);
+            pathToTimestampProperty.Insert(0, "this");
 
-            var jsPropertyExpression = string.Join(".", members);
-            var jsCondition = string.Concat(
+            var conditionPropertyPath = string.Join(".", pathToTimestampProperty);
+            var updateConditionScript = string.Concat(
                 "var shouldUpdate = ",
-                jsPropertyExpression,
+                conditionPropertyPath,
                 " < args.__AUTO_DateUpdated;");
 
             var assignmentScripts = new List<string>(propertyUpdates.Length);
@@ -58,9 +59,11 @@ namespace TicketManager.DataAccess.Documents.Extensions
                 parameters[paramName] = propertyUpdates[i].NewValue;
             }
 
+            assignmentScripts.Add("\t" + conditionPropertyPath + " = args.__AUTO_DateUpdated;");
+
             var script = string.Join(
                 Environment.NewLine,
-                jsCondition,
+                updateConditionScript,
                 "if (shouldUpdate) {",
                 string.Join(Environment.NewLine, assignmentScripts),
                 "}");
@@ -72,23 +75,6 @@ namespace TicketManager.DataAccess.Documents.Extensions
             };
 
             await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
-        }
-    }
-
-    public static class ExpressionHelper
-    {
-        public static List<string> GetMemberList(MemberExpression expression)
-        {
-            var result = new List<string>();
-
-            if (expression.Expression is MemberExpression memberExpression)
-            {
-                result.AddRange(GetMemberList(memberExpression));
-            }
-
-            result.Add(expression.Member.Name);
-
-            return result;
         }
     }
 
@@ -111,14 +97,7 @@ namespace TicketManager.DataAccess.Documents.Extensions
         public PropertyUpdate(Expression<Func<TObject, TProperty>> memberSelector, TProperty newValue)
             : base(newValue)
         {
-            if (memberSelector.Body is MemberExpression memberExpression)
-            {
-                memberList = ExpressionHelper.GetMemberList(memberExpression);
-            }
-            else
-            {
-                throw new ArgumentException($"The body of the {nameof(memberSelector)} parameter must be a {nameof(MemberExpression)}.", nameof(memberSelector));
-            }
+            memberList = ExpressionHelper.GetMemberList(memberSelector);
         }
 
         public override string ToJavaScriptPropertyExpression()

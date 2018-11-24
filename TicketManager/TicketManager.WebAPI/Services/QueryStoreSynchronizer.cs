@@ -102,8 +102,7 @@ namespace TicketManager.WebAPI.Services
                     t => t.Assignment.UtcDateUpdated,
                     ticketAssignedEvent.UtcDateRecorded,
                     new PropertyUpdate<Ticket, string>(t => t.Assignment.AssignedBy, ticketAssignedEvent.CausedBy),
-                    new PropertyUpdate<Ticket, string>(t => t.Assignment.AssignedTo, ticketAssignedEvent.AssignedTo),
-                    new PropertyUpdate<Ticket, DateTime>(t => t.Assignment.UtcDateUpdated, ticketAssignedEvent.UtcDateRecorded));
+                    new PropertyUpdate<Ticket, string>(t => t.Assignment.AssignedTo, ticketAssignedEvent.AssignedTo));
 
                 //await PatchAssignmentToNewer(documentStore, ticketDocumentId, ticketAssignedEvent.CausedBy, ticketAssignedEvent.AssignedTo, ticketAssignedEvent.UtcDateRecorded);
             }
