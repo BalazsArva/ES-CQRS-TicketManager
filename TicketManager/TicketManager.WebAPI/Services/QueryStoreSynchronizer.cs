@@ -97,12 +97,25 @@ namespace TicketManager.WebAPI.Services
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
 
+                var updates = new PropertyUpdateBatch<Ticket>()
+                    .Add(t => t.Assignment.AssignedBy, ticketAssignedEvent.CausedBy)
+                    .Add(t => t.Assignment.AssignedTo, ticketAssignedEvent.AssignedTo)
+                    .CreateBatch();
+
+                /*
                 await documentStore.PatchToNewer<Ticket>(
                     ticketDocumentId,
                     t => t.Assignment.UtcDateUpdated,
                     ticketAssignedEvent.UtcDateRecorded,
                     new PropertyUpdate<Ticket, string>(t => t.Assignment.AssignedBy, ticketAssignedEvent.CausedBy),
                     new PropertyUpdate<Ticket, string>(t => t.Assignment.AssignedTo, ticketAssignedEvent.AssignedTo));
+                */
+
+                await documentStore.PatchToNewer<Ticket>(
+                    ticketDocumentId,
+                    t => t.Assignment.UtcDateUpdated,
+                    ticketAssignedEvent.UtcDateRecorded,
+                    updates);
 
                 //await PatchAssignmentToNewer(documentStore, ticketDocumentId, ticketAssignedEvent.CausedBy, ticketAssignedEvent.AssignedTo, ticketAssignedEvent.UtcDateRecorded);
             }

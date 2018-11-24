@@ -77,33 +77,4 @@ namespace TicketManager.DataAccess.Documents.Extensions
             await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
         }
     }
-
-    public abstract class PropertyUpdate
-    {
-        protected PropertyUpdate(object newValue)
-        {
-            NewValue = newValue;
-        }
-
-        public object NewValue { get; }
-
-        public abstract string ToJavaScriptPropertyExpression();
-    }
-
-    public class PropertyUpdate<TObject, TProperty> : PropertyUpdate
-    {
-        private readonly List<string> memberList;
-
-        public PropertyUpdate(Expression<Func<TObject, TProperty>> memberSelector, TProperty newValue)
-            : base(newValue)
-        {
-            memberList = ExpressionHelper.GetMemberList(memberSelector);
-        }
-
-        public override string ToJavaScriptPropertyExpression()
-        {
-            // TODO: Check that the memberlist has at least 1 element.
-            return "this." + string.Join(".", memberList);
-        }
-    }
 }
