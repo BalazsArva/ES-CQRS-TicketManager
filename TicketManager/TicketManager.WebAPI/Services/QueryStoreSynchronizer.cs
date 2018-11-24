@@ -65,7 +65,12 @@ namespace TicketManager.WebAPI.Services
                     Priority = ticketEditedEvent.Priority,
                     TicketType = ticketEditedEvent.TicketType,
                     TicketStatus = ticketStatusChangedEvent.TicketStatus,
-                    AssignedTo = ticketAssignedEvent.AssignedTo,
+                    Assignment = new Assignment
+                    {
+                        AssignedBy = ticketAssignedEvent.CausedBy,
+                        AssignedTo = ticketAssignedEvent.AssignedTo,
+                        UtcDateUpdated = ticketAssignedEvent.UtcDateRecorded
+                    },
                     LastUpdate = new DocumentUpdate
                     {
                         UpdatedBy = lastUpdate.CausedBy,
@@ -92,11 +97,7 @@ namespace TicketManager.WebAPI.Services
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
 
-                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.AssignedTo, ticketAssignedEvent.AssignedTo);
-
-                await session.SaveChangesAsync();
-
-                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketAssignedEvent.CausedBy, ticketAssignedEvent.UtcDateRecorded);
+                await PatchAssignmentToNewer(documentStore, ticketDocumentId, ticketAssignedEvent.CausedBy, ticketAssignedEvent.AssignedTo, ticketAssignedEvent.UtcDateRecorded);
             }
         }
 
@@ -343,20 +344,42 @@ namespace TicketManager.WebAPI.Services
                 .OrderByDescending(evt => evt.UtcDateUpdated).FirstAsync();
         }
 
-        private async Task PatchLastUpdateToNewer(IDocumentStore store, string id, string updater, DateTime dateUpdated)
+        private async Task PatchLastUpdateToNewer(IDocumentStore store, string id, string updater, DateTime utcDateUpdated)
         {
             const string script =
                 "this.LastUpdate = this.LastUpdate || {};" +
-                "this.LastUpdate.UtcDateUpdated = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.DateUpdated : this.LastUpdate.UtcDateUpdated;" +
-                "this.LastUpdate.UpdatedBy      = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.UpdatedBy   : this.LastUpdate.UpdatedBy;";
+                "this.LastUpdate.UpdatedBy      = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.UpdatedBy   : this.LastUpdate.UpdatedBy;" +
+                "this.LastUpdate.UtcDateUpdated = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.DateUpdated : this.LastUpdate.UtcDateUpdated;";
 
             var patchRequest = new PatchRequest
             {
                 Script = script,
                 Values =
                 {
-                    ["DateUpdated"] = dateUpdated.ToUniversalTime(),
+                    ["DateUpdated"] = utcDateUpdated,
                     ["UpdatedBy"] = updater
+                }
+            };
+
+            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
+        }
+
+        private async Task PatchAssignmentToNewer(IDocumentStore store, string id, string assigner, string assignedTo, DateTime utcDateUpdated)
+        {
+            const string script =
+                "var isOlder                    = this.Assignment.UtcDateUpdated < args.DateUpdated;" +
+                "this.Assignment.AssignedTo     = isOlder ? args.AssignedTo  : this.Assignment.AssignedTo;" +
+                "this.Assignment.UtcDateUpdated = isOlder ? args.DateUpdated : this.Assignment.UtcDateUpdated;" +
+                "this.Assignment.AssignedBy     = isOlder ? args.AssignedBy  : this.Assignment.AssignedBy;";
+
+            var patchRequest = new PatchRequest
+            {
+                Script = script,
+                Values =
+                {
+                    ["DateUpdated"] = utcDateUpdated,
+                    ["AssignedBy"] = assigner,
+                    ["AssignedTo"] = assignedTo,
                 }
             };
 

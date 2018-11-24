@@ -9,8 +9,6 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public string CreatedBy { get; set; }
 
-        public string AssignedTo { get; set; }
-
         public DateTime UtcDateCreated { get; set; }
 
         public string Title { get; set; }
@@ -28,5 +26,7 @@ namespace TicketManager.DataAccess.Documents.DataModel
         public TicketLink[] Links { get; set; } = new TicketLink[0];
 
         public DocumentUpdate LastUpdate { get; set; }
+
+        public Assignment Assignment { get; set; }
     }
 }
