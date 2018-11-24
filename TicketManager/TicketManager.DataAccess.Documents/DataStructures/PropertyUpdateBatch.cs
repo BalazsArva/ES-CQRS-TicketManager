@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace TicketManager.DataAccess.Documents.Extensions
+namespace TicketManager.DataAccess.Documents.DataStructures
 {
     public class PropertyUpdateBatch<TDocument>
     {
-        private readonly List<PropertyUpdate> propertyUpdates = new List<PropertyUpdate>();
+        private readonly List<PropertyUpdateDescriptor> propertyUpdates = new List<PropertyUpdateDescriptor>();
 
         public PropertyUpdateBatch()
         {
@@ -14,12 +14,12 @@ namespace TicketManager.DataAccess.Documents.Extensions
 
         public PropertyUpdateBatch<TDocument> Add<TProperty>(Expression<Func<TDocument, TProperty>> memberSelector, TProperty newValue)
         {
-            propertyUpdates.Add(new PropertyUpdate<TDocument, TProperty>(memberSelector, newValue));
+            propertyUpdates.Add(new PropertyUpdateDescriptor<TDocument, TProperty>(memberSelector, newValue));
 
             return this;
         }
 
-        public PropertyUpdate[] CreateBatch()
+        public PropertyUpdateDescriptor[] CreateBatch()
         {
             return propertyUpdates.ToArray();
         }

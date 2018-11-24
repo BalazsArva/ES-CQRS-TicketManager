@@ -1,8 +1,8 @@
-﻿namespace TicketManager.DataAccess.Documents.Extensions
+﻿namespace TicketManager.DataAccess.Documents.DataStructures
 {
-    public abstract class PropertyUpdate
+    public abstract class PropertyUpdateDescriptor
     {
-        protected PropertyUpdate(object newValue)
+        protected PropertyUpdateDescriptor(object newValue)
         {
             NewValue = newValue;
         }

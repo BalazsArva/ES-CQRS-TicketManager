@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Operations;
 using TicketManager.Common.Linq.Expressions;
+using TicketManager.DataAccess.Documents.DataStructures;
 
 namespace TicketManager.DataAccess.Documents.Extensions
 {
@@ -33,7 +34,12 @@ namespace TicketManager.DataAccess.Documents.Extensions
         }
         */
 
-        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate, params PropertyUpdate[] propertyUpdates)
+        public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate)
+        {
+            return PatchToNewer(store, id, timestampSelector, utcUpdateDate, propertyUpdates.CreateBatch());
+        }
+
+        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate, params PropertyUpdateDescriptor[] propertyUpdates)
         {
             // If the expression is something like doc => doc.LastUpdate.UtcDateUpdated, this returns [ "LastUpdate", "UtcDateUpdated" ], so it omits the "doc" parameter.
             var pathToTimestampProperty = ExpressionHelper.GetMemberList(timestampSelector);

@@ -6,6 +6,7 @@ using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Operations;
 using TicketManager.DataAccess.Documents.DataModel;
+using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.Domain.Common;
@@ -99,25 +100,13 @@ namespace TicketManager.WebAPI.Services
 
                 var updates = new PropertyUpdateBatch<Ticket>()
                     .Add(t => t.Assignment.AssignedBy, ticketAssignedEvent.CausedBy)
-                    .Add(t => t.Assignment.AssignedTo, ticketAssignedEvent.AssignedTo)
-                    .CreateBatch();
+                    .Add(t => t.Assignment.AssignedTo, ticketAssignedEvent.AssignedTo);
 
-                /*
-                await documentStore.PatchToNewer<Ticket>(
+                await documentStore.PatchToNewer(
                     ticketDocumentId,
+                    updates,
                     t => t.Assignment.UtcDateUpdated,
-                    ticketAssignedEvent.UtcDateRecorded,
-                    new PropertyUpdate<Ticket, string>(t => t.Assignment.AssignedBy, ticketAssignedEvent.CausedBy),
-                    new PropertyUpdate<Ticket, string>(t => t.Assignment.AssignedTo, ticketAssignedEvent.AssignedTo));
-                */
-
-                await documentStore.PatchToNewer<Ticket>(
-                    ticketDocumentId,
-                    t => t.Assignment.UtcDateUpdated,
-                    ticketAssignedEvent.UtcDateRecorded,
-                    updates);
-
-                //await PatchAssignmentToNewer(documentStore, ticketDocumentId, ticketAssignedEvent.CausedBy, ticketAssignedEvent.AssignedTo, ticketAssignedEvent.UtcDateRecorded);
+                    ticketAssignedEvent.UtcDateRecorded);
             }
         }
 

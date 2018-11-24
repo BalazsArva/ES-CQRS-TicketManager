@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using TicketManager.Common.Linq.Expressions;
 
-namespace TicketManager.DataAccess.Documents.Extensions
+namespace TicketManager.DataAccess.Documents.DataStructures
 {
-    public class PropertyUpdate<TObject, TProperty> : PropertyUpdate
+    public class PropertyUpdateDescriptor<TObject, TProperty> : PropertyUpdateDescriptor
     {
         private readonly List<string> memberList;
 
-        public PropertyUpdate(Expression<Func<TObject, TProperty>> memberSelector, TProperty newValue)
+        public PropertyUpdateDescriptor(Expression<Func<TObject, TProperty>> memberSelector, TProperty newValue)
             : base(newValue)
         {
             memberList = ExpressionHelper.GetMemberList(memberSelector);
