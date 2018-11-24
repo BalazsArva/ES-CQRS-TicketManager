@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using TicketManager.WebAPI.DTOs.Commands;
 
-namespace TicketManager.WebAPI.Validation
+namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public class PostCommentToTicketCommandValidator : AbstractValidator<PostCommentToTicketCommand>
     {

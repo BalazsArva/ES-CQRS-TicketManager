@@ -2,7 +2,7 @@
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 
-namespace TicketManager.WebAPI.Validation
+namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public class EditTicketDetailsCommandValidator : AbstractValidator<EditTicketDetailsCommand>
     {

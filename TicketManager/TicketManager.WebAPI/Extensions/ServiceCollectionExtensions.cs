@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Events;
-using TicketManager.WebAPI.Validation;
+using TicketManager.WebAPI.Validation.CommandValidators;
 
 namespace TicketManager.WebAPI.Extensions
 {
