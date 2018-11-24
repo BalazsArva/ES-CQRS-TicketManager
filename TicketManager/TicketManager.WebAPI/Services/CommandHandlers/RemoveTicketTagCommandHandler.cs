@@ -9,24 +9,24 @@ using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Validation;
 
-namespace TicketManager.WebAPI.Services
+namespace TicketManager.WebAPI.Services.CommandHandlers
 {
-    public class AddTicketTagCommandHandler : IRequestHandler<AddTicketTagCommand>
+    public class RemoveTicketTagCommandHandler : IRequestHandler<RemoveTicketTagCommand>
     {
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
-        private readonly AddTicketTagCommandValidator addTicketTagCommandValidator;
+        private readonly RemoveTicketTagCommandValidator removeTicketTagCommandValidator;
 
-        public AddTicketTagCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, AddTicketTagCommandValidator addTicketTagCommandValidator)
+        public RemoveTicketTagCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, RemoveTicketTagCommandValidator removeTicketTagCommandValidator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
-            this.addTicketTagCommandValidator = addTicketTagCommandValidator ?? throw new ArgumentNullException(nameof(addTicketTagCommandValidator));
+            this.removeTicketTagCommandValidator = removeTicketTagCommandValidator ?? throw new ArgumentNullException(nameof(removeTicketTagCommandValidator));
         }
 
-        public async Task<Unit> Handle(AddTicketTagCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(RemoveTicketTagCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await addTicketTagCommandValidator.ValidateAsync(request, cancellationToken);
+            var validationResult = await removeTicketTagCommandValidator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -39,12 +39,12 @@ namespace TicketManager.WebAPI.Services
                 {
                     CausedBy = request.User,
                     Tag = request.Tag,
-                    TagAdded = true,
+                    TagAdded = false,
                     TicketCreatedEventId = request.TicketId,
                     UtcDateRecorded = DateTime.UtcNow
                 };
 
-                // TODO: Consider whether: there should be validation that the tag is not yet assigned to the ticket, OR simply ignore and get the distinct tags on the query level.
+                // TODO: Consider whether: there should be validation that the tag is already assigned to the ticket, OR simply ignore as the query won't return it anyway.
                 context.TicketTagChangedEvents.Add(ticketTagChangedEvent);
 
                 await context.SaveChangesAsync();
@@ -52,7 +52,7 @@ namespace TicketManager.WebAPI.Services
                 ticketTagChangedEventId = ticketTagChangedEvent.Id;
             }
 
-            await mediator.Publish(new TicketTagAddedNotification(ticketTagChangedEventId));
+            await mediator.Publish(new TicketTagRemovedNotification(ticketTagChangedEventId));
 
             return Unit.Value;
         }

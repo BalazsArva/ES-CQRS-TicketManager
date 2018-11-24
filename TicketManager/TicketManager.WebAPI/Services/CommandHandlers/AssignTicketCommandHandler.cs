@@ -9,7 +9,7 @@ using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Validation;
 
-namespace TicketManager.WebAPI.Services
+namespace TicketManager.WebAPI.Services.CommandHandlers
 {
     public class AssignTicketCommandHandler : IRequestHandler<AssignTicketCommand>
     {
