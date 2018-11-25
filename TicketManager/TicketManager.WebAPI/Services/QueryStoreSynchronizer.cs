@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Operations;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
@@ -343,26 +342,6 @@ namespace TicketManager.WebAPI.Services
                     await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, lastChange.UtcDateRecorded);
                 }
             }
-        }
-
-        private async Task PatchLastUpdateToNewer(IDocumentStore store, string id, string updater, DateTime utcDateUpdated)
-        {
-            const string script =
-                "this.LastUpdate = this.LastUpdate || {};" +
-                "this.LastUpdate.UpdatedBy      = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.UpdatedBy   : this.LastUpdate.UpdatedBy;" +
-                "this.LastUpdate.UtcDateUpdated = (!this.LastUpdate.UtcDateUpdated || this.LastUpdate.UtcDateUpdated < args.DateUpdated) ? args.DateUpdated : this.LastUpdate.UtcDateUpdated;";
-
-            var patchRequest = new PatchRequest
-            {
-                Script = script,
-                Values =
-                {
-                    ["DateUpdated"] = utcDateUpdated,
-                    ["UpdatedBy"] = updater
-                }
-            };
-
-            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
         }
     }
 }
