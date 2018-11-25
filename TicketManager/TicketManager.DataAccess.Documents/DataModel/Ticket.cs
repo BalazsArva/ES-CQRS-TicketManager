@@ -12,7 +12,7 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public Tags Tags { get; set; } = new Tags();
 
-        public TicketLink[] Links { get; set; } = Array.Empty<TicketLink>();
+        public Links Links { get; set; } = new Links();
 
         public DocumentUpdate LastUpdate { get; set; }
 

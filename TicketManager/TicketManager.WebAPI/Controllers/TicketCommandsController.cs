@@ -29,7 +29,16 @@ namespace TicketManager.WebAPI.Controllers
                 Title = "Test"
             });
 
-            id = 26023;
+            var id2 = await mediator.Send(new CreateTicketCommand
+            {
+                Creator = "Balazs2",
+                Description = "Test2",
+                Priority = Domain.Common.Priority.Lowest,
+                TicketType = Domain.Common.TicketType.Task,
+                Title = "Test2"
+            });
+
+            //id = 26023;
 
             await mediator.Send(new AssignTicketCommand
             {
@@ -80,6 +89,30 @@ namespace TicketManager.WebAPI.Controllers
             {
                 Tag = "QA",
                 TicketId = id,
+                User = "Balazs"
+            });
+
+            await mediator.Send(new AddTicketLinkCommand
+            {
+                LinkType = Domain.Common.LinkType.RelatedTo,
+                SourceTicketId = id,
+                TargetTicketId = id2,
+                User = "Balazs"
+            });
+
+            await mediator.Send(new AddTicketLinkCommand
+            {
+                LinkType = Domain.Common.LinkType.RelatedTo,
+                SourceTicketId = id,
+                TargetTicketId = id2,
+                User = "Balazs"
+            });
+
+            await mediator.Send(new AddTicketLinkCommand
+            {
+                LinkType = Domain.Common.LinkType.PartOf,
+                SourceTicketId = id,
+                TargetTicketId = id2,
                 User = "Balazs"
             });
 

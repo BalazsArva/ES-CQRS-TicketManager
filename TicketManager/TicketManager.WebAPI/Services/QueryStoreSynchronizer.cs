@@ -94,6 +94,13 @@ namespace TicketManager.WebAPI.Services
                     {
                         ChangedBy = ticketCreatedEvent.CausedBy,
                         UtcDateUpdated = ticketCreatedEvent.UtcDateRecorded
+                    },
+
+                    // TODO: Query the links as well, maybe there will be a way to create a ticket with the links already set.
+                    Links =
+                    {
+                        ChangedBy = ticketCreatedEvent.CausedBy,
+                        UtcDateUpdated = ticketCreatedEvent.UtcDateRecorded
                     }
                 };
 
@@ -162,59 +169,12 @@ namespace TicketManager.WebAPI.Services
 
         public async Task Handle(TicketLinkAddedNotification notification, CancellationToken cancellationToken)
         {
-            using (var context = eventsContextFactory.CreateContext())
-            using (var session = documentStore.OpenAsyncSession())
-            {
-                var ticketLinkChangedEvent = await context.TicketLinkChangedEvents.FindAsync(notification.TicketLinkChangedEventId);
-
-                var sourceTicketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.SourceTicketCreatedEventId.ToString());
-                var targetTicketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.TargetTicketCreatedEventId.ToString());
-
-                // Remove possibly existing ones with same target and type
-                session.Advanced.Patch<Ticket, TicketLink>(
-                    sourceTicketDocumentId,
-                    t => t.Links,
-                    links => links.RemoveAll(t => t.TargetTicketId == targetTicketDocumentId && t.LinkType == ticketLinkChangedEvent.LinkType));
-
-                session.Advanced.Patch<Ticket, TicketLink>(
-                    sourceTicketDocumentId,
-                    t => t.Links,
-                    links => links.Add(new TicketLink
-                    {
-                        LinkType = ticketLinkChangedEvent.LinkType,
-                        TargetTicketId = targetTicketDocumentId
-                    }));
-
-                await session.SaveChangesAsync();
-
-                // The change affects the last update of both ends of the link
-                await PatchLastUpdateToNewer(documentStore, sourceTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
-                await PatchLastUpdateToNewer(documentStore, targetTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
-            }
+            await SyncLinks(notification.TicketLinkChangedEventId);
         }
 
         public async Task Handle(TicketLinkRemovedNotification notification, CancellationToken cancellationToken)
         {
-            using (var context = eventsContextFactory.CreateContext())
-            using (var session = documentStore.OpenAsyncSession())
-            {
-                var ticketLinkChangedEvent = await context.TicketLinkChangedEvents.FindAsync(notification.TicketLinkChangedEventId);
-
-                var sourceTicketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.SourceTicketCreatedEventId.ToString());
-                var targetTicketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.TargetTicketCreatedEventId.ToString());
-
-                // Remove possibly existing ones with same target and type
-                session.Advanced.Patch<Ticket, TicketLink>(
-                    sourceTicketDocumentId,
-                    t => t.Links,
-                    links => links.RemoveAll(t => t.TargetTicketId == targetTicketDocumentId && t.LinkType == ticketLinkChangedEvent.LinkType));
-
-                await session.SaveChangesAsync();
-
-                // The change affects the last update of both ends of the link
-                await PatchLastUpdateToNewer(documentStore, sourceTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
-                await PatchLastUpdateToNewer(documentStore, targetTicketDocumentId, ticketLinkChangedEvent.CausedBy, ticketLinkChangedEvent.UtcDateRecorded);
-            }
+            await SyncLinks(notification.TicketLinkChangedEventId);
         }
 
         public async Task Handle(TicketDetailsChangedNotification notification, CancellationToken cancellationToken)
@@ -319,16 +279,68 @@ namespace TicketManager.WebAPI.Services
                         })
                         .ToList();
 
+                    var lastChange = tagChangesSinceLastSync.Last();
                     var removedTags = tagOperations.Where(op => !op.IsAdded).Select(op => op.Tag).ToList();
                     var addedTags = tagOperations.Where(op => op.IsAdded).Select(op => op.Tag).ToList();
 
                     var newTags = ticketDocument.Tags.TagSet.Except(removedTags).Concat(addedTags).Distinct().ToArray();
 
                     var updates = new PropertyUpdateBatch<Ticket>()
-                        .Add(t => t.Tags.ChangedBy, ticketTagChangedEvent.CausedBy)
+                        .Add(t => t.Tags.ChangedBy, lastChange.CausedBy)
                         .Add(t => t.Tags.TagSet, newTags);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, tagChangesSinceLastSync.Last().UtcDateRecorded);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, lastChange.UtcDateRecorded);
+                }
+            }
+        }
+
+        private async Task SyncLinks(int linkChangedEventId)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketLinkChangedEvent = await context.TicketLinkChangedEvents.FindAsync(linkChangedEventId);
+
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketLinkChangedEvent.SourceTicketCreatedEventId.ToString());
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
+
+                var linkChangesSinceLastSync = await context
+                    .TicketLinkChangedEvents
+                    .Where(evt => evt.SourceTicketCreatedEventId == ticketLinkChangedEvent.SourceTicketCreatedEventId)
+                    .After(ticketDocument.Links.UtcDateUpdated)
+                    .ToChronologicalListAsync();
+
+                if (linkChangesSinceLastSync.Count > 0)
+                {
+                    var linkOperations = linkChangesSinceLastSync
+                        .GroupBy(
+                            lnk => new TicketLink
+                            {
+                                TargetTicketId = session.GeneratePrefixedDocumentId<Ticket>(lnk.TargetTicketCreatedEventId.ToString()),
+                                LinkType = lnk.LinkType
+                            },
+                            (key, elements) => new
+                            {
+                                Link = key,
+                                IsAdded = elements.OrderByDescending(e => e.UtcDateRecorded).First().ConnectionIsActive
+                            })
+                        .ToList();
+
+                    var lastChange = linkChangesSinceLastSync.Last();
+                    var removedLinks = linkOperations.Where(op => !op.IsAdded).Select(lnk => lnk.Link).ToList();
+                    var addedLinks = linkOperations.Where(op => op.IsAdded).Select(lnk => lnk.Link).ToList();
+
+                    var newLinks = ticketDocument.Links.LinkSet
+                        .Except(removedLinks)
+                        .Concat(addedLinks)
+                        .Distinct()
+                        .ToArray();
+
+                    var updates = new PropertyUpdateBatch<Ticket>()
+                        .Add(t => t.Links.ChangedBy, lastChange.CausedBy)
+                        .Add(t => t.Links.LinkSet, newLinks);
+
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, lastChange.UtcDateRecorded);
                 }
             }
         }
