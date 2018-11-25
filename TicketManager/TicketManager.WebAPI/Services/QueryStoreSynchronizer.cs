@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,9 +64,9 @@ namespace TicketManager.WebAPI.Services
                     UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
                     TicketStatus =
                     {
-                        ChangedBy=ticketStatusChangedEvent.CausedBy,
-                        Status=ticketStatusChangedEvent.TicketStatus,
-                        UtcDateUpdated=ticketStatusChangedEvent.UtcDateRecorded
+                        ChangedBy = ticketStatusChangedEvent.CausedBy,
+                        Status = ticketStatusChangedEvent.TicketStatus,
+                        UtcDateUpdated = ticketStatusChangedEvent.UtcDateRecorded
                     },
                     Assignment =
                     {
@@ -80,12 +81,19 @@ namespace TicketManager.WebAPI.Services
                     },
                     Details =
                     {
-                        ChangedBy=ticketEditedEvent.CausedBy,
-                        Description=ticketEditedEvent.Description,
-                        Title=ticketEditedEvent.Title,
-                        UtcDateUpdated=ticketEditedEvent.UtcDateRecorded,
+                        ChangedBy = ticketEditedEvent.CausedBy,
+                        Description = ticketEditedEvent.Description,
+                        Title = ticketEditedEvent.Title,
+                        UtcDateUpdated = ticketEditedEvent.UtcDateRecorded,
                         Priority = ticketEditedEvent.Priority,
                         TicketType = ticketEditedEvent.TicketType
+                    },
+
+                    // TODO: Query the tags as well, maybe there will be a way to create a ticket with the tags already set.
+                    Tags =
+                    {
+                        ChangedBy = ticketCreatedEvent.CausedBy,
+                        UtcDateUpdated = ticketCreatedEvent.UtcDateRecorded
                     }
                 };
 
@@ -132,8 +140,7 @@ namespace TicketManager.WebAPI.Services
 
                 var updates = new PropertyUpdateBatch<Ticket>()
                     .Add(t => t.TicketStatus.ChangedBy, ticketStatusChangedEvent.CausedBy)
-                    .Add(t => t.TicketStatus.Status, ticketStatusChangedEvent.TicketStatus)
-                    .Add(t => t.TicketStatus.UtcDateUpdated, ticketStatusChangedEvent.UtcDateRecorded);
+                    .Add(t => t.TicketStatus.Status, ticketStatusChangedEvent.TicketStatus);
 
                 await documentStore.PatchToNewer(
                     ticketDocumentId,
@@ -145,37 +152,12 @@ namespace TicketManager.WebAPI.Services
 
         public async Task Handle(TicketTagAddedNotification notification, CancellationToken cancellationToken)
         {
-            using (var context = eventsContextFactory.CreateContext())
-            using (var session = documentStore.OpenAsyncSession())
-            {
-                var ticketTagChangedEvent = await context.TicketTagChangedEvents.FindAsync(notification.TagChangedEventId);
-
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketTagChangedEvent.TicketCreatedEventId.ToString());
-
-                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Tags, tags => tags.RemoveAll(t => t == ticketTagChangedEvent.Tag));
-                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Tags, tags => tags.Add(ticketTagChangedEvent.Tag));
-
-                await session.SaveChangesAsync();
-
-                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketTagChangedEvent.CausedBy, ticketTagChangedEvent.UtcDateRecorded);
-            }
+            await SyncTags(notification.TagChangedEventId);
         }
 
         public async Task Handle(TicketTagRemovedNotification notification, CancellationToken cancellationToken)
         {
-            using (var context = eventsContextFactory.CreateContext())
-            using (var session = documentStore.OpenAsyncSession())
-            {
-                var ticketTagChangedEvent = await context.TicketTagChangedEvents.FindAsync(notification.TagChangedEventId);
-
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketTagChangedEvent.TicketCreatedEventId.ToString());
-
-                session.Advanced.Patch<Ticket, string>(ticketDocumentId, t => t.Tags, tags => tags.RemoveAll(t => t == ticketTagChangedEvent.Tag));
-
-                await session.SaveChangesAsync();
-
-                await PatchLastUpdateToNewer(documentStore, ticketDocumentId, ticketTagChangedEvent.CausedBy, ticketTagChangedEvent.UtcDateRecorded);
-            }
+            await SyncTags(notification.TagChangedEventId);
         }
 
         public async Task Handle(TicketLinkAddedNotification notification, CancellationToken cancellationToken)
@@ -311,63 +293,44 @@ namespace TicketManager.WebAPI.Services
             }
         }
 
-        private async Task<DocumentUpdate> GetLatestUpdate(EventsContext context, int ticketId)
+        private async Task SyncTags(int tagChangedEventId)
         {
-            var ticketDetailsChangedEvents = context.TicketDetailsChangedEvents
-                .OfTicket(ticketId)
-                .Select(evt => new DocumentUpdate
-                {
-                    UpdatedBy = evt.CausedBy,
-                    UtcDateUpdated = evt.UtcDateRecorded
-                });
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketTagChangedEvent = await context.TicketTagChangedEvents.FindAsync(tagChangedEventId);
 
-            var ticketStatusChangedEvents = context.TicketStatusChangedEvents
-                .OfTicket(ticketId)
-                .Select(evt => new DocumentUpdate
-                {
-                    UpdatedBy = evt.CausedBy,
-                    UtcDateUpdated = evt.UtcDateRecorded
-                });
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketTagChangedEvent.TicketCreatedEventId.ToString());
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-            var ticketAssignedEvents = context.TicketAssignedEvents
-                .OfTicket(ticketId)
-                .Select(evt => new DocumentUpdate
-                {
-                    UpdatedBy = evt.CausedBy,
-                    UtcDateUpdated = evt.UtcDateRecorded
-                });
+                var tagChangesSinceLastSync = await context
+                    .TicketTagChangedEvents
+                    .OfTicket(ticketTagChangedEvent.TicketCreatedEventId)
+                    .After(ticketDocument.Tags.UtcDateUpdated)
+                    .ToChronologicalListAsync();
 
-            var ticketTagChangedEvents = context.TicketTagChangedEvents
-                .OfTicket(ticketId)
-                .Select(evt => new DocumentUpdate
+                if (tagChangesSinceLastSync.Count > 0)
                 {
-                    UpdatedBy = evt.CausedBy,
-                    UtcDateUpdated = evt.UtcDateRecorded
-                });
+                    var tagOperations = tagChangesSinceLastSync
+                        .GroupBy(t => t.Tag, (key, elements) => new
+                        {
+                            Tag = key,
+                            IsAdded = elements.OrderByDescending(e => e.UtcDateRecorded).First().TagAdded
+                        })
+                        .ToList();
 
-            var ticketLinkChangedEvents = context.TicketLinkChangedEvents
-                .Where(evt => evt.SourceTicketCreatedEventId == ticketId || evt.TargetTicketCreatedEventId == ticketId)
-                .Select(evt => new DocumentUpdate
-                {
-                    UpdatedBy = evt.CausedBy,
-                    UtcDateUpdated = evt.UtcDateRecorded
-                });
+                    var removedTags = tagOperations.Where(op => !op.IsAdded).Select(op => op.Tag).ToList();
+                    var addedTags = tagOperations.Where(op => op.IsAdded).Select(op => op.Tag).ToList();
 
-            var ticketCommentEditedEvents = context.TicketCommentEditedEvents
-                .Where(evt => evt.TicketCommentPostedEvent.TicketCreatedEventId == ticketId)
-                .Select(evt => new DocumentUpdate
-                {
-                    UpdatedBy = evt.CausedBy,
-                    UtcDateUpdated = evt.UtcDateRecorded
-                });
+                    var newTags = ticketDocument.Tags.TagSet.Except(removedTags).Concat(addedTags).Distinct().ToArray();
 
-            return await ticketDetailsChangedEvents
-                .Concat(ticketStatusChangedEvents)
-                .Concat(ticketAssignedEvents)
-                .Concat(ticketTagChangedEvents)
-                .Concat(ticketLinkChangedEvents)
-                .Concat(ticketCommentEditedEvents)
-                .OrderByDescending(evt => evt.UtcDateUpdated).FirstAsync();
+                    var updates = new PropertyUpdateBatch<Ticket>()
+                        .Add(t => t.Tags.ChangedBy, ticketTagChangedEvent.CausedBy)
+                        .Add(t => t.Tags.TagSet, newTags);
+
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, tagChangesSinceLastSync.Last().UtcDateRecorded);
+                }
+            }
         }
 
         private async Task PatchLastUpdateToNewer(IDocumentStore store, string id, string updater, DateTime utcDateUpdated)

@@ -10,9 +10,9 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public DateTime UtcDateCreated { get; set; }
 
-        public string[] Tags { get; set; } = new string[0];
+        public Tags Tags { get; set; } = new Tags();
 
-        public TicketLink[] Links { get; set; } = new TicketLink[0];
+        public TicketLink[] Links { get; set; } = Array.Empty<TicketLink>();
 
         public DocumentUpdate LastUpdate { get; set; }
 

@@ -42,5 +42,13 @@ namespace TicketManager.WebAPI.Extensions.Linq
         {
             return events.Where(x => x.UtcDateRecorded > lastKnownEventDateTime);
         }
+
+        public static Task<List<TEvent>> ToChronologicalListAsync<TEvent>(this IQueryable<TEvent> events)
+            where TEvent : EventBase
+        {
+            return events
+                .OrderBy(evt => evt.UtcDateRecorded)
+                .ToListAsync();
+        }
     }
 }

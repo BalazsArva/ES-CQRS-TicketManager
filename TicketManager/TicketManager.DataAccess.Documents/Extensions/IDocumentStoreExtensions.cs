@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Operations;
 using TicketManager.Common.Linq.Expressions;
+using TicketManager.Common.Utils;
 using TicketManager.DataAccess.Documents.DataStructures;
 
 namespace TicketManager.DataAccess.Documents.Extensions
@@ -59,10 +61,23 @@ namespace TicketManager.DataAccess.Documents.Extensions
 
             for (var i = 0; i < propertyUpdates.Length; ++i)
             {
+                var newValue = propertyUpdates[i].NewValue;
                 var paramName = "__AUTO_Parameter" + i.ToString();
 
                 assignmentScripts.Add("\t" + propertyUpdates[i].ToJavaScriptPropertyExpression() + " = args." + paramName + ";");
-                parameters[paramName] = propertyUpdates[i].NewValue;
+
+                if (ObjectHelper.IsCollection(newValue))
+                {
+                    parameters[paramName] = new JArray(newValue);
+                }
+                else if (ObjectHelper.IsPrimitive(newValue) || ObjectHelper.IsDateTimeLike(newValue))
+                {
+                    parameters[paramName] = newValue;
+                }
+                else
+                {
+                    throw new NotSupportedException($"The patch operation could not handle the value of type '{newValue.GetType().FullName}'.");
+                }
             }
 
             assignmentScripts.Add("\t" + conditionPropertyPath + " = args.__AUTO_DateUpdated;");
