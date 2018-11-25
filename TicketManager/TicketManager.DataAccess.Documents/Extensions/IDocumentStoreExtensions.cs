@@ -13,29 +13,6 @@ namespace TicketManager.DataAccess.Documents.Extensions
 {
     public static class IDocumentStoreExtensions
     {
-        /*
-        public static async Task PatchConditionally<TDocument>(this IDocumentStore store, Expression<Func<TDocument, bool>> condition)
-        {
-            // condition example:
-            // doc => doc.LastUpdate.UtcDateUpdated
-            var conditionParameterName = condition.Parameters[0];
-            //condition.Body.
-
-            var patchRequest = new PatchRequest
-            {
-                Script = "",
-                Values =
-                {
-                    ["DateUpdated"] = utcDateUpdated,
-                    ["AssignedBy"] = assigner,
-                    ["AssignedTo"] = assignedTo,
-                }
-            };
-
-            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
-        }
-        */
-
         public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate)
         {
             return PatchToNewer(store, id, timestampSelector, utcUpdateDate, propertyUpdates.CreateBatch());
@@ -68,7 +45,7 @@ namespace TicketManager.DataAccess.Documents.Extensions
 
                 if (ObjectHelper.IsCollection(newValue))
                 {
-                    parameters[paramName] = new JArray(newValue);
+                    parameters[paramName] = JArray.FromObject(newValue);
                 }
                 else if (ObjectHelper.IsPrimitive(newValue) || ObjectHelper.IsDateTimeLike(newValue))
                 {
