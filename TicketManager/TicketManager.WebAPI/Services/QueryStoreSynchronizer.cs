@@ -339,7 +339,7 @@ namespace TicketManager.WebAPI.Services
                         .Add(t => t.Links.ChangedBy, lastChange.CausedBy)
                         .Add(t => t.Links.LinkSet, newLinks);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, lastChange.UtcDateRecorded);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.UtcDateUpdated, lastChange.UtcDateRecorded);
                 }
             }
         }
