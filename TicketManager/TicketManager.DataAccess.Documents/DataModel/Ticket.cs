@@ -14,8 +14,6 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public Links Links { get; set; } = new Links();
 
-        public DocumentUpdate LastUpdate { get; set; }
-
         public Assignment Assignment { get; set; } = new Assignment();
 
         public TicketDetails Details { get; set; } = new TicketDetails();
