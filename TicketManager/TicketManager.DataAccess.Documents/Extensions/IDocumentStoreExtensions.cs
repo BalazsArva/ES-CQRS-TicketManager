@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Operations;
 using TicketManager.Common.Linq.Expressions;
-using TicketManager.Common.Utils;
 using TicketManager.DataAccess.Documents.DataStructures;
 
 namespace TicketManager.DataAccess.Documents.Extensions
@@ -20,59 +19,81 @@ namespace TicketManager.DataAccess.Documents.Extensions
 
         public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate, params PropertyUpdateDescriptor[] propertyUpdates)
         {
-            // If the expression is something like doc => doc.LastUpdate.UtcDateUpdated, this returns [ "LastUpdate", "UtcDateUpdated" ], so it omits the "doc" parameter.
-            var pathToTimestampProperty = ExpressionHelper.GetMemberList(timestampSelector);
-            pathToTimestampProperty.Insert(0, "this");
+            const string argumentName = "__AUTO_DateUpdated";
+            const string variableName = "shouldUpdate";
 
-            var conditionPropertyPath = string.Join(".", pathToTimestampProperty);
-            var updateConditionScript = string.Concat(
-                "var shouldUpdate = ",
-                conditionPropertyPath,
-                " < args.__AUTO_DateUpdated;");
+            var timestampPropertyPath = GetTimestampPropertyPath(timestampSelector);
+            var conditionVariableScript = CreateConditionVariableScript(timestampSelector, utcUpdateDate, argumentName, variableName, timestampPropertyPath);
 
             var assignmentScripts = new List<string>(propertyUpdates.Length);
-            var parameters = new Dictionary<string, object>
+            var scriptParameters = new ScriptParameterDictionary
             {
-                ["__AUTO_DateUpdated"] = utcUpdateDate
+                [argumentName] = utcUpdateDate
             };
 
             for (var i = 0; i < propertyUpdates.Length; ++i)
             {
-                var newValue = propertyUpdates[i].NewValue;
-                var paramName = "__AUTO_Parameter" + i.ToString();
+                var propertyUpdate = propertyUpdates[i];
+                var parameterName = string.Concat("__AUTO_Parameter", i);
 
-                assignmentScripts.Add("\t" + propertyUpdates[i].ToJavaScriptPropertyExpression() + " = args." + paramName + ";");
-
-                if (ObjectHelper.IsCollection(newValue))
-                {
-                    parameters[paramName] = JArray.FromObject(newValue);
-                }
-                else if (ObjectHelper.IsPrimitive(newValue) || ObjectHelper.IsDateTimeLike(newValue))
-                {
-                    parameters[paramName] = newValue;
-                }
-                else
-                {
-                    throw new NotSupportedException($"The patch operation could not handle the value of type '{newValue.GetType().FullName}'.");
-                }
+                assignmentScripts.Add(CreateUpdateScript(propertyUpdate, scriptParameters, parameterName));
+                scriptParameters.AddParameter(parameterName, propertyUpdate.NewValue);
             }
 
-            assignmentScripts.Add("\t" + conditionPropertyPath + " = args.__AUTO_DateUpdated;");
+            assignmentScripts.Add("\t" + timestampPropertyPath + " = args.__AUTO_DateUpdated;");
 
             var script = string.Join(
                 Environment.NewLine,
-                updateConditionScript,
-                "if (shouldUpdate) {",
+                conditionVariableScript,
+                $"if ({variableName})",
+                "{",
                 string.Join(Environment.NewLine, assignmentScripts),
                 "}");
 
             var patchRequest = new PatchRequest
             {
                 Script = script,
-                Values = parameters
+                Values = scriptParameters
             };
 
             await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
+        }
+
+        private static string CreateUpdateScript(PropertyUpdateDescriptor propertyUpdateDescriptor, Dictionary<string, object> parameters, string parameterName)
+        {
+            var returnValue = new StringBuilder();
+
+            returnValue.Append("\t");
+            returnValue.Append(propertyUpdateDescriptor.ToJavaScriptPropertyExpression());
+            returnValue.Append(" = args.");
+            returnValue.Append(parameterName);
+            returnValue.Append(";");
+
+            return returnValue.ToString();
+        }
+
+        private static string CreateConditionVariableScript<TDocument>(Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate, string argumentName, string variableName, string conditionPropertyPath)
+        {
+            var returnValue = new StringBuilder();
+
+            returnValue.Append("var ");
+            returnValue.Append(variableName);
+            returnValue.Append(" = ");
+            returnValue.Append(conditionPropertyPath);
+            returnValue.Append(" < args.");
+            returnValue.Append(argumentName);
+            returnValue.Append(";");
+
+            return returnValue.ToString();
+        }
+
+        private static string GetTimestampPropertyPath<TDocument>(Expression<Func<TDocument, DateTime>> timestampSelector)
+        {
+            // If the expression is something like doc => doc.LastUpdate.UtcDateUpdated, this returns [ "LastUpdate", "UtcDateUpdated" ], so it omits the "doc" parameter.
+            var pathToTimestampProperty = ExpressionHelper.GetMemberList(timestampSelector);
+            pathToTimestampProperty.Insert(0, "this");
+
+            return string.Join(".", pathToTimestampProperty);
         }
     }
 }
