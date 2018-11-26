@@ -25,7 +25,8 @@ namespace TicketManager.DataAccess.Documents.Extensions
             var timestampPropertyPath = GetTimestampPropertyPath(timestampSelector);
             var conditionVariableScript = CreateConditionVariableScript(timestampSelector, utcUpdateDate, argumentName, variableName, timestampPropertyPath);
 
-            var assignmentScripts = new List<string>(propertyUpdates.Length);
+            // +1 for the update timestamp which does not need to be provided explicitly.
+            var assignmentScripts = new List<string>(propertyUpdates.Length + 1);
             var scriptParameters = new ScriptParameterDictionary
             {
                 [argumentName] = utcUpdateDate
