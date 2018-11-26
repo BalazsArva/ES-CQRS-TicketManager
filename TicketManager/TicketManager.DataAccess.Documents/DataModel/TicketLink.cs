@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Documents.DataModel
@@ -7,8 +9,7 @@ namespace TicketManager.DataAccess.Documents.DataModel
     {
         public string TargetTicketId { get; set; }
 
-        // TODO: This is serialized as number for some reason. Fix that.
-        [Newtonsoft.Json.JsonProperty(ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        [JsonConverter(typeof(StringEnumConverter))]
         public LinkType LinkType { get; set; }
 
         public bool Equals(TicketLink other)

@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Documents.DataModel
@@ -13,8 +15,10 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public string Description { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public Priority Priority { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public TicketType TicketType { get; set; }
     }
 }
