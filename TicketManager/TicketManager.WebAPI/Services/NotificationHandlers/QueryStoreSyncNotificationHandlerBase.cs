@@ -24,7 +24,66 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        protected async Task SyncTags(int tagChangedEventId)
+        protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, IAsyncDocumentSession session, int ticketId)
+        {
+            var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(ticketId);
+            var ticketEditedEvent = await context.TicketDetailsChangedEvents
+                .OfTicket(ticketId)
+                .LatestAsync();
+            var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
+                .OfTicket(ticketId)
+                .LatestAsync();
+            var ticketAssignedEvent = await context.TicketAssignedEvents
+                .OfTicket(ticketId)
+                .LatestAsync();
+
+            var tags = await GetUpdatedTagsAsync(context, ticketId, DateTime.MinValue, Array.Empty<string>());
+            var links = await GetUpdatedLinksAsync(context, session, ticketId, DateTime.MinValue, Array.Empty<TicketLink>());
+
+            var ticket = new Ticket
+            {
+                Id = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString()),
+                CreatedBy = ticketCreatedEvent.CausedBy,
+                UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
+                TicketStatus =
+                {
+                    ChangedBy = ticketStatusChangedEvent.CausedBy,
+                    Status = ticketStatusChangedEvent.TicketStatus,
+                    UtcDateUpdated = ticketStatusChangedEvent.UtcDateRecorded
+                },
+                Assignment =
+                {
+                    AssignedBy = ticketAssignedEvent.CausedBy,
+                    AssignedTo = ticketAssignedEvent.AssignedTo,
+                    UtcDateUpdated = ticketAssignedEvent.UtcDateRecorded
+                },
+                Details =
+                {
+                    ChangedBy = ticketEditedEvent.CausedBy,
+                    Description = ticketEditedEvent.Description,
+                    Title = ticketEditedEvent.Title,
+                    UtcDateUpdated = ticketEditedEvent.UtcDateRecorded,
+                    Priority = ticketEditedEvent.Priority,
+                    TicketType = ticketEditedEvent.TicketType
+                },
+                Tags =
+                {
+                    ChangedBy = tags.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
+                    UtcDateUpdated = tags.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
+                    TagSet = tags.Tags
+                },
+                Links =
+                {
+                    ChangedBy = links.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
+                    UtcDateUpdated = links.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
+                    LinkSet = links.Links
+                }
+            };
+
+            return ticket;
+        }
+
+        protected async Task SyncTagsAsync(int tagChangedEventId)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
@@ -35,7 +94,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedTags = await GetUpdatedTags(context, ticketCreatedEventId, ticketDocument.Tags.UtcDateUpdated, ticketDocument.Tags.TagSet);
+                var updatedTags = await GetUpdatedTagsAsync(context, ticketCreatedEventId, ticketDocument.Tags.UtcDateUpdated, ticketDocument.Tags.TagSet);
                 var lastChange = updatedTags.LastChange;
 
                 if (lastChange != null)
@@ -49,7 +108,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             }
         }
 
-        protected async Task SyncLinks(int linkChangedEventId)
+        protected async Task SyncLinksAsync(int linkChangedEventId)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
@@ -60,7 +119,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(sourceTicketCreatedEventId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedLinks = await GetUpdatedLinks(context, session, sourceTicketCreatedEventId, ticketDocument.Links.UtcDateUpdated, ticketDocument.Links.LinkSet);
+                var updatedLinks = await GetUpdatedLinksAsync(context, session, sourceTicketCreatedEventId, ticketDocument.Links.UtcDateUpdated, ticketDocument.Links.LinkSet);
                 var lastChange = updatedLinks.LastChange;
 
                 if (lastChange != null)
@@ -74,7 +133,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             }
         }
 
-        protected async Task<(string[] Tags, TicketTagChangedEvent LastChange)> GetUpdatedTags(EventsContext context, int ticketCreatedEventId, DateTime lastUpdate, string[] currentTags)
+        protected async Task<(string[] Tags, TicketTagChangedEvent LastChange)> GetUpdatedTagsAsync(EventsContext context, int ticketCreatedEventId, DateTime lastUpdate, string[] currentTags)
         {
             currentTags = currentTags ?? Array.Empty<string>();
 
@@ -109,7 +168,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return (updatedTags, tagChangesSinceLastSync.Last());
         }
 
-        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinks(EventsContext context, IAsyncDocumentSession session, int sourceTicketCreatedEventId, DateTime lastUpdate, TicketLink[] currentLinks)
+        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, IAsyncDocumentSession session, int sourceTicketCreatedEventId, DateTime lastUpdate, TicketLink[] currentLinks)
         {
             currentLinks = currentLinks ?? Array.Empty<TicketLink>();
 

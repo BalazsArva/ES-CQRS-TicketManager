@@ -18,7 +18,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
         public async Task Handle(TicketLinkAddedNotification notification, CancellationToken cancellationToken)
         {
-            await SyncLinks(notification.TicketLinkChangedEventId);
+            await SyncLinksAsync(notification.TicketLinkChangedEventId);
         }
     }
 }
