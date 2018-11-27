@@ -1,14 +1,14 @@
 ﻿using FluentValidation;
+using Raven.Client.Documents;
 using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public class AddTicketTagCommandValidator : AbstractValidator<AddTicketTagCommand>
+    public class AddTicketTagCommandValidator : TicketCommandValidatorBase<AddTicketTagCommand>
     {
-        public AddTicketTagCommandValidator()
+        public AddTicketTagCommandValidator(IDocumentStore documentStore)
+            : base(documentStore)
         {
-            // TODO: Use the query model (once it is implemented) to verify the existence of the Ticket.
-
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(AddTicketTagCommand.User)));
@@ -16,6 +16,10 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.Tag)
                 .NotEmpty()
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(AddTicketTagCommand.Tag)));
+
+            RuleFor(cmd => cmd.TicketId)
+                .MustAsync(TicketExistsAsync)
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket(nameof(AddTicketTagCommand.TicketId)));
         }
     }
 }

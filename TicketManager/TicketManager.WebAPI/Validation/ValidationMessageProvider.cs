@@ -19,5 +19,7 @@ namespace TicketManager.WebAPI.Validation
 
             return OnlyTheseValuesAreAllowed(propertyName, allowedValues);
         }
+
+        public static string MustReferenceAnExistingTicket(string propertyName) => $"'{propertyName}' must be an existent ticket.";
     }
 }
