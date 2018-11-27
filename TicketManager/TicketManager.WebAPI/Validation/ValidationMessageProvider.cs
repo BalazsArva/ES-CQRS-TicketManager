@@ -21,5 +21,7 @@ namespace TicketManager.WebAPI.Validation
         }
 
         public static string MustReferenceAnExistingTicket(string propertyName) => $"'{propertyName}' must be an existent ticket.";
+
+        public static string MustReferenceAnExistingComment(string propertyName) => $"'{propertyName}' must be an existent comment.";
     }
 }

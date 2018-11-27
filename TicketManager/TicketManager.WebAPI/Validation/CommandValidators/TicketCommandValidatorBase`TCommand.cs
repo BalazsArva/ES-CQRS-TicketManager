@@ -26,5 +26,16 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 return await session.Advanced.ExistsAsync(ticketDocumentId);
             }
         }
+
+        protected async Task<bool> CommentExistsAsync(int commentId, CancellationToken cancellationToken)
+        {
+            // TODO: Consider replacing the session with query store when implemented.
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(commentId.ToString());
+
+                return await session.Advanced.ExistsAsync(commentDocumentId);
+            }
+        }
     }
 }

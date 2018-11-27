@@ -9,8 +9,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public EditTicketCommentCommandValidator(IDocumentStore documentStore)
             : base(documentStore)
         {
-            // TODO: Use the query model (once it is implemented) to verify the existence of the comment.
-
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(EditTicketCommentCommand.User)));
@@ -18,6 +16,10 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.CommentText)
                 .NotEmpty()
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(EditTicketCommentCommand.CommentText)));
+
+            RuleFor(cmd => cmd.CommentId)
+                .MustAsync(CommentExistsAsync)
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingComment(nameof(EditTicketCommentCommand.CommentId)));
         }
     }
 }
