@@ -17,7 +17,11 @@ namespace TicketManager.DataAccess.Documents.DataStructures
 
         public override string ToJavaScriptPropertyExpression()
         {
-            // TODO: Check that the memberlist has at least 1 element.
+            if (memberList.Count == 0)
+            {
+                return "this";
+            }
+
             return "this." + string.Join(".", memberList);
         }
     }
