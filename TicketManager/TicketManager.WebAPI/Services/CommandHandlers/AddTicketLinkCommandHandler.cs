@@ -11,6 +11,7 @@ using TicketManager.WebAPI.Validation.CommandValidators;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
+    // TODO: Support adding/removing multiple tags at once
     public class AddTicketLinkCommandHandler : IRequestHandler<AddTicketLinkCommand>
     {
         private readonly IMediator mediator;
