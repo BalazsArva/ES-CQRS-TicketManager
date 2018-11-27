@@ -116,6 +116,20 @@ namespace TicketManager.WebAPI.Controllers
                 User = "Balazs"
             });
 
+            await mediator.Send(new UpdateTicketCommand
+            {
+                AssignedTo = null,
+                Description = null,
+                Links = new UpdateTicketCommand.TicketLink[0],
+                Tags = new string[0],
+                Priority = Domain.Common.Priority.Medium,
+                TicketId = id,
+                TicketStatus = Domain.Common.TicketStatus.Blocked,
+                TicketType = Domain.Common.TicketType.Bug,
+                Title = "Batch updated ticket",
+                User = "Anonymous"
+            });
+
             return Ok();
         }
     }

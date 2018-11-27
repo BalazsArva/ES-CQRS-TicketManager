@@ -7,14 +7,14 @@ using TicketManager.WebAPI.DTOs.Notifications;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
-    public class TicketCreatedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketCreatedNotification>
+    public class TicketUpdatedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketUpdatedNotification>
     {
-        public TicketCreatedNotificationHandler(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
+        public TicketUpdatedNotificationHandler(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
             : base(eventsContextFactory, documentStore)
         {
         }
 
-        public async Task Handle(TicketCreatedNotification notification, CancellationToken cancellationToken)
+        public async Task Handle(TicketUpdatedNotification notification, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())

@@ -19,5 +19,16 @@ namespace TicketManager.DataAccess.Documents.Extensions
 
             return string.Concat(collectionName, separator, customIdValue);
         }
+
+        public static string TrimIdPrefix<TDocument>(this IAsyncDocumentSession documentSession, string documentId)
+        {
+            var separator = documentSession.Advanced.DocumentStore.Conventions.IdentityPartsSeparator;
+            var collectionName = documentSession.Advanced.DocumentStore.Conventions.GetCollectionName(typeof(TDocument));
+
+            var prefix = collectionName + separator;
+            var trimmedDocumentId = documentId.Substring(prefix.Length);
+
+            return trimmedDocumentId;
+        }
     }
 }
