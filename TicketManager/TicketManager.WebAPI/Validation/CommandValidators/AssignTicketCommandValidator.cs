@@ -11,11 +11,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         {
             RuleFor(cmd => cmd.Assigner)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(AssignTicketCommand.Assigner)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
 
             RuleFor(cmd => cmd.TicketId)
                 .MustAsync(TicketExistsAsync)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket(nameof(AssignTicketCommand.TicketId)));
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
         }
     }
 }

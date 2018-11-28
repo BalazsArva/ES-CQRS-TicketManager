@@ -12,11 +12,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(RemoveTicketLinkCommand.User)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
 
             RuleFor(cmd => cmd.LinkType)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<LinkType>(nameof(RemoveTicketLinkCommand.LinkType)));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<LinkType>("link type"));
         }
     }
 }

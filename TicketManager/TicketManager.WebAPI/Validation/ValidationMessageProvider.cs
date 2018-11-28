@@ -4,24 +4,24 @@ namespace TicketManager.WebAPI.Validation
 {
     public static class ValidationMessageProvider
     {
-        public static string CannotBeNull(string propertyName) => $"'{propertyName}' cannot be null.";
+        public static string CannotBeNull(string propertyDisplayName) => $"The {propertyDisplayName} cannot be null.";
 
-        public static string CannotBeNullOrEmpty(string propertyName) => $"'{propertyName}' cannot be null or empty.";
+        public static string CannotBeNullOrEmpty(string propertyDisplayName) => $"The {propertyDisplayName} cannot be null or empty.";
 
-        public static string CannotBeNullOrEmptyOrWhitespace(string propertyName) => $"'{propertyName}' cannot be null, empty or whitespace-only.";
+        public static string CannotBeNullOrEmptyOrWhitespace(string propertyDisplayName) => $"The {propertyDisplayName} cannot be null, empty or whitespace-only.";
 
-        public static string OnlyTheseValuesAreAllowed<TValue>(string propertyName, params TValue[] allowedValues) =>
-            $"Only the following values are accepted for '{propertyName}': {string.Join(", ", allowedValues)}";
+        public static string OnlyTheseValuesAreAllowed<TValue>(string propertyDisplayName, params TValue[] allowedValues) =>
+            $"Only the following values are accepted for {propertyDisplayName}: {string.Join(", ", allowedValues)}";
 
-        public static string OnlyEnumValuesAreAllowed<TEnum>(string propertyName) where TEnum : Enum
+        public static string OnlyEnumValuesAreAllowed<TEnum>(string propertyDisplayName) where TEnum : Enum
         {
             var allowedValues = Enum.GetNames(typeof(TEnum));
 
-            return OnlyTheseValuesAreAllowed(propertyName, allowedValues);
+            return OnlyTheseValuesAreAllowed(propertyDisplayName, allowedValues);
         }
 
-        public static string MustReferenceAnExistingTicket(string propertyName) => $"'{propertyName}' must be an existent ticket.";
+        public static string MustReferenceAnExistingTicket(string propertyDisplayName) => $"The {propertyDisplayName} must be an existing ticket.";
 
-        public static string MustReferenceAnExistingComment(string propertyName) => $"'{propertyName}' must be an existent comment.";
+        public static string MustReferenceAnExistingComment(string propertyDisplayName) => $"The {propertyDisplayName} must be an existing comment.";
     }
 }

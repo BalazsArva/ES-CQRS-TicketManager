@@ -11,11 +11,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(RemoveTicketTagCommand.User)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
 
             RuleFor(cmd => cmd.Tag)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(RemoveTicketTagCommand.Tag)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("tag"));
         }
     }
 }

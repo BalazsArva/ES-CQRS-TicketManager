@@ -12,19 +12,19 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         {
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(AddTicketLinkCommand.User)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
 
             RuleFor(cmd => cmd.LinkType)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<LinkType>(nameof(AddTicketLinkCommand.LinkType)));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<LinkType>("link type"));
 
             RuleFor(cmd => cmd.SourceTicketId)
                 .MustAsync(TicketExistsAsync)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket(nameof(AddTicketLinkCommand.SourceTicketId)));
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("source ticket"));
 
             RuleFor(cmd => cmd.TargetTicketId)
                 .MustAsync(TicketExistsAsync)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket(nameof(AddTicketLinkCommand.TargetTicketId)));
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("target ticket"));
         }
     }
 }

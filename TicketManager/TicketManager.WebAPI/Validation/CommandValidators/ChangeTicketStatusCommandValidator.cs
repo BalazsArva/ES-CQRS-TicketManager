@@ -12,15 +12,15 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         {
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(ChangeTicketStatusCommand.User)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
 
             RuleFor(cmd => cmd.NewStatus)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>(nameof(ChangeTicketStatusCommand.NewStatus)));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>("new status"));
 
             RuleFor(cmd => cmd.TicketId)
                 .MustAsync(TicketExistsAsync)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket(nameof(ChangeTicketStatusCommand.TicketId)));
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
         }
     }
 }

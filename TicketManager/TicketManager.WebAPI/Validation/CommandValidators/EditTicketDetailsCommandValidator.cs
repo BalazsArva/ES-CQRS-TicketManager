@@ -12,23 +12,23 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         {
             RuleFor(cmd => cmd.Editor)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(EditTicketDetailsCommand.Editor)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("editor"));
 
             RuleFor(cmd => cmd.Title)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(EditTicketDetailsCommand.Title)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("title"));
 
             RuleFor(cmd => cmd.Priority)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>(nameof(EditTicketDetailsCommand.Priority)));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>("priority"));
 
             RuleFor(cmd => cmd.TicketType)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>(nameof(EditTicketDetailsCommand.TicketType)));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket type"));
 
             RuleFor(cmd => cmd.TicketId)
                 .MustAsync(TicketExistsAsync)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket(nameof(EditTicketDetailsCommand.TicketId)));
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
         }
     }
 }

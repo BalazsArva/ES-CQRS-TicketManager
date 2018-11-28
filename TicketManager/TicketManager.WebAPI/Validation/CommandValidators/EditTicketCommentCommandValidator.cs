@@ -11,15 +11,15 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         {
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(EditTicketCommentCommand.User)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("editor"));
 
             RuleFor(cmd => cmd.CommentText)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(EditTicketCommentCommand.CommentText)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("comment text"));
 
             RuleFor(cmd => cmd.CommentId)
                 .MustAsync(CommentExistsAsync)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingComment(nameof(EditTicketCommentCommand.CommentId)));
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingComment("modified comment"));
         }
     }
 }
