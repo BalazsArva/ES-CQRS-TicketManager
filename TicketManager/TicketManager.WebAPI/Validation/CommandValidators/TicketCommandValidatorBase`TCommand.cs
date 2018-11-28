@@ -18,6 +18,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         protected async Task<bool> TicketExistsAsync(int ticketId, CancellationToken cancellationToken)
         {
+            if (ticketId == 0)
+            {
+                return false;
+            }
+
             // TODO: Consider replacing the session with query store when implemented.
             using (var session = documentStore.OpenAsyncSession())
             {

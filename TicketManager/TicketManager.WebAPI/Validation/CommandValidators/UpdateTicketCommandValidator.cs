@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
+using FluentValidation.Results;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Events;
 using TicketManager.Domain.Common;
@@ -9,20 +11,20 @@ using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public class UpdateTicketCommandValidator : AbstractValidator<UpdateTicketCommand>
+    public class UpdateTicketCommandValidator : TicketCommandValidatorBase<UpdateTicketCommand>
     {
+        private const string FoundTicketIdsContextDataKey = "FoundTicketIds";
+
         private readonly IEventsContextFactory eventsContextFactory;
 
-        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory)
+        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
+            : base(documentStore)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new System.ArgumentNullException(nameof(eventsContextFactory));
 
-            // TODO: Validate that the ticket exists
-            /*
             RuleFor(cmd => cmd.TicketId)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(UpdateTicketCommand.TicketId)));
-            */
+                .MustAsync(TicketExistsAsync)
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
 
             RuleFor(cmd => cmd.Title)
                 .NotEmpty()
@@ -50,35 +52,43 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .Must((command, links) => !links.Any(link => link.TargetTicketId == command.TicketId))
                 .WithMessage("A ticket link cannot be established to the same ticket.");
 
-            RuleFor(cmd => cmd.Links)
-                .MustAsync(AllTicketsExist)
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(UpdateTicketCommand.Links)));
+            // TODO: Try this out
+            RuleForEach(cmd => cmd.Links)
+                .Must((command, link, context) =>
+                {
+                    var foundTicketIds = context.ParentContext.RootContextData[FoundTicketIdsContextDataKey] as ISet<int>;
 
-            // TODO: Implement a per-tag feedback.
-            RuleFor(cmd => cmd.Tags)
-                .Must(tags => tags.All(tag => !string.IsNullOrWhiteSpace(tag)))
-                .WithMessage("A tag cannot be empty or whitespace-only.");
+                    return foundTicketIds.Contains(link.TargetTicketId);
+                })
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("target ticket"));
+
+            RuleForEach(cmd => cmd.Tags)
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
         }
 
-        private async Task<bool> AllTicketsExist(UpdateTicketCommand.TicketLink[] links, CancellationToken cancellationToken)
+        public override async Task<ValidationResult> ValidateAsync(ValidationContext<UpdateTicketCommand> context, CancellationToken cancellation = default)
         {
-            var targetTicketIds = links.Select(link => link.TargetTicketId).ToList();
+            var targetTicketIds = context.InstanceToValidate.Links.Select(link => link.TargetTicketId).ToList();
 
             if (targetTicketIds.Count == 0)
             {
-                return true;
-            }
+                using (var dbcontext = eventsContextFactory.CreateContext())
+                {
+                    var foundIds = await dbcontext
+                        .TicketCreatedEvents.Where(evt => targetTicketIds.Contains(evt.Id))
+                        .Select(evt => evt.Id)
+                        .ToListAsync();
 
-            using (var context = eventsContextFactory.CreateContext())
+                    context.RootContextData[FoundTicketIdsContextDataKey] = new HashSet<int>(foundIds);
+                }
+            }
+            else
             {
-                var foundIds = await context
-                    .TicketCreatedEvents.Where(evt => targetTicketIds.Contains(evt.Id))
-                    .Select(evt => evt.Id)
-                    .ToListAsync();
-
-                // TODO: Provide which were not found.
-                return foundIds.Count == targetTicketIds.Count;
+                context.RootContextData[FoundTicketIdsContextDataKey] = new HashSet<int>();
             }
+
+            return await base.ValidateAsync(context, cancellation);
         }
     }
 }
