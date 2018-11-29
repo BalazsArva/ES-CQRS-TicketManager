@@ -19,7 +19,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("comment text"));
 
             RuleFor(cmd => cmd.CommentId)
-                .Must(CommentExists)
+                .Must(BeAnExistingComment)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingComment("modified comment"));
         }
 

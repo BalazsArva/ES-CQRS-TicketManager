@@ -27,7 +27,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             return await base.ValidateAsync(context, cancellationToken);
         }
 
-        protected bool TicketExists(TCommand command, int ticketId, PropertyValidatorContext context)
+        protected bool BeAnExistingTicket(TCommand command, int ticketId, PropertyValidatorContext context)
         {
             if (context.ParentContext.RootContextData[ValidationContextKeys.FoundTicketIdsContextDataKey] is ISet<int> foundTicketIds)
             {

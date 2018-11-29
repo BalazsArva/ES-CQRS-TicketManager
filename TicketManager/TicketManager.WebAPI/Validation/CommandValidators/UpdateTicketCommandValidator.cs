@@ -13,7 +13,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.TicketId)
-                .Must(TicketExists)
+                .Must(BeAnExistingTicket)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
 
             RuleFor(cmd => cmd.Title)

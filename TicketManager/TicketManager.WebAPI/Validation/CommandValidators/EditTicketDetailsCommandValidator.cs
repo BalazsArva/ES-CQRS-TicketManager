@@ -28,7 +28,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket type"));
 
             RuleFor(cmd => cmd.TicketId)
-                .Must(TicketExists)
+                .Must(BeAnExistingTicket)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
         }
 

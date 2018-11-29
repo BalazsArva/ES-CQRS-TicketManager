@@ -19,7 +19,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("tag"));
 
             RuleFor(cmd => cmd.TicketId)
-                .Must(TicketExists)
+                .Must(BeAnExistingTicket)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
         }
 

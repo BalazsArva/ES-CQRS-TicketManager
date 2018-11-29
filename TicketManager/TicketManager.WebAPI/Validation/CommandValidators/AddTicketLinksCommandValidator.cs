@@ -16,12 +16,12 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
 
             RuleFor(cmd => cmd.SourceTicketId)
-                .Must(TicketExists)
+                .Must(BeAnExistingTicket)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("source ticket"));
 
             RuleForEach(cmd => cmd.Links)
                .Must((command, link) => link.TargetTicketId != command.SourceTicketId)
-               .WithMessage("A ticket link cannot be established to the same ticket.");
+               .WithMessage("A ticket link cannot be linked to itself.");
 
             RuleForEach(cmd => cmd.Links)
                 .SetValidator(ticketLinkValidator);
