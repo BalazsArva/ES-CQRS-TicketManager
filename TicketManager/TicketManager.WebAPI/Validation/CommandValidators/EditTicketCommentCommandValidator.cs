@@ -23,12 +23,9 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingComment("modified comment"));
         }
 
-        protected override ISet<int> ExtractReferencedCommentIds(ValidationContext<EditTicketCommentCommand> context)
+        protected override ISet<int> ExtractReferencedCommentIds(EditTicketCommentCommand command)
         {
-            return new HashSet<int>
-            {
-                context.InstanceToValidate.CommentId
-            };
+            return new HashSet<int> { command.CommentId };
         }
     }
 }

@@ -27,10 +27,8 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .SetValidator(ticketLinkValidator);
         }
 
-        protected override ISet<int> ExtractReferencedTicketIds(ValidationContext<AddTicketLinksCommand> context)
+        protected override ISet<int> ExtractReferencedTicketIds(AddTicketLinksCommand command)
         {
-            var command = context.InstanceToValidate;
-
             return command.Links.Select(link => link.TargetTicketId).Concat(new[] { command.SourceTicketId }).ToHashSet();
         }
     }

@@ -23,11 +23,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
         }
 
-        protected override ISet<int> ExtractReferencedTicketIds(ValidationContext<AddTicketTagCommand> context)
+        protected override ISet<int> ExtractReferencedTicketIds(AddTicketTagCommand command)
         {
             return new HashSet<int>
             {
-                context.InstanceToValidate.TicketId
+                command.TicketId
             };
         }
     }

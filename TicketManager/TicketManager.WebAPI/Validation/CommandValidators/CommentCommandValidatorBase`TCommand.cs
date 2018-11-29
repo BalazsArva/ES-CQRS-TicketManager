@@ -22,7 +22,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         public override async Task<ValidationResult> ValidateAsync(ValidationContext<TCommand> context, CancellationToken cancellationToken = default)
         {
-            context.RootContextData[ValidationContextKeys.FoundCommentIdsContextDataKey] = await FindExistingReferencedCommentIdsAsync(context, cancellationToken);
+            context.RootContextData[ValidationContextKeys.FoundCommentIdsContextDataKey] = await FindExistingReferencedCommentIdsAsync(context.InstanceToValidate, cancellationToken);
 
             return await base.ValidateAsync(context, cancellationToken);
         }
@@ -42,8 +42,8 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         /// Asynchronously returns a set which contains all comment Ids which can be found in any appropriate property of
         /// the validated object and which are verified to exist.
         /// </summary>
-        /// <param name="context">
-        /// The validation context.
+        /// <param name="command">
+        /// The command to find the existing comment Ids for.
         /// </param>
         /// <param name="cancellationToken">
         /// A cancellation token used to cancel the asynchronous operation.
@@ -51,13 +51,13 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         /// <returns>
         /// A set which contains all comment ids which are referenced in any property of the validated object and verified to exist.
         /// </returns>
-        protected virtual async Task<ISet<int>> FindExistingReferencedCommentIdsAsync(ValidationContext<TCommand> context, CancellationToken cancellationToken = default)
+        protected virtual async Task<ISet<int>> FindExistingReferencedCommentIdsAsync(TCommand command, CancellationToken cancellationToken = default)
         {
-            var requiredCommentIds = ExtractReferencedCommentIds(context);
+            var requiredCommentIds = ExtractReferencedCommentIds(command);
 
-            using (var dbcontext = eventsContextFactory.CreateContext())
+            using (var context = eventsContextFactory.CreateContext())
             {
-                return await dbcontext
+                return await context
                     .TicketCommentPostedEvents
                     .Where(evt => requiredCommentIds.Contains(evt.Id))
                     .Select(evt => evt.Id)
@@ -72,12 +72,12 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         /// item/property which concerns a comment. The existence check can later be performed by retrieving the result of
         /// this method which is stored in the <see cref="ValidationContext.RootContextData"/> with the key <see cref="ValidationContextKeys.FoundTicketIdsContextDataKey"/>.
         /// </summary>
-        /// <param name="context">
-        /// The validation context.
+        /// <param name="command">
+        /// The command to extract referenced comment Ids from.
         /// </param>
         /// <returns>
         /// A set which contains all comment ids which are referenced in any property of the validated object.
         /// </returns>
-        protected abstract ISet<int> ExtractReferencedCommentIds(ValidationContext<TCommand> context);
+        protected abstract ISet<int> ExtractReferencedCommentIds(TCommand command);
     }
 }
