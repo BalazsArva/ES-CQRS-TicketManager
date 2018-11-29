@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
-using Raven.Client.Documents;
+using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Events;
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
@@ -17,7 +17,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         private readonly IEventsContextFactory eventsContextFactory;
 
-        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
+        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
             : base(documentStore)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new System.ArgumentNullException(nameof(eventsContextFactory));
@@ -52,7 +52,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .Must((command, links) => !links.Any(link => link.TargetTicketId == command.TicketId))
                 .WithMessage("A ticket link cannot be established to the same ticket.");
 
-            // TODO: Try this out
             RuleForEach(cmd => cmd.Links)
                 .Must((command, link, context) =>
                 {
@@ -70,8 +69,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public override async Task<ValidationResult> ValidateAsync(ValidationContext<UpdateTicketCommand> context, CancellationToken cancellation = default)
         {
             var targetTicketIds = context.InstanceToValidate.Links.Select(link => link.TargetTicketId).ToList();
-
-            if (targetTicketIds.Count == 0)
+            if (targetTicketIds.Count > 0)
             {
                 using (var dbcontext = eventsContextFactory.CreateContext())
                 {
