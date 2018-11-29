@@ -4,8 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Events;
+using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 
@@ -73,12 +73,10 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             {
                 using (var dbcontext = eventsContextFactory.CreateContext())
                 {
-                    var foundIds = await dbcontext
+                    context.RootContextData[FoundTicketIdsContextDataKey] = await dbcontext
                         .TicketCreatedEvents.Where(evt => targetTicketIds.Contains(evt.Id))
                         .Select(evt => evt.Id)
-                        .ToListAsync();
-
-                    context.RootContextData[FoundTicketIdsContextDataKey] = new HashSet<int>(foundIds);
+                        .ToSetAsync();
                 }
             }
             else
