@@ -52,7 +52,7 @@ namespace TicketManager.WebAPI.Extensions
                 .AddTransient<EditTicketCommentCommandValidator>()
                 .AddTransient<EditTicketDetailsCommandValidator>()
                 .AddTransient<PostCommentToTicketCommandValidator>()
-                .AddTransient<RemoveTicketLinkCommandValidator>()
+                .AddTransient<RemoveTicketLinksCommandValidator>()
                 .AddTransient<RemoveTicketTagCommandValidator>()
                 .AddTransient<UpdateTicketCommandValidator>()
                 .AddTransient<TicketLinkValidator>();
