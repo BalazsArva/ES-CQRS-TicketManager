@@ -12,8 +12,8 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.User)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleFor(cmd => cmd.NewStatus)
                 .IsInEnum()
@@ -26,10 +26,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         protected override ISet<int> ExtractReferencedTicketIds(ChangeTicketStatusCommand command)
         {
-            return new HashSet<int>
-            {
-                command.TicketId
-            };
+            return new HashSet<int> { command.TicketId };
         }
     }
 }

@@ -17,28 +17,28 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
 
             RuleFor(cmd => cmd.Title)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(UpdateTicketCommand.Title)));
+                .Must(title => !string.IsNullOrWhiteSpace(title))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
 
             RuleFor(cmd => cmd.Priority)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>(nameof(UpdateTicketCommand.Priority)));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>("priority"));
 
             RuleFor(cmd => cmd.TicketType)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>(nameof(UpdateTicketCommand.TicketType)));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket type"));
 
             RuleFor(cmd => cmd.TicketStatus)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(UpdateTicketCommand.TicketStatus)));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatus>("ticket status"));
 
             RuleFor(cmd => cmd.User)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
+                .Must(user => !string.IsNullOrWhiteSpace(user))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleForEach(cmd => cmd.Links)
                 .Must((command, link) => link.TargetTicketId != command.TicketId)
-                .WithMessage("A ticket link cannot be established to the same ticket.");
+                .WithMessage("A ticket cannot be linked to itself.");
 
             RuleForEach(cmd => cmd.Links)
                 .SetValidator(ticketLinkValidator);

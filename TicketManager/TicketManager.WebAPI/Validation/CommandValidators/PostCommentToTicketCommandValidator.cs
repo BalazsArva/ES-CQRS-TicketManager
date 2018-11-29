@@ -11,12 +11,12 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.User)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("commenter"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("commenter"));
 
             RuleFor(cmd => cmd.CommentText)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("comment text"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("comment text"));
 
             RuleFor(cmd => cmd.TicketId)
                 .Must(BeAnExistingTicket)
@@ -25,10 +25,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         protected override ISet<int> ExtractReferencedTicketIds(PostCommentToTicketCommand command)
         {
-            return new HashSet<int>
-            {
-                command.TicketId
-            };
+            return new HashSet<int> { command.TicketId };
         }
     }
 }

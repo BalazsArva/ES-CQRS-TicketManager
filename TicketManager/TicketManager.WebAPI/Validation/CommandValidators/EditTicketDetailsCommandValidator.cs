@@ -12,12 +12,12 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.Editor)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("editor"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("editor"));
 
             RuleFor(cmd => cmd.Title)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("title"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
 
             RuleFor(cmd => cmd.Priority)
                 .IsInEnum()
@@ -34,10 +34,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         protected override ISet<int> ExtractReferencedTicketIds(EditTicketDetailsCommand command)
         {
-            return new HashSet<int>
-            {
-                command.TicketId
-            };
+            return new HashSet<int> { command.TicketId };
         }
     }
 }

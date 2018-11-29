@@ -12,16 +12,16 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.User)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleFor(cmd => cmd.SourceTicketId)
                 .Must(BeAnExistingTicket)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("source ticket"));
 
             RuleForEach(cmd => cmd.Links)
-               .Must((command, link) => link.TargetTicketId != command.SourceTicketId)
-               .WithMessage("A ticket link cannot be linked to itself.");
+                .Must((command, link) => link.TargetTicketId != command.SourceTicketId)
+                .WithMessage("A ticket cannot be linked to itself.");
 
             RuleForEach(cmd => cmd.Links)
                 .SetValidator(ticketLinkValidator);

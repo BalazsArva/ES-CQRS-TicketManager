@@ -1,21 +1,33 @@
-﻿using FluentValidation;
+﻿using System.Collections.Generic;
+using FluentValidation;
+using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public class RemoveTicketTagCommandValidator : AbstractValidator<RemoveTicketTagCommand>
+    public class RemoveTicketTagCommandValidator : TicketCommandValidatorBase<RemoveTicketTagCommand>
     {
-        public RemoveTicketTagCommandValidator()
+        public RemoveTicketTagCommandValidator(IEventsContextFactory eventsContextFactory)
+            : base(eventsContextFactory)
         {
-            // TODO: Use the query model (once it is implemented) to verify the existence of the Ticket and that the tag is actually added (actually can ignore that).
+            // TODO: Verify  that the tag is actually added (or maybe can ignore that).
+
+            RuleFor(cmd => cmd.TicketId)
+                .Must(BeAnExistingTicket)
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
 
             RuleFor(cmd => cmd.User)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleFor(cmd => cmd.Tag)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("tag"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
+        }
+
+        protected override ISet<int> ExtractReferencedTicketIds(RemoveTicketTagCommand command)
+        {
+            return new HashSet<int> { command.TicketId };
         }
     }
 }

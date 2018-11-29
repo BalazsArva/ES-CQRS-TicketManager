@@ -9,12 +9,12 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public CreateTicketCommandValidator()
         {
             RuleFor(cmd => cmd.Creator)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("creator"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("creator"));
 
             RuleFor(cmd => cmd.Title)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("title"));
+                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
 
             RuleFor(cmd => cmd.Priority)
                 .IsInEnum()
