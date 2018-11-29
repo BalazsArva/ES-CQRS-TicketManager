@@ -11,6 +11,7 @@ using TicketManager.WebAPI.Validation.CommandValidators;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
+    // TODO: Consider implementing a resiliency base class (e.g. mediator.Publish fails, or a constraint violation happens after validation but before insert)
     public class RemoveTicketTagCommandHandler : IRequestHandler<RemoveTicketTagCommand>
     {
         private readonly IMediator mediator;
