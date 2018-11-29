@@ -10,6 +10,7 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
+using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Validation.CommandValidators;
@@ -142,7 +143,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateLinksIfChanged(EventsContext context, IAsyncDocumentSession session, Ticket ticketDocument, int ticketCreatedEventId, UpdateTicketCommand.TicketLink[] newLinks, string changedBy, DateTime dateOfUpdate)
+        private void UpdateLinksIfChanged(EventsContext context, IAsyncDocumentSession session, Ticket ticketDocument, int ticketCreatedEventId, TicketLinkDTO[] newLinks, string changedBy, DateTime dateOfUpdate)
         {
             var currentLinks = ticketDocument.Links?.LinkSet ?? Array.Empty<TicketLink>();
 

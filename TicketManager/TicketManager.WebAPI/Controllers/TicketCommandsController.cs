@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Controllers
@@ -92,27 +93,41 @@ namespace TicketManager.WebAPI.Controllers
                 User = "Balazs"
             });
 
-            await mediator.Send(new AddTicketLinkCommand
+            await mediator.Send(new AddTicketLinksCommand
             {
-                LinkType = Domain.Common.LinkType.RelatedTo,
+                Links = new[]
+                {
+                    new TicketLinkDTO
+                    {
+                        LinkType = Domain.Common.LinkType.PartOf,
+                        TargetTicketId = id2,
+                    },
+                    new TicketLinkDTO
+                    {
+                        LinkType = Domain.Common.LinkType.RelatedTo,
+                        TargetTicketId = id2,
+                    },
+                },
                 SourceTicketId = id,
-                TargetTicketId = id2,
                 User = "Balazs"
             });
 
-            await mediator.Send(new AddTicketLinkCommand
+            await mediator.Send(new AddTicketLinksCommand
             {
-                LinkType = Domain.Common.LinkType.RelatedTo,
+                Links = new[]
+                {
+                    new TicketLinkDTO
+                    {
+                        LinkType = Domain.Common.LinkType.BlockedBy,
+                        TargetTicketId = id2,
+                    },
+                    new TicketLinkDTO
+                    {
+                        LinkType = Domain.Common.LinkType.RelatedTo,
+                        TargetTicketId = id2,
+                    },
+                },
                 SourceTicketId = id,
-                TargetTicketId = id2,
-                User = "Balazs"
-            });
-
-            await mediator.Send(new AddTicketLinkCommand
-            {
-                LinkType = Domain.Common.LinkType.PartOf,
-                SourceTicketId = id,
-                TargetTicketId = id2,
                 User = "Balazs"
             });
 
@@ -120,7 +135,7 @@ namespace TicketManager.WebAPI.Controllers
             {
                 AssignedTo = null,
                 Description = null,
-                Links = new UpdateTicketCommand.TicketLink[0],
+                Links = new TicketLinkDTO[0],
                 Tags = new string[0],
                 Priority = Domain.Common.Priority.Medium,
                 TicketId = id,

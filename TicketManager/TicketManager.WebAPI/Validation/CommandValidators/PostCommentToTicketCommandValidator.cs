@@ -1,13 +1,14 @@
-﻿using FluentValidation;
-using Raven.Client.Documents;
+﻿using System.Collections.Generic;
+using FluentValidation;
+using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public class PostCommentToTicketCommandValidator : TicketCommandValidatorBase<PostCommentToTicketCommand>
     {
-        public PostCommentToTicketCommandValidator(IDocumentStore documentStore)
-            : base(documentStore)
+        public PostCommentToTicketCommandValidator(IEventsContextFactory eventsContextFactory)
+            : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
@@ -18,8 +19,16 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("comment text"));
 
             RuleFor(cmd => cmd.TicketId)
-                .MustAsync(TicketExistsAsync)
+                .Must(TicketExists)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
+        }
+
+        protected override ISet<int> ExtractReferencedTicketIds(ValidationContext<PostCommentToTicketCommand> context)
+        {
+            return new HashSet<int>
+            {
+                context.InstanceToValidate.TicketId
+            };
         }
     }
 }

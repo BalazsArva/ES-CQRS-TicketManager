@@ -1,5 +1,6 @@
-﻿using FluentValidation;
-using Raven.Client.Documents;
+﻿using System.Collections.Generic;
+using FluentValidation;
+using TicketManager.DataAccess.Events;
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 
@@ -7,8 +8,8 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public class EditTicketDetailsCommandValidator : TicketCommandValidatorBase<EditTicketDetailsCommand>
     {
-        public EditTicketDetailsCommandValidator(IDocumentStore documentStore)
-            : base(documentStore)
+        public EditTicketDetailsCommandValidator(IEventsContextFactory eventsContextFactory)
+            : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.Editor)
                 .NotEmpty()
@@ -27,8 +28,16 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket type"));
 
             RuleFor(cmd => cmd.TicketId)
-                .MustAsync(TicketExistsAsync)
+                .Must(TicketExists)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
+        }
+
+        protected override ISet<int> ExtractReferencedTicketIds(ValidationContext<EditTicketDetailsCommand> context)
+        {
+            return new HashSet<int>
+            {
+                context.InstanceToValidate.TicketId
+            };
         }
     }
 }

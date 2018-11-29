@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentValidation;
-using FluentValidation.Results;
 using TicketManager.DataAccess.Events;
-using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 
@@ -13,17 +9,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public class UpdateTicketCommandValidator : TicketCommandValidatorBase<UpdateTicketCommand>
     {
-        private const string FoundTicketIdsContextDataKey = "FoundTicketIds";
-
-        private readonly IEventsContextFactory eventsContextFactory;
-
-        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
-            : base(documentStore)
+        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, TicketLinkValidator ticketLinkValidator)
+            : base(eventsContextFactory)
         {
-            this.eventsContextFactory = eventsContextFactory ?? throw new System.ArgumentNullException(nameof(eventsContextFactory));
-
             RuleFor(cmd => cmd.TicketId)
-                .MustAsync(TicketExistsAsync)
+                .Must(TicketExists)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
 
             RuleFor(cmd => cmd.Title)
@@ -44,47 +34,25 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
             RuleFor(cmd => cmd.User)
                 .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty(nameof(UpdateTicketCommand.User)));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("modifier"));
 
-            // TODO: Add the same validation to AddTicketLinkCommand
-            // TODO: Provide feedback which link is the offending one.
-            RuleFor(cmd => cmd.Links)
-                .Must((command, links) => !links.Any(link => link.TargetTicketId == command.TicketId))
+            RuleForEach(cmd => cmd.Links)
+                .Must((command, link) => link.TargetTicketId != command.TicketId)
                 .WithMessage("A ticket link cannot be established to the same ticket.");
 
             RuleForEach(cmd => cmd.Links)
-                .Must((command, link, context) =>
-                {
-                    var foundTicketIds = context.ParentContext.RootContextData[FoundTicketIdsContextDataKey] as ISet<int>;
-
-                    return foundTicketIds.Contains(link.TargetTicketId);
-                })
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("target ticket"));
+                .SetValidator(ticketLinkValidator);
 
             RuleForEach(cmd => cmd.Tags)
                 .Must(tag => !string.IsNullOrWhiteSpace(tag))
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
         }
 
-        public override async Task<ValidationResult> ValidateAsync(ValidationContext<UpdateTicketCommand> context, CancellationToken cancellation = default)
+        protected override ISet<int> ExtractReferencedTicketIds(ValidationContext<UpdateTicketCommand> context)
         {
-            var targetTicketIds = context.InstanceToValidate.Links.Select(link => link.TargetTicketId).ToList();
-            if (targetTicketIds.Count > 0)
-            {
-                using (var dbcontext = eventsContextFactory.CreateContext())
-                {
-                    context.RootContextData[FoundTicketIdsContextDataKey] = await dbcontext
-                        .TicketCreatedEvents.Where(evt => targetTicketIds.Contains(evt.Id))
-                        .Select(evt => evt.Id)
-                        .ToSetAsync();
-                }
-            }
-            else
-            {
-                context.RootContextData[FoundTicketIdsContextDataKey] = new HashSet<int>();
-            }
+            var command = context.InstanceToValidate;
 
-            return await base.ValidateAsync(context, cancellation);
+            return command.Links.Select(link => link.TargetTicketId).Concat(new[] { command.TicketId }).ToHashSet();
         }
     }
 }

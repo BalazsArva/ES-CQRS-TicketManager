@@ -5,13 +5,6 @@ namespace TicketManager.WebAPI.DTOs.Commands
 {
     public class UpdateTicketCommand : IRequest
     {
-        public class TicketLink
-        {
-            public int TargetTicketId { get; set; }
-
-            public LinkType LinkType { get; set; }
-        }
-
         public int TicketId { get; set; }
 
         public string Title { get; set; }
@@ -30,6 +23,6 @@ namespace TicketManager.WebAPI.DTOs.Commands
 
         public string[] Tags { get; set; }
 
-        public TicketLink[] Links { get; set; }
+        public TicketLinkDTO[] Links { get; set; }
     }
 }
