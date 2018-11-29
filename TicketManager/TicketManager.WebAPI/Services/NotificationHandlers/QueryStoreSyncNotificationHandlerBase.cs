@@ -108,33 +108,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             }
         }
 
-        // TODO: Delete when RemoveTicketLink supports batching as well.
-        protected async Task SyncLinksAsync(int linkChangedEventId)
-        {
-            using (var context = eventsContextFactory.CreateContext())
-            using (var session = documentStore.OpenAsyncSession())
-            {
-                var ticketLinkChangedEvent = await context.TicketLinkChangedEvents.FindAsync(linkChangedEventId);
-                var sourceTicketCreatedEventId = ticketLinkChangedEvent.SourceTicketCreatedEventId;
-
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(sourceTicketCreatedEventId.ToString());
-                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
-
-                var updatedLinks = await GetUpdatedLinksAsync(context, session, sourceTicketCreatedEventId, ticketDocument.Links.UtcDateUpdated, ticketDocument.Links.LinkSet);
-                var lastChange = updatedLinks.LastChange;
-
-                if (lastChange != null)
-                {
-                    var updates = new PropertyUpdateBatch<Ticket>()
-                        .Add(t => t.Links.ChangedBy, lastChange.CausedBy)
-                        .Add(t => t.Links.LinkSet, updatedLinks.Links);
-
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.UtcDateUpdated, lastChange.UtcDateRecorded);
-                }
-            }
-        }
-
-        protected async Task SyncLinksForTicketAsync(int ticketCreatedEventId)
+        protected async Task SyncLinksAsync(int ticketCreatedEventId)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
