@@ -28,7 +28,11 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, IAsyncDocumentSession session, int ticketId)
         {
             var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(ticketId);
-            var ticketEditedEvent = await context.TicketDetailsChangedEvents
+            var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .LatestAsync();
+            var ticketDescriptionChangedEvent = await context.TicketDescriptionChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .LatestAsync();
@@ -69,23 +73,28 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     AssignedTo = ticketAssignedEvent.AssignedTo,
                     UtcDateLastUpdated = ticketAssignedEvent.UtcDateRecorded
                 },
-                Details =
+                TicketDescription =
                 {
-                    LastChangedBy = ticketEditedEvent.CausedBy,
-                    Description = ticketEditedEvent.Description,
-                    Title = ticketEditedEvent.Title,
-                    UtcDateLastUpdated = ticketEditedEvent.UtcDateRecorded
+                    LastChangedBy = ticketDescriptionChangedEvent.CausedBy,
+                    Description = ticketDescriptionChangedEvent.Description,
+                    UtcDateLastUpdated = ticketDescriptionChangedEvent.UtcDateRecorded
+                },
+                TicketTitle =
+                {
+                    LastChangedBy = ticketTitleChangedEvent.CausedBy,
+                    Title = ticketTitleChangedEvent.Title,
+                    UtcDateLastUpdated = ticketTitleChangedEvent.UtcDateRecorded
                 },
                 TicketPriority =
                 {
-                    LastChangedBy = ticketEditedEvent.CausedBy,
-                    UtcDateLastUpdated = ticketEditedEvent.UtcDateRecorded,
+                    LastChangedBy = ticketPriorityChangedEvent.CausedBy,
+                    UtcDateLastUpdated = ticketPriorityChangedEvent.UtcDateRecorded,
                     Priority = ticketPriorityChangedEvent.Priority
                 },
                 TicketType =
                 {
-                    LastChangedBy = ticketEditedEvent.CausedBy,
-                    UtcDateLastUpdated = ticketEditedEvent.UtcDateRecorded,
+                    LastChangedBy = ticketTypeChangedEvent.CausedBy,
+                    UtcDateLastUpdated = ticketTypeChangedEvent.UtcDateRecorded,
                     Type = ticketTypeChangedEvent.TicketType
                 },
                 Tags =

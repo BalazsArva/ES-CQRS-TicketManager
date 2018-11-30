@@ -11,19 +11,19 @@ using TicketManager.WebAPI.Extensions.Linq;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
-    public class TicketDetailsChangedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketDetailsChangedNotification>
+    public class TicketTitleChangedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketTitleChangedNotification>
     {
-        public TicketDetailsChangedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
+        public TicketTitleChangedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
             : base(eventsContextFactory, documentStore)
         {
         }
 
-        public async Task Handle(TicketDetailsChangedNotification notification, CancellationToken cancellationToken)
+        public async Task Handle(TicketTitleChangedNotification notification, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketDetailsChangedEvent = await context.TicketDetailsChangedEvents
+                var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
                     .AsNoTracking()
                     .OfTicket(notification.TicketId)
                     .LatestAsync();
@@ -31,15 +31,14 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(notification.TicketId.ToString());
 
                 var updates = new PropertyUpdateBatch<Ticket>()
-                    .Add(t => t.Details.LastChangedBy, ticketDetailsChangedEvent.CausedBy)
-                    .Add(t => t.Details.Title, ticketDetailsChangedEvent.Title)
-                    .Add(t => t.Details.Description, ticketDetailsChangedEvent.Description);
+                    .Add(t => t.TicketTitle.LastChangedBy, ticketTitleChangedEvent.CausedBy)
+                    .Add(t => t.TicketTitle.Title, ticketTitleChangedEvent.Title);
 
                 await documentStore.PatchToNewer(
                     ticketDocumentId,
                     updates,
-                    t => t.Details.UtcDateLastUpdated,
-                    ticketDetailsChangedEvent.UtcDateRecorded);
+                    t => t.TicketTitle.UtcDateLastUpdated,
+                    ticketTitleChangedEvent.UtcDateRecorded);
             }
         }
     }

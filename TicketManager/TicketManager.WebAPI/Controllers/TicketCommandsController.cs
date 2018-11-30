@@ -48,10 +48,16 @@ namespace TicketManager.WebAPI.Controllers
                 AssignTo = "Balazs",
             });
 
-            await mediator.Send(new EditTicketDetailsCommand
+            await mediator.Send(new EditTicketTitleCommand
+            {
+                Title = "New title",
+                Editor = "Balazs2",
+                TicketId = id
+            });
+
+            await mediator.Send(new EditTicketDescriptionCommand
             {
                 Description = "New description",
-                Title = "New title",
                 Editor = "Balazs2",
                 TicketId = id
             });

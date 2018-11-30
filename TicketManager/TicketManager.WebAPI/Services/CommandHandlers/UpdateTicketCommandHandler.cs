@@ -51,7 +51,8 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
                 UpdateAssignmentIfChanged(context, ticketDocument, ticketId, request.AssignedTo, updatedBy, now);
-                UpdateDetailsIfChanged(context, ticketDocument, ticketId, request.Title, request.Description, request.TicketType, request.Priority, updatedBy, now);
+                UpdateTitleIfChanged(context, ticketDocument, ticketId, request.Title, request.TicketType, request.Priority, updatedBy, now);
+                UpdateDescriptionIfChanged(context, ticketDocument, ticketId, request.Description, request.TicketType, request.Priority, updatedBy, now);
                 UpdateStatusIfChanged(context, ticketDocument, ticketId, request.TicketStatus, updatedBy, now);
                 UpdateTypeIfChanged(context, ticketDocument, ticketId, request.TicketType, updatedBy, now);
                 UpdatePriorityIfChanged(context, ticketDocument, ticketId, request.Priority, updatedBy, now);
@@ -66,17 +67,28 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             return Unit.Value;
         }
 
-        private void UpdateDetailsIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newTitle, string newDescription, Domain.Common.TicketTypes newTicketType, Domain.Common.TicketPriorities newPriority, string changedBy, DateTime dateOfUpdate)
+        private void UpdateTitleIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newTitle, Domain.Common.TicketTypes newTicketType, Domain.Common.TicketPriorities newPriority, string changedBy, DateTime dateOfUpdate)
         {
-            var details = ticketDocument.Details;
-
-            if (details?.Title != newTitle || details?.Description != newDescription)
+            if (ticketDocument.TicketTitle?.Title != newTitle)
             {
-                context.TicketDetailsChangedEvents.Add(new TicketDetailsChangedEvent
+                context.TicketTitleChangedEvents.Add(new TicketTitleChangedEvent
+                {
+                    CausedBy = changedBy,
+                    Title = newTitle,
+                    UtcDateRecorded = dateOfUpdate,
+                    TicketCreatedEventId = ticketCreatedEventId
+                });
+            }
+        }
+
+        private void UpdateDescriptionIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newDescription, Domain.Common.TicketTypes newTicketType, Domain.Common.TicketPriorities newPriority, string changedBy, DateTime dateOfUpdate)
+        {
+            if (ticketDocument.TicketDescription?.Description != newDescription)
+            {
+                context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
                     CausedBy = changedBy,
                     Description = newDescription,
-                    Title = newTitle,
                     UtcDateRecorded = dateOfUpdate,
                     TicketCreatedEventId = ticketCreatedEventId
                 });

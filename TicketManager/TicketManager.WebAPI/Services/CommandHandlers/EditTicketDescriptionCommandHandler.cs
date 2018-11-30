@@ -11,22 +11,22 @@ using TicketManager.WebAPI.Validation.CommandValidators;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
-    public class EditTicketDetailsCommandHandler : IRequestHandler<EditTicketDetailsCommand>
+    public class EditTicketDescriptionCommandHandler : IRequestHandler<EditTicketDescriptionCommand>
     {
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
-        private readonly EditTicketDetailsCommandValidator editTicketDetailsCommandValidator;
+        private readonly EditTicketDescriptionCommandValidator editTicketDescriptionCommandValidator;
 
-        public EditTicketDetailsCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, EditTicketDetailsCommandValidator editTicketDetailsCommandValidator)
+        public EditTicketDescriptionCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, EditTicketDescriptionCommandValidator editTicketDescriptionCommandValidator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
-            this.editTicketDetailsCommandValidator = editTicketDetailsCommandValidator ?? throw new ArgumentNullException(nameof(editTicketDetailsCommandValidator));
+            this.editTicketDescriptionCommandValidator = editTicketDescriptionCommandValidator ?? throw new ArgumentNullException(nameof(editTicketDescriptionCommandValidator));
         }
 
-        public async Task<Unit> Handle(EditTicketDetailsCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(EditTicketDescriptionCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await editTicketDetailsCommandValidator.ValidateAsync(request, cancellationToken);
+            var validationResult = await editTicketDescriptionCommandValidator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -34,19 +34,18 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
             using (var context = eventsContextFactory.CreateContext())
             {
-                context.TicketDetailsChangedEvents.Add(new TicketDetailsChangedEvent
+                context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
                     CausedBy = request.Editor,
                     Description = request.Description,
                     TicketCreatedEventId = request.TicketId,
-                    Title = request.Title,
                     UtcDateRecorded = DateTime.UtcNow
                 });
 
                 await context.SaveChangesAsync();
             }
 
-            await mediator.Publish(new TicketDetailsChangedNotification(request.TicketId));
+            await mediator.Publish(new TicketDescriptionChangedNotification(request.TicketId));
 
             return Unit.Value;
         }

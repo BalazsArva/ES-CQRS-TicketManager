@@ -44,12 +44,18 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 };
 
                 context.TicketCreatedEvents.Add(ticketCreatedEvent);
-                context.TicketDetailsChangedEvents.Add(new TicketDetailsChangedEvent
+                context.TicketTitleChangedEvents.Add(new TicketTitleChangedEvent
+                {
+                    CausedBy = request.Creator,
+                    TicketCreatedEvent = ticketCreatedEvent,
+                    Title = request.Title,
+                    UtcDateRecorded = now
+                });
+                context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
                     CausedBy = request.Creator,
                     Description = request.Description,
                     TicketCreatedEvent = ticketCreatedEvent,
-                    Title = request.Title,
                     UtcDateRecorded = now
                 });
                 context.TicketPriorityChangedEvents.Add(new TicketPriorityChangedEvent

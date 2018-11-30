@@ -18,7 +18,9 @@ namespace TicketManager.DataAccess.Events
 
         public DbSet<TicketCreatedEvent> TicketCreatedEvents { get; set; }
 
-        public DbSet<TicketDetailsChangedEvent> TicketDetailsChangedEvents { get; set; }
+        public DbSet<TicketTitleChangedEvent> TicketTitleChangedEvents { get; set; }
+
+        public DbSet<TicketDescriptionChangedEvent> TicketDescriptionChangedEvents { get; set; }
 
         public DbSet<TicketLinkChangedEvent> TicketLinkChangedEvents { get; set; }
 
@@ -50,7 +52,8 @@ namespace TicketManager.DataAccess.Events
             SetupDateIndex<TicketCommentEditedEvent>(modelBuilder);
             SetupDateIndex<TicketCommentPostedEvent>(modelBuilder);
             SetupDateIndex<TicketCreatedEvent>(modelBuilder);
-            SetupDateIndex<TicketDetailsChangedEvent>(modelBuilder);
+            SetupDateIndex<TicketTitleChangedEvent>(modelBuilder);
+            SetupDateIndex<TicketDescriptionChangedEvent>(modelBuilder);
             SetupDateIndex<TicketLinkChangedEvent>(modelBuilder);
             SetupDateIndex<TicketStatusChangedEvent>(modelBuilder);
             SetupDateIndex<TicketTagChangedEvent>(modelBuilder);
