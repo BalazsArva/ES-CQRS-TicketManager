@@ -35,6 +35,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
             using (var context = eventsContextFactory.CreateContext())
             {
+                var now = DateTime.UtcNow;
                 foreach (var tag in request.Tags)
                 {
                     var ticketTagChangedEvent = new TicketTagChangedEvent
@@ -43,7 +44,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                         Tag = tag,
                         TagAdded = false,
                         TicketCreatedEventId = request.TicketId,
-                        UtcDateRecorded = DateTime.UtcNow
+                        UtcDateRecorded = now
                     };
 
                     // TODO: Consider whether: there should be validation that the tag is already assigned to the ticket, OR simply ignore as the query won't return it anyway.
