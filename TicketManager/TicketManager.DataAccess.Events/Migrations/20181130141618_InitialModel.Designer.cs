@@ -10,8 +10,8 @@ using TicketManager.DataAccess.Events;
 namespace TicketManager.DataAccess.Events.Migrations
 {
     [DbContext(typeof(EventsContext))]
-    [Migration("20181130115524_ExtractTicketTypeAndPriority")]
-    partial class ExtractTicketTypeAndPriority
+    [Migration("20181130141618_InitialModel")]
+    partial class InitialModel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -115,7 +115,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                     b.ToTable("TicketCreatedEvents");
                 });
 
-            modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketDetailsChangedEvent", b =>
+            modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketDescriptionChangedEvent", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,10 +129,6 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketCreatedEventId");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(256);
-
                     b.Property<DateTime>("UtcDateRecorded");
 
                     b.HasKey("Id");
@@ -141,7 +137,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.HasIndex("UtcDateRecorded");
 
-                    b.ToTable("TicketDetailsChangedEvents");
+                    b.ToTable("TicketDescriptionChangedEvents");
                 });
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketLinkChangedEvent", b =>
@@ -254,6 +250,33 @@ namespace TicketManager.DataAccess.Events.Migrations
                     b.ToTable("TicketTagChangedEvents");
                 });
 
+            modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketTitleChangedEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CausedBy")
+                        .IsRequired()
+                        .HasMaxLength(256);
+
+                    b.Property<int>("TicketCreatedEventId");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256);
+
+                    b.Property<DateTime>("UtcDateRecorded");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TicketCreatedEventId");
+
+                    b.HasIndex("UtcDateRecorded");
+
+                    b.ToTable("TicketTitleChangedEvents");
+                });
+
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketTypeChangedEvent", b =>
                 {
                     b.Property<int>("Id")
@@ -303,7 +326,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketDetailsChangedEvent", b =>
+            modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketDescriptionChangedEvent", b =>
                 {
                     b.HasOne("TicketManager.DataAccess.Events.DataModel.TicketCreatedEvent", "TicketCreatedEvent")
                         .WithMany()
@@ -341,6 +364,14 @@ namespace TicketManager.DataAccess.Events.Migrations
                 });
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketTagChangedEvent", b =>
+                {
+                    b.HasOne("TicketManager.DataAccess.Events.DataModel.TicketCreatedEvent", "TicketCreatedEvent")
+                        .WithMany()
+                        .HasForeignKey("TicketCreatedEventId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketTitleChangedEvent", b =>
                 {
                     b.HasOne("TicketManager.DataAccess.Events.DataModel.TicketCreatedEvent", "TicketCreatedEvent")
                         .WithMany()
