@@ -4,16 +4,16 @@ using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public class CreateTicketCommandValidator : AbstractValidator<CreateTicketCommand>
+    public class CreateTicketCommandValidator : ValidatorBase<CreateTicketCommand>
     {
         public CreateTicketCommandValidator()
         {
             RuleFor(cmd => cmd.Creator)
-                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("creator"));
 
             RuleFor(cmd => cmd.Title)
-                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
 
             RuleFor(cmd => cmd.Priority)

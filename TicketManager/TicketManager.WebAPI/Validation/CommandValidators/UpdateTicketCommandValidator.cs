@@ -17,7 +17,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
 
             RuleFor(cmd => cmd.Title)
-                .Must(title => !string.IsNullOrWhiteSpace(title))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
 
             RuleFor(cmd => cmd.Priority)
@@ -33,7 +33,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatus>("ticket status"));
 
             RuleFor(cmd => cmd.User)
-                .Must(user => !string.IsNullOrWhiteSpace(user))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleForEach(cmd => cmd.Links)
@@ -44,7 +44,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .SetValidator(ticketLinkValidator);
 
             RuleForEach(cmd => cmd.Tags)
-                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
         }
 

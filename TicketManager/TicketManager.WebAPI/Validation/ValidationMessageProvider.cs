@@ -6,9 +6,11 @@ namespace TicketManager.WebAPI.Validation
     {
         public static string CannotBeNull(string propertyDisplayName) => $"The {propertyDisplayName} cannot be null.";
 
-        public static string CannotBeNullOrEmpty(string propertyDisplayName) => $"The {propertyDisplayName} cannot be null or empty.";
+        // Do not include null in the message because that's technical, the general user won't understand it.
+        public static string CannotBeNullOrEmpty(string propertyDisplayName) => $"The {propertyDisplayName} cannot be empty.";
 
-        public static string CannotBeNullOrEmptyOrWhitespace(string propertyDisplayName) => $"The {propertyDisplayName} cannot be null, empty or whitespace-only.";
+        // Do not include null in the message because that's technical, the general user won't understand it.
+        public static string CannotBeNullOrEmptyOrWhitespace(string propertyDisplayName) => $"The {propertyDisplayName} cannot be empty or whitespace-only.";
 
         public static string OnlyTheseValuesAreAllowed<TValue>(string propertyDisplayName, params TValue[] allowedValues) =>
             $"Only the following values are accepted for {propertyDisplayName}: {string.Join(", ", allowedValues)}";

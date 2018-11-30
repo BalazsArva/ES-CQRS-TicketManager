@@ -12,11 +12,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.Editor)
-                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("editor"));
 
             RuleFor(cmd => cmd.Title)
-                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
 
             RuleFor(cmd => cmd.Priority)

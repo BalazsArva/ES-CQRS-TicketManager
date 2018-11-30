@@ -17,11 +17,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
 
             RuleFor(cmd => cmd.User)
-                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleForEach(cmd => cmd.Tags)
-                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
         }
 

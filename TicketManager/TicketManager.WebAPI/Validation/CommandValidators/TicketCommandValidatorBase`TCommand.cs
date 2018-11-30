@@ -11,7 +11,7 @@ using TicketManager.DataAccess.Events.Extensions;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public abstract class TicketCommandValidatorBase<TCommand> : AbstractValidator<TCommand>
+    public abstract class TicketCommandValidatorBase<TCommand> : ValidatorBase<TCommand>
     {
         protected readonly IEventsContextFactory eventsContextFactory;
 

@@ -11,7 +11,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.Assigner)
-                .Must(tag => !string.IsNullOrWhiteSpace(tag))
+                .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleFor(cmd => cmd.TicketId)
