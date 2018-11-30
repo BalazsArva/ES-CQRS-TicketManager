@@ -10,7 +10,7 @@ namespace TicketManager.DataAccess.Documents.DataModel
         public string TargetTicketId { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public LinkType LinkType { get; set; }
+        public TicketLinkTypes LinkType { get; set; }
 
         public bool Equals(TicketLink other)
         {

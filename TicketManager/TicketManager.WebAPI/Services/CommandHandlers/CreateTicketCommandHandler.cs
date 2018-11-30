@@ -5,7 +5,6 @@ using FluentValidation;
 using MediatR;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
-using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Validation.CommandValidators;
@@ -45,26 +44,44 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 };
 
                 context.TicketCreatedEvents.Add(ticketCreatedEvent);
-                context.TicketDetailsChangedEvents.Add(new TicketDetailsChangedEvent
+                context.TicketTitleChangedEvents.Add(new TicketTitleChangedEvent
+                {
+                    CausedBy = request.Creator,
+                    TicketCreatedEvent = ticketCreatedEvent,
+                    Title = request.Title,
+                    UtcDateRecorded = now
+                });
+                context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
                     CausedBy = request.Creator,
                     Description = request.Description,
-                    Priority = request.Priority,
                     TicketCreatedEvent = ticketCreatedEvent,
-                    TicketType = request.TicketType,
-                    Title = request.Title,
                     UtcDateRecorded = now
+                });
+                context.TicketPriorityChangedEvents.Add(new TicketPriorityChangedEvent
+                {
+                    CausedBy = request.Creator,
+                    Priority = request.Priority,
+                    UtcDateRecorded = now,
+                    TicketCreatedEvent = ticketCreatedEvent
+                });
+                context.TicketTypeChangedEvents.Add(new TicketTypeChangedEvent
+                {
+                    CausedBy = request.Creator,
+                    TicketType = request.TicketType,
+                    UtcDateRecorded = now,
+                    TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
                 {
                     TicketCreatedEvent = ticketCreatedEvent,
                     CausedBy = request.Creator,
-                    TicketStatus = TicketStatus.NotStarted,
+                    TicketStatus = request.TicketStatus,
                     UtcDateRecorded = now
                 });
                 context.TicketAssignedEvents.Add(new TicketAssignedEvent
                 {
-                    AssignedTo = null,
+                    AssignedTo = request.AssignTo,
                     CausedBy = request.Creator,
                     TicketCreatedEvent = ticketCreatedEvent,
                     UtcDateRecorded = now

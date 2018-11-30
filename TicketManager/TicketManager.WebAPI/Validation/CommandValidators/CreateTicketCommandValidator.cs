@@ -4,25 +4,29 @@ using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public class CreateTicketCommandValidator : AbstractValidator<CreateTicketCommand>
+    public class CreateTicketCommandValidator : ValidatorBase<CreateTicketCommand>
     {
         public CreateTicketCommandValidator()
         {
             RuleFor(cmd => cmd.Creator)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("creator"));
+                .Must(NotBeWhitespaceOnly)
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("creator"));
 
             RuleFor(cmd => cmd.Title)
-                .NotEmpty()
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmpty("title"));
+                .Must(NotBeWhitespaceOnly)
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
 
             RuleFor(cmd => cmd.Priority)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>("priority"));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketPriorities>("priority"));
 
             RuleFor(cmd => cmd.TicketType)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket type"));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketTypes>("ticket type"));
+
+            RuleFor(cmd => cmd.TicketStatus)
+                .IsInEnum()
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketTypes>("ticket status"));
         }
     }
 }

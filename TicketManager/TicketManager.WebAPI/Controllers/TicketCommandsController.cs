@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Controllers
@@ -24,8 +25,8 @@ namespace TicketManager.WebAPI.Controllers
             {
                 Creator = "Balazs",
                 Description = "Test",
-                Priority = Domain.Common.Priority.Lowest,
-                TicketType = Domain.Common.TicketType.Task,
+                Priority = Domain.Common.TicketPriorities.Lowest,
+                TicketType = Domain.Common.TicketTypes.Task,
                 Title = "Test"
             });
 
@@ -33,8 +34,8 @@ namespace TicketManager.WebAPI.Controllers
             {
                 Creator = "Balazs2",
                 Description = "Test2",
-                Priority = Domain.Common.Priority.Lowest,
-                TicketType = Domain.Common.TicketType.Task,
+                Priority = Domain.Common.TicketPriorities.Lowest,
+                TicketType = Domain.Common.TicketTypes.Task,
                 Title = "Test2"
             });
 
@@ -47,72 +48,90 @@ namespace TicketManager.WebAPI.Controllers
                 AssignTo = "Balazs",
             });
 
-            await mediator.Send(new EditTicketDetailsCommand
+            await mediator.Send(new EditTicketTitleCommand
             {
-                Description = "New description",
                 Title = "New title",
                 Editor = "Balazs2",
-                Priority = Domain.Common.Priority.Highest,
-                TicketId = id,
-                TicketType = Domain.Common.TicketType.Bug
+                TicketId = id
+            });
+
+            await mediator.Send(new EditTicketDescriptionCommand
+            {
+                Description = "New description",
+                Editor = "Balazs2",
+                TicketId = id
             });
 
             await mediator.Send(new ChangeTicketStatusCommand
             {
-                NewStatus = Domain.Common.TicketStatus.InProgress,
+                NewStatus = Domain.Common.TicketStatuses.InProgress,
                 TicketId = id,
                 User = "Balazs2"
             });
 
-            await mediator.Send(new AddTicketTagCommand
+            await mediator.Send(new AddTicketTagsCommand
             {
-                Tag = "Dev",
+                Tags = new[] { "Dev" },
                 TicketId = id,
                 User = "Balazs"
             });
 
-            await mediator.Send(new AddTicketTagCommand
+            await mediator.Send(new AddTicketTagsCommand
             {
-                Tag = "PoC",
+                Tags = new[] { "PoC", "Backend" },
                 TicketId = id,
                 User = "Balazs"
             });
 
-            await mediator.Send(new RemoveTicketTagCommand
+            await mediator.Send(new RemoveTicketTagsCommand
             {
-                Tag = "Dev",
+                Tags = new[] { "Dev" },
                 TicketId = id,
                 User = "Balazs"
             });
 
-            await mediator.Send(new AddTicketTagCommand
+            await mediator.Send(new AddTicketTagsCommand
             {
-                Tag = "QA",
+                Tags = new[] { "QA" },
                 TicketId = id,
                 User = "Balazs"
             });
 
-            await mediator.Send(new AddTicketLinkCommand
+            await mediator.Send(new AddTicketLinksCommand
             {
-                LinkType = Domain.Common.LinkType.RelatedTo,
+                Links = new[]
+                {
+                    new TicketLinkDTO
+                    {
+                        LinkType = Domain.Common.TicketLinkTypes.PartOf,
+                        TargetTicketId = id2,
+                    },
+                    new TicketLinkDTO
+                    {
+                        LinkType = Domain.Common.TicketLinkTypes.RelatedTo,
+                        TargetTicketId = id2,
+                    },
+                },
                 SourceTicketId = id,
-                TargetTicketId = id2,
                 User = "Balazs"
             });
 
-            await mediator.Send(new AddTicketLinkCommand
+            await mediator.Send(new AddTicketLinksCommand
             {
-                LinkType = Domain.Common.LinkType.RelatedTo,
+                Links = new[]
+                {
+                    new TicketLinkDTO
+                    {
+                        LinkType = Domain.Common.TicketLinkTypes.BlockedBy,
+                        TargetTicketId = id2,
+                    },
+                    new TicketLinkDTO
+                    {
+                        LinkType = Domain.Common.TicketLinkTypes.RelatedTo,
+                        TargetTicketId = id2,
+                    },
+                },
                 SourceTicketId = id,
-                TargetTicketId = id2,
-                User = "Balazs"
-            });
-
-            await mediator.Send(new AddTicketLinkCommand
-            {
-                LinkType = Domain.Common.LinkType.PartOf,
-                SourceTicketId = id,
-                TargetTicketId = id2,
                 User = "Balazs"
             });
 

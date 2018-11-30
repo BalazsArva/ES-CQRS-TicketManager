@@ -2,12 +2,8 @@
 
 namespace TicketManager.DataAccess.Documents.DataModel
 {
-    public class Tags
+    public class Tags : ChangeTrackedObjectBase
     {
         public string[] TagSet { get; set; } = Array.Empty<string>();
-
-        public DateTime UtcDateUpdated { get; set; }
-
-        public string ChangedBy { get; set; }
     }
 }

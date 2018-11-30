@@ -16,8 +16,14 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public Assignment Assignment { get; set; } = new Assignment();
 
-        public TicketDetails Details { get; set; } = new TicketDetails();
+        public TicketTitle TicketTitle { get; set; } = new TicketTitle();
+
+        public TicketDescription TicketDescription { get; set; } = new TicketDescription();
 
         public TicketStatus TicketStatus { get; set; } = new TicketStatus();
+
+        public TicketPriority TicketPriority { get; set; } = new TicketPriority();
+
+        public TicketType TicketType { get; set; } = new TicketType();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Raven.Client.Documents;
+using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
@@ -13,7 +13,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
     public class TicketStatusChangedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketStatusChangedNotification>
     {
-        public TicketStatusChangedNotificationHandler(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
+        public TicketStatusChangedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
             : base(eventsContextFactory, documentStore)
         {
         }
@@ -25,19 +25,20 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             {
                 var ticketId = notification.TicketId;
                 var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
+                    .AsNoTracking()
                     .OfTicket(ticketId)
                     .LatestAsync();
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
 
                 var updates = new PropertyUpdateBatch<Ticket>()
-                    .Add(t => t.TicketStatus.ChangedBy, ticketStatusChangedEvent.CausedBy)
+                    .Add(t => t.TicketStatus.LastChangedBy, ticketStatusChangedEvent.CausedBy)
                     .Add(t => t.TicketStatus.Status, ticketStatusChangedEvent.TicketStatus);
 
                 await documentStore.PatchToNewer(
                     ticketDocumentId,
                     updates,
-                    t => t.Assignment.UtcDateUpdated,
+                    t => t.TicketStatus.UtcDateLastUpdated,
                     ticketStatusChangedEvent.UtcDateRecorded);
             }
         }

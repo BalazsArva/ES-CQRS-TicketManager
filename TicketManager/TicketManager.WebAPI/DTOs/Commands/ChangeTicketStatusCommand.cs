@@ -9,6 +9,6 @@ namespace TicketManager.WebAPI.DTOs.Commands
 
         public string User { get; set; }
 
-        public TicketStatus NewStatus { get; set; }
+        public TicketStatuses NewStatus { get; set; }
     }
 }

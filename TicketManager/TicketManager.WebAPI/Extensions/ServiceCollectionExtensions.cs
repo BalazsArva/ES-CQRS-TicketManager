@@ -44,16 +44,21 @@ namespace TicketManager.WebAPI.Extensions
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             return services
-                .AddTransient<AddTicketLinkCommandValidator>()
-                .AddTransient<AddTicketTagCommandValidator>()
+                .AddTransient<AddTicketLinksCommandValidator>()
+                .AddTransient<AddTicketTagsCommandValidator>()
                 .AddTransient<AssignTicketCommandValidator>()
+                .AddTransient<ChangeTicketPriorityCommandValidator>()
                 .AddTransient<ChangeTicketStatusCommandValidator>()
+                .AddTransient<ChangeTicketTypeCommandValidator>()
                 .AddTransient<CreateTicketCommandValidator>()
                 .AddTransient<EditTicketCommentCommandValidator>()
-                .AddTransient<EditTicketDetailsCommandValidator>()
+                .AddTransient<EditTicketTitleCommandValidator>()
+                .AddTransient<EditTicketDescriptionCommandValidator>()
                 .AddTransient<PostCommentToTicketCommandValidator>()
-                .AddTransient<RemoveTicketLinkCommandValidator>()
-                .AddTransient<RemoveTicketTagCommandValidator>();
+                .AddTransient<RemoveTicketLinksCommandValidator>()
+                .AddTransient<RemoveTicketTagsCommandValidator>()
+                .AddTransient<UpdateTicketCommandValidator>()
+                .AddTransient<TicketLinkValidator>();
         }
     }
 }

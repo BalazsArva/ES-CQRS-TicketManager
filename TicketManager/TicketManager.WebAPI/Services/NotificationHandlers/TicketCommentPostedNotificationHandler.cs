@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Raven.Client.Documents;
+using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
@@ -12,7 +12,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
     public class TicketCommentPostedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketCommentPostedNotification>
     {
-        public TicketCommentPostedNotificationHandler(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
+        public TicketCommentPostedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
             : base(eventsContextFactory, documentStore)
         {
         }
@@ -24,6 +24,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             {
                 var commentPostedEvent = await context.TicketCommentPostedEvents.FindAsync(notification.CommentId);
                 var commentEditedEvent = await context.TicketCommentEditedEvents
+                    .AsNoTracking()
                     .OfComment(notification.CommentId)
                     .LatestAsync();
 
@@ -37,7 +38,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     UtcDatePosted = commentPostedEvent.UtcDateRecorded,
                     UtcDateLastUpdated = commentEditedEvent.UtcDateRecorded,
                     CreatedBy = commentPostedEvent.CausedBy,
-                    LastModifiedBy = commentPostedEvent.CausedBy,
+                    LastChangedBy = commentPostedEvent.CausedBy,
                     TicketId = ticketDocumentId
                 };
 

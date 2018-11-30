@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
+using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.Extensions.Linq;
+using IAsyncDocumentSession = Raven.Client.Documents.Session.IAsyncDocumentSession;
+using IDocumentStore = Raven.Client.Documents.IDocumentStore;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
@@ -27,13 +28,28 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, IAsyncDocumentSession session, int ticketId)
         {
             var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(ticketId);
-            var ticketEditedEvent = await context.TicketDetailsChangedEvents
+            var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .LatestAsync();
+            var ticketDescriptionChangedEvent = await context.TicketDescriptionChangedEvents
+                .AsNoTracking()
                 .OfTicket(ticketId)
                 .LatestAsync();
             var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
+                .AsNoTracking()
                 .OfTicket(ticketId)
                 .LatestAsync();
             var ticketAssignedEvent = await context.TicketAssignedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .LatestAsync();
+            var ticketTypeChangedEvent = await context.TicketTypeChangedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .LatestAsync();
+            var ticketPriorityChangedEvent = await context.TicketPriorityChangedEvents
+                .AsNoTracking()
                 .OfTicket(ticketId)
                 .LatestAsync();
 
@@ -47,35 +63,50 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
                 TicketStatus =
                 {
-                    ChangedBy = ticketStatusChangedEvent.CausedBy,
+                    LastChangedBy = ticketStatusChangedEvent.CausedBy,
                     Status = ticketStatusChangedEvent.TicketStatus,
-                    UtcDateUpdated = ticketStatusChangedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketStatusChangedEvent.UtcDateRecorded
                 },
                 Assignment =
                 {
-                    AssignedBy = ticketAssignedEvent.CausedBy,
+                    LastChangedBy = ticketAssignedEvent.CausedBy,
                     AssignedTo = ticketAssignedEvent.AssignedTo,
-                    UtcDateUpdated = ticketAssignedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketAssignedEvent.UtcDateRecorded
                 },
-                Details =
+                TicketDescription =
                 {
-                    ChangedBy = ticketEditedEvent.CausedBy,
-                    Description = ticketEditedEvent.Description,
-                    Title = ticketEditedEvent.Title,
-                    UtcDateUpdated = ticketEditedEvent.UtcDateRecorded,
-                    Priority = ticketEditedEvent.Priority,
-                    TicketType = ticketEditedEvent.TicketType
+                    LastChangedBy = ticketDescriptionChangedEvent.CausedBy,
+                    Description = ticketDescriptionChangedEvent.Description,
+                    UtcDateLastUpdated = ticketDescriptionChangedEvent.UtcDateRecorded
+                },
+                TicketTitle =
+                {
+                    LastChangedBy = ticketTitleChangedEvent.CausedBy,
+                    Title = ticketTitleChangedEvent.Title,
+                    UtcDateLastUpdated = ticketTitleChangedEvent.UtcDateRecorded
+                },
+                TicketPriority =
+                {
+                    LastChangedBy = ticketPriorityChangedEvent.CausedBy,
+                    UtcDateLastUpdated = ticketPriorityChangedEvent.UtcDateRecorded,
+                    Priority = ticketPriorityChangedEvent.Priority
+                },
+                TicketType =
+                {
+                    LastChangedBy = ticketTypeChangedEvent.CausedBy,
+                    UtcDateLastUpdated = ticketTypeChangedEvent.UtcDateRecorded,
+                    Type = ticketTypeChangedEvent.TicketType
                 },
                 Tags =
                 {
-                    ChangedBy = tags.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
-                    UtcDateUpdated = tags.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
+                    LastChangedBy = tags.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
+                    UtcDateLastUpdated = tags.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
                     TagSet = tags.Tags
                 },
                 Links =
                 {
-                    ChangedBy = links.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
-                    UtcDateUpdated = links.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
+                    LastChangedBy = links.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
+                    UtcDateLastUpdated = links.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
                     LinkSet = links.Links
                 }
             };
@@ -83,52 +114,46 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return ticket;
         }
 
-        protected async Task SyncTagsAsync(int tagChangedEventId)
+        protected async Task SyncTagsAsync(int ticketId)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketTagChangedEvent = await context.TicketTagChangedEvents.FindAsync(tagChangedEventId);
-                var ticketCreatedEventId = ticketTagChangedEvent.TicketCreatedEventId;
-
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId.ToString());
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedTags = await GetUpdatedTagsAsync(context, ticketCreatedEventId, ticketDocument.Tags.UtcDateUpdated, ticketDocument.Tags.TagSet);
+                var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.UtcDateLastUpdated, ticketDocument.Tags.TagSet);
                 var lastChange = updatedTags.LastChange;
 
                 if (lastChange != null)
                 {
                     var updates = new PropertyUpdateBatch<Ticket>()
-                        .Add(t => t.Tags.ChangedBy, lastChange.CausedBy)
+                        .Add(t => t.Tags.LastChangedBy, lastChange.CausedBy)
                         .Add(t => t.Tags.TagSet, updatedTags.Tags);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, lastChange.UtcDateRecorded);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateLastUpdated, lastChange.UtcDateRecorded);
                 }
             }
         }
 
-        protected async Task SyncLinksAsync(int linkChangedEventId)
+        protected async Task SyncLinksAsync(int ticketCreatedEventId)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketLinkChangedEvent = await context.TicketLinkChangedEvents.FindAsync(linkChangedEventId);
-                var sourceTicketCreatedEventId = ticketLinkChangedEvent.SourceTicketCreatedEventId;
-
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(sourceTicketCreatedEventId.ToString());
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedLinks = await GetUpdatedLinksAsync(context, session, sourceTicketCreatedEventId, ticketDocument.Links.UtcDateUpdated, ticketDocument.Links.LinkSet);
+                var updatedLinks = await GetUpdatedLinksAsync(context, session, ticketCreatedEventId, ticketDocument.Links.UtcDateLastUpdated, ticketDocument.Links.LinkSet);
                 var lastChange = updatedLinks.LastChange;
 
                 if (lastChange != null)
                 {
                     var updates = new PropertyUpdateBatch<Ticket>()
-                        .Add(t => t.Links.ChangedBy, lastChange.CausedBy)
+                        .Add(t => t.Links.LastChangedBy, lastChange.CausedBy)
                         .Add(t => t.Links.LinkSet, updatedLinks.Links);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.UtcDateUpdated, lastChange.UtcDateRecorded);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.UtcDateLastUpdated, lastChange.UtcDateRecorded);
                 }
             }
         }
@@ -139,6 +164,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
             var tagChangesSinceLastSync = await context
                 .TicketTagChangedEvents
+                .AsNoTracking()
                 .OfTicket(ticketCreatedEventId)
                 .After(lastUpdate)
                 .ToChronologicalListAsync();
@@ -174,6 +200,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
             var linkChangesSinceLastSync = await context
                 .TicketLinkChangedEvents
+                .AsNoTracking()
                 .Where(evt => evt.SourceTicketCreatedEventId == sourceTicketCreatedEventId)
                 .After(lastUpdate)
                 .ToChronologicalListAsync();

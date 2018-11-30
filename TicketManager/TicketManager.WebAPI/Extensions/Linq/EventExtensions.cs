@@ -20,6 +20,12 @@ namespace TicketManager.WebAPI.Extensions.Linq
             return events.OrderByDescending(x => x.UtcDateRecorded).First();
         }
 
+        public static Task<TEvent> LatestOrDefaultAsync<TEvent>(this IQueryable<TEvent> events)
+            where TEvent : EventBase
+        {
+            return events.OrderByDescending(x => x.UtcDateRecorded).FirstOrDefaultAsync();
+        }
+
         public static IQueryable<TEvent> OfTicket<TEvent>(this IQueryable<TEvent> events, int ticketId)
             where TEvent : ITicketEvent
         {
