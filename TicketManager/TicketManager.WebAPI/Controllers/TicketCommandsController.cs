@@ -53,9 +53,7 @@ namespace TicketManager.WebAPI.Controllers
                 Description = "New description",
                 Title = "New title",
                 Editor = "Balazs2",
-                Priority = Domain.Common.Priority.Highest,
-                TicketId = id,
-                TicketType = Domain.Common.TicketType.Bug
+                TicketId = id
             });
 
             await mediator.Send(new ChangeTicketStatusCommand

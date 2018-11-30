@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TicketManager.Domain.Common;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
@@ -12,9 +11,5 @@ namespace TicketManager.WebAPI.DTOs.Commands
         public string Title { get; set; }
 
         public string Description { get; set; }
-
-        public Priority Priority { get; set; }
-
-        public TicketType TicketType { get; set; }
     }
 }

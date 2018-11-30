@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentValidation;
 using TicketManager.DataAccess.Events;
-using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
@@ -18,14 +17,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.Title)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
-
-            RuleFor(cmd => cmd.Priority)
-                .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>("priority"));
-
-            RuleFor(cmd => cmd.TicketType)
-                .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket type"));
 
             RuleFor(cmd => cmd.TicketId)
                 .Must(BeAnExistingTicket)
