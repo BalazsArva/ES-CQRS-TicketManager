@@ -24,7 +24,7 @@ namespace TicketManager.Common.Linq.Expressions
         {
             if (lambdaExpression.Body is MemberExpression memberExpression)
             {
-                return GetMemberList((MemberExpression)memberExpression);
+                return GetMemberList(memberExpression);
             }
             else
             {
