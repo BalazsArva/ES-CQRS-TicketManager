@@ -38,7 +38,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 await documentStore.PatchToNewer(
                     ticketDocumentId,
                     updates,
-                    t => t.Assignment.UtcDateUpdated,
+                    t => t.TicketStatus.UtcDateUpdated,
                     ticketStatusChangedEvent.UtcDateRecorded);
             }
         }
