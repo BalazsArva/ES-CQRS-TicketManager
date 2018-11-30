@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
@@ -8,6 +9,6 @@ namespace TicketManager.WebAPI.DTOs.Commands
 
         public string User { get; set; }
 
-        public TicketLinkDTO[] Links { get; set; }
+        public TicketLinkDTO[] Links { get; set; } = Array.Empty<TicketLinkDTO>();
     }
 }

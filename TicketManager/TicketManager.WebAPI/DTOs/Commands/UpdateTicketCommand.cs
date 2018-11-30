@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using TicketManager.Domain.Common;
 
 namespace TicketManager.WebAPI.DTOs.Commands
@@ -21,8 +22,8 @@ namespace TicketManager.WebAPI.DTOs.Commands
 
         public TicketStatus TicketStatus { get; set; }
 
-        public string[] Tags { get; set; }
+        public string[] Tags { get; set; } = Array.Empty<string>();
 
-        public TicketLinkDTO[] Links { get; set; }
+        public TicketLinkDTO[] Links { get; set; } = Array.Empty<TicketLinkDTO>();
     }
 }
