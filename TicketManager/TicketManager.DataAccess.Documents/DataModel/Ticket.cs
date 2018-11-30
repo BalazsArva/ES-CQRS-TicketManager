@@ -19,5 +19,9 @@ namespace TicketManager.DataAccess.Documents.DataModel
         public TicketDetails Details { get; set; } = new TicketDetails();
 
         public TicketStatus TicketStatus { get; set; } = new TicketStatus();
+
+        public TicketPriority TicketPriority { get; set; } = new TicketPriority();
+
+        public TicketType TicketType { get; set; } = new TicketType();
     }
 }

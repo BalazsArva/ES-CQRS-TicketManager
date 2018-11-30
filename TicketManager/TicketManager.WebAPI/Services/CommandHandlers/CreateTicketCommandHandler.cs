@@ -12,6 +12,7 @@ using TicketManager.WebAPI.Validation.CommandValidators;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
+    // TODO: Extend the CreateTicketCommand to accept all other details as well (status, assignment, etc.)
     public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, int>
     {
         private readonly IMediator mediator;
@@ -49,11 +50,23 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     CausedBy = request.Creator,
                     Description = request.Description,
-                    Priority = request.Priority,
                     TicketCreatedEvent = ticketCreatedEvent,
-                    TicketType = request.TicketType,
                     Title = request.Title,
                     UtcDateRecorded = now
+                });
+                context.TicketPriorityChangedEvents.Add(new TicketPriorityChangedEvent
+                {
+                    CausedBy = request.Creator,
+                    Priority = request.Priority,
+                    UtcDateRecorded = now,
+                    TicketCreatedEvent = ticketCreatedEvent
+                });
+                context.TicketTypeChangedEvents.Add(new TicketTypeChangedEvent
+                {
+                    CausedBy = request.Creator,
+                    TicketType = request.TicketType,
+                    UtcDateRecorded = now,
+                    TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
                 {

@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Events.DataModel
 {
@@ -15,9 +14,5 @@ namespace TicketManager.DataAccess.Events.DataModel
         public string Title { get; set; }
 
         public string Description { get; set; }
-
-        public Priority Priority { get; set; }
-
-        public TicketType TicketType { get; set; }
     }
 }

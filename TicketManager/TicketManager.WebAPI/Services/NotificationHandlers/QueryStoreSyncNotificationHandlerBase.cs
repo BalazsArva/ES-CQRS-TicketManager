@@ -40,6 +40,14 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .LatestAsync();
+            var ticketTypeChangedEvent = await context.TicketTypeChangedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .LatestAsync();
+            var ticketPriorityChangedEvent = await context.TicketPriorityChangedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .LatestAsync();
 
             var tags = await GetUpdatedTagsAsync(context, ticketId, DateTime.MinValue, Array.Empty<string>());
             var links = await GetUpdatedLinksAsync(context, session, ticketId, DateTime.MinValue, Array.Empty<TicketLink>());
@@ -66,9 +74,19 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     ChangedBy = ticketEditedEvent.CausedBy,
                     Description = ticketEditedEvent.Description,
                     Title = ticketEditedEvent.Title,
+                    UtcDateUpdated = ticketEditedEvent.UtcDateRecorded
+                },
+                TicketPriority =
+                {
+                    ChangedBy = ticketEditedEvent.CausedBy,
                     UtcDateUpdated = ticketEditedEvent.UtcDateRecorded,
-                    Priority = ticketEditedEvent.Priority,
-                    TicketType = ticketEditedEvent.TicketType
+                    Priority = ticketPriorityChangedEvent.Priority
+                },
+                TicketType =
+                {
+                    ChangedBy = ticketEditedEvent.CausedBy,
+                    UtcDateUpdated = ticketEditedEvent.UtcDateRecorded,
+                    Type = ticketTypeChangedEvent.TicketType
                 },
                 Tags =
                 {

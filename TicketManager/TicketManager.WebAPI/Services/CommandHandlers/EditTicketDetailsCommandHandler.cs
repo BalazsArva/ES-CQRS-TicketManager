@@ -38,9 +38,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     CausedBy = request.Editor,
                     Description = request.Description,
-                    Priority = request.Priority,
                     TicketCreatedEventId = request.TicketId,
-                    TicketType = request.TicketType,
                     Title = request.Title,
                     UtcDateRecorded = DateTime.UtcNow
                 });

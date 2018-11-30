@@ -33,9 +33,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var updates = new PropertyUpdateBatch<Ticket>()
                     .Add(t => t.Details.ChangedBy, ticketDetailsChangedEvent.CausedBy)
                     .Add(t => t.Details.Title, ticketDetailsChangedEvent.Title)
-                    .Add(t => t.Details.Description, ticketDetailsChangedEvent.Description)
-                    .Add(t => t.Details.Priority, ticketDetailsChangedEvent.Priority)
-                    .Add(t => t.Details.TicketType, ticketDetailsChangedEvent.TicketType);
+                    .Add(t => t.Details.Description, ticketDetailsChangedEvent.Description);
 
                 await documentStore.PatchToNewer(
                     ticketDocumentId,

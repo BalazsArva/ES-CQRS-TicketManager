@@ -1,18 +1,16 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Documents.DataModel
 {
-    public class TicketDetails
+    public class TicketType
     {
         public DateTime UtcDateUpdated { get; set; }
 
         public string ChangedBy { get; set; }
 
-        public string Title { get; set; }
-
-        public string Description { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Domain.Common.TicketType Type { get; set; }
     }
 }
