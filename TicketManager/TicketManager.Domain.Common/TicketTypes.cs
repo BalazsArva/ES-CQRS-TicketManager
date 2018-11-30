@@ -1,6 +1,6 @@
 ﻿namespace TicketManager.Domain.Common
 {
-    public enum TicketType
+    public enum TicketTypes
     {
         Bug,
 

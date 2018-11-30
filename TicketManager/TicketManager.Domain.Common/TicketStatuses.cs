@@ -1,6 +1,6 @@
 ﻿namespace TicketManager.Domain.Common
 {
-    public enum TicketStatus
+    public enum TicketStatuses
     {
         NotStarted,
 

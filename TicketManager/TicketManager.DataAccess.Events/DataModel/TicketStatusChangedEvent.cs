@@ -10,6 +10,6 @@ namespace TicketManager.DataAccess.Events.DataModel
         [ForeignKey(nameof(TicketCreatedEventId))]
         public virtual TicketCreatedEvent TicketCreatedEvent { get; set; }
 
-        public TicketStatus TicketStatus { get; set; }
+        public TicketStatuses TicketStatus { get; set; }
     }
 }

@@ -66,7 +66,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             return Unit.Value;
         }
 
-        private void UpdateDetailsIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newTitle, string newDescription, Domain.Common.TicketType newTicketType, Domain.Common.Priority newPriority, string changedBy, DateTime dateOfUpdate)
+        private void UpdateDetailsIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newTitle, string newDescription, Domain.Common.TicketTypes newTicketType, Domain.Common.TicketPriorities newPriority, string changedBy, DateTime dateOfUpdate)
         {
             var details = ticketDocument.Details;
 
@@ -97,7 +97,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketStatus newStatus, string changedBy, DateTime dateOfUpdate)
+        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketStatuses newStatus, string changedBy, DateTime dateOfUpdate)
         {
             if (ticketDocument.TicketStatus?.Status != newStatus)
             {
@@ -111,7 +111,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketType newTicketType, string changedBy, DateTime dateOfUpdate)
+        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketTypes newTicketType, string changedBy, DateTime dateOfUpdate)
         {
             if (ticketDocument.TicketType?.Type != newTicketType)
             {
@@ -125,7 +125,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.Priority newPriority, string changedBy, DateTime dateOfUpdate)
+        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketPriorities newPriority, string changedBy, DateTime dateOfUpdate)
         {
             if (ticketDocument.TicketPriority?.Priority != newPriority)
             {

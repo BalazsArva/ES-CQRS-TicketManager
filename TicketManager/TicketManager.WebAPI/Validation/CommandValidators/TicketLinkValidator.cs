@@ -12,7 +12,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         {
             RuleFor(link => link.LinkType)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<LinkType>("link type"));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketLinkTypes>("link type"));
 
             RuleFor(link => link.TargetTicketId)
                 .Must((link, index, context) =>

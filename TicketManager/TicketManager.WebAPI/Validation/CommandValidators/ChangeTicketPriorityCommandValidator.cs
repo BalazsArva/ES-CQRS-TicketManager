@@ -17,7 +17,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
             RuleFor(cmd => cmd.Priority)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>("priority"));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketPriorities>("priority"));
 
             RuleFor(cmd => cmd.TicketId)
                 .Must(BeAnExistingTicket)

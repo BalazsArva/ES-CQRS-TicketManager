@@ -22,15 +22,15 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
             RuleFor(cmd => cmd.Priority)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<Priority>("priority"));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketPriorities>("priority"));
 
             RuleFor(cmd => cmd.TicketType)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket type"));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketTypes>("ticket type"));
 
             RuleFor(cmd => cmd.TicketStatus)
                 .IsInEnum()
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatus>("ticket status"));
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatuses>("ticket status"));
 
             RuleFor(cmd => cmd.User)
                 .Must(NotBeWhitespaceOnly)

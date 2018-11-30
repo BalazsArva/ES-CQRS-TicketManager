@@ -6,6 +6,6 @@ namespace TicketManager.WebAPI.DTOs
     {
         public int TargetTicketId { get; set; }
 
-        public LinkType LinkType { get; set; }
+        public TicketLinkTypes LinkType { get; set; }
     }
 }

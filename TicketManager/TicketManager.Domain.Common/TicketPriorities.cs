@@ -1,6 +1,6 @@
 ﻿namespace TicketManager.Domain.Common
 {
-    public enum Priority
+    public enum TicketPriorities
     {
         Lowest,
 

@@ -15,7 +15,7 @@ namespace TicketManager.DataAccess.Events.DataModel
         [ForeignKey(nameof(TargetTicketCreatedEventId))]
         public virtual TicketCreatedEvent TargetTicketCreatedEvent { get; set; }
 
-        public LinkType LinkType { get; set; }
+        public TicketLinkTypes LinkType { get; set; }
 
         public bool ConnectionIsActive { get; set; }
     }

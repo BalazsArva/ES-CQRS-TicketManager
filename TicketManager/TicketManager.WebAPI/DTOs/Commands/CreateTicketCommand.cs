@@ -13,10 +13,10 @@ namespace TicketManager.WebAPI.DTOs.Commands
 
         public string Description { get; set; }
 
-        public Priority Priority { get; set; }
+        public TicketPriorities Priority { get; set; }
 
-        public TicketType TicketType { get; set; }
+        public TicketTypes TicketType { get; set; }
 
-        public TicketStatus TicketStatus { get; set; }
+        public TicketStatuses TicketStatus { get; set; }
     }
 }

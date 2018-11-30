@@ -9,6 +9,6 @@ namespace TicketManager.WebAPI.DTOs.Commands
 
         public string User { get; set; }
 
-        public Priority Priority { get; set; }
+        public TicketPriorities Priority { get; set; }
     }
 }

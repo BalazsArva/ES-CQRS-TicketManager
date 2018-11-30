@@ -25,8 +25,8 @@ namespace TicketManager.WebAPI.Controllers
             {
                 Creator = "Balazs",
                 Description = "Test",
-                Priority = Domain.Common.Priority.Lowest,
-                TicketType = Domain.Common.TicketType.Task,
+                Priority = Domain.Common.TicketPriorities.Lowest,
+                TicketType = Domain.Common.TicketTypes.Task,
                 Title = "Test"
             });
 
@@ -34,8 +34,8 @@ namespace TicketManager.WebAPI.Controllers
             {
                 Creator = "Balazs2",
                 Description = "Test2",
-                Priority = Domain.Common.Priority.Lowest,
-                TicketType = Domain.Common.TicketType.Task,
+                Priority = Domain.Common.TicketPriorities.Lowest,
+                TicketType = Domain.Common.TicketTypes.Task,
                 Title = "Test2"
             });
 
@@ -58,7 +58,7 @@ namespace TicketManager.WebAPI.Controllers
 
             await mediator.Send(new ChangeTicketStatusCommand
             {
-                NewStatus = Domain.Common.TicketStatus.InProgress,
+                NewStatus = Domain.Common.TicketStatuses.InProgress,
                 TicketId = id,
                 User = "Balazs2"
             });
@@ -97,12 +97,12 @@ namespace TicketManager.WebAPI.Controllers
                 {
                     new TicketLinkDTO
                     {
-                        LinkType = Domain.Common.LinkType.PartOf,
+                        LinkType = Domain.Common.TicketLinkTypes.PartOf,
                         TargetTicketId = id2,
                     },
                     new TicketLinkDTO
                     {
-                        LinkType = Domain.Common.LinkType.RelatedTo,
+                        LinkType = Domain.Common.TicketLinkTypes.RelatedTo,
                         TargetTicketId = id2,
                     },
                 },
@@ -116,12 +116,12 @@ namespace TicketManager.WebAPI.Controllers
                 {
                     new TicketLinkDTO
                     {
-                        LinkType = Domain.Common.LinkType.BlockedBy,
+                        LinkType = Domain.Common.TicketLinkTypes.BlockedBy,
                         TargetTicketId = id2,
                     },
                     new TicketLinkDTO
                     {
-                        LinkType = Domain.Common.LinkType.RelatedTo,
+                        LinkType = Domain.Common.TicketLinkTypes.RelatedTo,
                         TargetTicketId = id2,
                     },
                 },

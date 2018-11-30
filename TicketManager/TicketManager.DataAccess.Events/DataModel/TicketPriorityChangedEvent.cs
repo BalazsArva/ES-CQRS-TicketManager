@@ -10,6 +10,6 @@ namespace TicketManager.DataAccess.Events.DataModel
         [ForeignKey(nameof(TicketCreatedEventId))]
         public virtual TicketCreatedEvent TicketCreatedEvent { get; set; }
 
-        public Priority Priority { get; set; }
+        public TicketPriorities Priority { get; set; }
     }
 }

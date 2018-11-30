@@ -6,6 +6,6 @@ namespace TicketManager.DataAccess.Documents.DataModel
     public class TicketStatus : ChangeTrackedObjectBase
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public Domain.Common.TicketStatus Status { get; set; }
+        public Domain.Common.TicketStatuses Status { get; set; }
     }
 }

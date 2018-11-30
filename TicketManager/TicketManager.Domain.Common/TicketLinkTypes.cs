@@ -1,6 +1,6 @@
 ﻿namespace TicketManager.Domain.Common
 {
-    public enum LinkType
+    public enum TicketLinkTypes
     {
         RelatedTo,
 
