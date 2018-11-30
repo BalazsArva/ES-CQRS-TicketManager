@@ -11,7 +11,6 @@ using TicketManager.WebAPI.Validation.CommandValidators;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
-    // TODO: Extend the CreateTicketCommand to accept all other details as well (status, assignment, etc.)
     public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, int>
     {
         private readonly IMediator mediator;
