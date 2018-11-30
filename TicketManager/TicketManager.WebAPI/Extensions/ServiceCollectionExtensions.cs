@@ -48,6 +48,7 @@ namespace TicketManager.WebAPI.Extensions
                 .AddTransient<AddTicketTagsCommandValidator>()
                 .AddTransient<AssignTicketCommandValidator>()
                 .AddTransient<ChangeTicketStatusCommandValidator>()
+                .AddTransient<ChangeTicketTypeCommandValidator>()
                 .AddTransient<CreateTicketCommandValidator>()
                 .AddTransient<EditTicketCommentCommandValidator>()
                 .AddTransient<EditTicketDetailsCommandValidator>()
