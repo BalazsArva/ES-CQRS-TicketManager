@@ -5,9 +5,9 @@ using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public class RemoveTicketTagCommandValidator : TicketCommandValidatorBase<RemoveTicketTagCommand>
+    public class RemoveTicketTagsCommandValidator : TicketCommandValidatorBase<RemoveTicketTagsCommand>
     {
-        public RemoveTicketTagCommandValidator(IEventsContextFactory eventsContextFactory)
+        public RemoveTicketTagsCommandValidator(IEventsContextFactory eventsContextFactory)
             : base(eventsContextFactory)
         {
             // TODO: Verify  that the tag is actually added (or maybe can ignore that).
@@ -20,12 +20,12 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .Must(tag => !string.IsNullOrWhiteSpace(tag))
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
-            RuleFor(cmd => cmd.Tag)
+            RuleForEach(cmd => cmd.Tags)
                 .Must(tag => !string.IsNullOrWhiteSpace(tag))
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
         }
 
-        protected override ISet<int> ExtractReferencedTicketIds(RemoveTicketTagCommand command)
+        protected override ISet<int> ExtractReferencedTicketIds(RemoveTicketTagsCommand command)
         {
             return new HashSet<int> { command.TicketId };
         }

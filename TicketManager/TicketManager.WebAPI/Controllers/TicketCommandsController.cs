@@ -79,9 +79,9 @@ namespace TicketManager.WebAPI.Controllers
                 User = "Balazs"
             });
 
-            await mediator.Send(new RemoveTicketTagCommand
+            await mediator.Send(new RemoveTicketTagsCommand
             {
-                Tag = "Dev",
+                Tags = new[] { "Dev" },
                 TicketId = id,
                 User = "Balazs"
             });
@@ -129,20 +129,6 @@ namespace TicketManager.WebAPI.Controllers
                 },
                 SourceTicketId = id,
                 User = "Balazs"
-            });
-
-            await mediator.Send(new UpdateTicketCommand
-            {
-                AssignedTo = null,
-                Description = null,
-                Links = new TicketLinkDTO[0],
-                Tags = new string[0],
-                Priority = Domain.Common.Priority.Medium,
-                TicketId = id,
-                TicketStatus = Domain.Common.TicketStatus.Blocked,
-                TicketType = Domain.Common.TicketType.Bug,
-                Title = "Batch updated ticket",
-                User = "Anonymous"
             });
 
             return Ok();
