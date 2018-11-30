@@ -38,13 +38,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     AssignedTo = request.AssignTo,
                     CausedBy = request.Assigner,
-                    TicketCreatedEventId = request.TicketId,
-
-                    // TODO: Maybe should populate this DB side. In a real scenario, the clocks of different nodes can be different and if we filter on date when
-                    // eg. updating a snapshot, there might be intermediate events whose values are earlier but get inserted to the DB slightly later. In this case,
-                    // if we filter on UtcDateRecorded > LatestSnapshot.UtcLastUpdated, some values will be skipped which hurts if the current value is an aggregate
-                    // of all the earlier values.
-                    UtcDateRecorded = DateTime.UtcNow
+                    TicketCreatedEventId = request.TicketId
                 });
 
                 await context.SaveChangesAsync();

@@ -35,56 +35,44 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             int ticketId;
             using (var context = eventsContextFactory.CreateContext())
             {
-                var now = DateTime.UtcNow;
-
-                var ticketCreatedEvent = new TicketCreatedEvent
-                {
-                    CausedBy = request.Creator,
-                    UtcDateRecorded = now
-                };
+                var ticketCreatedEvent = new TicketCreatedEvent { CausedBy = request.Creator };
 
                 context.TicketCreatedEvents.Add(ticketCreatedEvent);
                 context.TicketTitleChangedEvents.Add(new TicketTitleChangedEvent
                 {
                     CausedBy = request.Creator,
                     TicketCreatedEvent = ticketCreatedEvent,
-                    Title = request.Title,
-                    UtcDateRecorded = now
+                    Title = request.Title
                 });
                 context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
                     CausedBy = request.Creator,
                     Description = request.Description,
-                    TicketCreatedEvent = ticketCreatedEvent,
-                    UtcDateRecorded = now
+                    TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketPriorityChangedEvents.Add(new TicketPriorityChangedEvent
                 {
                     CausedBy = request.Creator,
                     Priority = request.Priority,
-                    UtcDateRecorded = now,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketTypeChangedEvents.Add(new TicketTypeChangedEvent
                 {
                     CausedBy = request.Creator,
                     TicketType = request.TicketType,
-                    UtcDateRecorded = now,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
                 {
                     TicketCreatedEvent = ticketCreatedEvent,
                     CausedBy = request.Creator,
-                    TicketStatus = request.TicketStatus,
-                    UtcDateRecorded = now
+                    TicketStatus = request.TicketStatus
                 });
                 context.TicketAssignedEvents.Add(new TicketAssignedEvent
                 {
                     AssignedTo = request.AssignTo,
                     CausedBy = request.Creator,
-                    TicketCreatedEvent = ticketCreatedEvent,
-                    UtcDateRecorded = now
+                    TicketCreatedEvent = ticketCreatedEvent
                 });
 
                 await context.SaveChangesAsync();

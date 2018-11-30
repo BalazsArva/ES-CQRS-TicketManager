@@ -38,8 +38,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     CausedBy = request.Editor,
                     TicketCreatedEventId = request.TicketId,
-                    Title = request.Title,
-                    UtcDateRecorded = DateTime.UtcNow
+                    Title = request.Title
                 });
 
                 await context.SaveChangesAsync();

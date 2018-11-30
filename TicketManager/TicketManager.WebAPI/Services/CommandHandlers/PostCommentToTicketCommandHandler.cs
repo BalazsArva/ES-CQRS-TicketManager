@@ -35,13 +35,10 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             int commentId;
             using (var context = eventsContextFactory.CreateContext())
             {
-                var now = DateTime.UtcNow;
-
                 var ticketCommentPostedEvent = new TicketCommentPostedEvent
                 {
                     CausedBy = request.User,
-                    TicketCreatedEventId = request.TicketId,
-                    UtcDateRecorded = now
+                    TicketCreatedEventId = request.TicketId
                 };
 
                 context.TicketCommentPostedEvents.Add(ticketCommentPostedEvent);
@@ -49,8 +46,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     CausedBy = request.User,
                     CommentText = request.CommentText,
-                    TicketCommentPostedEvent = ticketCommentPostedEvent,
-                    UtcDateRecorded = now
+                    TicketCommentPostedEvent = ticketCommentPostedEvent
                 });
 
                 await context.SaveChangesAsync();

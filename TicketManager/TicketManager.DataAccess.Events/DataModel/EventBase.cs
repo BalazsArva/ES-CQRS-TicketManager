@@ -9,7 +9,7 @@ namespace TicketManager.DataAccess.Events.DataModel
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public DateTime UtcDateRecorded { get; set; }
+        public DateTime UtcDateRecorded { get; protected set; }
 
         [Required, MaxLength(256)]
         public string CausedBy { get; set; }

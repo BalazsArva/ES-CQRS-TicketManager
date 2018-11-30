@@ -43,7 +43,6 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                         LinkType = ticketLink.LinkType,
                         SourceTicketCreatedEventId = request.SourceTicketId,
                         TargetTicketCreatedEventId = ticketLink.TargetTicketId,
-                        UtcDateRecorded = now,
                         ConnectionIsActive = false
                     };
 

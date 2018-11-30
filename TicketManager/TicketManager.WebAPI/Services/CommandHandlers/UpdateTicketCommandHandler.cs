@@ -43,21 +43,20 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var now = DateTime.UtcNow;
                 var updatedBy = request.User;
                 var ticketId = request.TicketId;
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                UpdateAssignmentIfChanged(context, ticketDocument, ticketId, request.AssignedTo, updatedBy, now);
-                UpdateTitleIfChanged(context, ticketDocument, ticketId, request.Title, request.TicketType, request.Priority, updatedBy, now);
-                UpdateDescriptionIfChanged(context, ticketDocument, ticketId, request.Description, request.TicketType, request.Priority, updatedBy, now);
-                UpdateStatusIfChanged(context, ticketDocument, ticketId, request.TicketStatus, updatedBy, now);
-                UpdateTypeIfChanged(context, ticketDocument, ticketId, request.TicketType, updatedBy, now);
-                UpdatePriorityIfChanged(context, ticketDocument, ticketId, request.Priority, updatedBy, now);
-                UpdateTagsIfChanged(context, ticketDocument, ticketId, request.Tags, updatedBy, now);
-                UpdateLinksIfChanged(context, session, ticketDocument, ticketId, request.Links, updatedBy, now);
+                UpdateAssignmentIfChanged(context, ticketDocument, ticketId, request.AssignedTo, updatedBy);
+                UpdateTitleIfChanged(context, ticketDocument, ticketId, request.Title, updatedBy);
+                UpdateDescriptionIfChanged(context, ticketDocument, ticketId, request.Description, updatedBy);
+                UpdateStatusIfChanged(context, ticketDocument, ticketId, request.TicketStatus, updatedBy);
+                UpdateTypeIfChanged(context, ticketDocument, ticketId, request.TicketType, updatedBy);
+                UpdatePriorityIfChanged(context, ticketDocument, ticketId, request.Priority, updatedBy);
+                UpdateTagsIfChanged(context, ticketDocument, ticketId, request.Tags, updatedBy);
+                UpdateLinksIfChanged(context, session, ticketDocument, ticketId, request.Links, updatedBy);
 
                 await context.SaveChangesAsync();
             }
@@ -67,7 +66,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             return Unit.Value;
         }
 
-        private void UpdateTitleIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newTitle, Domain.Common.TicketTypes newTicketType, Domain.Common.TicketPriorities newPriority, string changedBy, DateTime dateOfUpdate)
+        private void UpdateTitleIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newTitle, string changedBy)
         {
             if (ticketDocument.TicketTitle?.Title != newTitle)
             {
@@ -75,13 +74,12 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     CausedBy = changedBy,
                     Title = newTitle,
-                    UtcDateRecorded = dateOfUpdate,
                     TicketCreatedEventId = ticketCreatedEventId
                 });
             }
         }
 
-        private void UpdateDescriptionIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newDescription, Domain.Common.TicketTypes newTicketType, Domain.Common.TicketPriorities newPriority, string changedBy, DateTime dateOfUpdate)
+        private void UpdateDescriptionIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newDescription, string changedBy)
         {
             if (ticketDocument.TicketDescription?.Description != newDescription)
             {
@@ -89,27 +87,25 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     CausedBy = changedBy,
                     Description = newDescription,
-                    UtcDateRecorded = dateOfUpdate,
                     TicketCreatedEventId = ticketCreatedEventId
                 });
             }
         }
 
-        private void UpdateAssignmentIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string assignTo, string assignBy, DateTime dateOfUpdate)
+        private void UpdateAssignmentIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string assignTo, string assignBy)
         {
             if (ticketDocument.Assignment?.AssignedTo != assignTo)
             {
                 context.TicketAssignedEvents.Add(new TicketAssignedEvent
                 {
                     AssignedTo = assignTo,
-                    UtcDateRecorded = dateOfUpdate,
                     CausedBy = assignBy,
                     TicketCreatedEventId = ticketCreatedEventId
                 });
             }
         }
 
-        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketStatuses newStatus, string changedBy, DateTime dateOfUpdate)
+        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketStatuses newStatus, string changedBy)
         {
             if (ticketDocument.TicketStatus?.Status != newStatus)
             {
@@ -117,41 +113,38 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     CausedBy = changedBy,
                     TicketCreatedEventId = ticketCreatedEventId,
-                    TicketStatus = newStatus,
-                    UtcDateRecorded = dateOfUpdate
+                    TicketStatus = newStatus
                 });
             }
         }
 
-        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketTypes newTicketType, string changedBy, DateTime dateOfUpdate)
+        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketTypes newTicketType, string changedBy)
         {
             if (ticketDocument.TicketType?.Type != newTicketType)
             {
                 context.TicketTypeChangedEvents.Add(new TicketTypeChangedEvent
                 {
                     CausedBy = changedBy,
-                    UtcDateRecorded = dateOfUpdate,
                     TicketCreatedEventId = ticketCreatedEventId,
                     TicketType = newTicketType
                 });
             }
         }
 
-        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketPriorities newPriority, string changedBy, DateTime dateOfUpdate)
+        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketPriorities newPriority, string changedBy)
         {
             if (ticketDocument.TicketPriority?.Priority != newPriority)
             {
                 context.TicketPriorityChangedEvents.Add(new TicketPriorityChangedEvent
                 {
                     CausedBy = changedBy,
-                    UtcDateRecorded = dateOfUpdate,
                     TicketCreatedEventId = ticketCreatedEventId,
                     Priority = newPriority
                 });
             }
         }
 
-        private void UpdateTagsIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string[] newTags, string changedBy, DateTime dateOfUpdate)
+        private void UpdateTagsIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string[] newTags, string changedBy)
         {
             var currentlyAssignedTags = ticketDocument.Tags?.TagSet ?? Array.Empty<string>();
 
@@ -165,8 +158,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     CausedBy = changedBy,
                     Tag = removedTag,
                     TagAdded = false,
-                    TicketCreatedEventId = ticketCreatedEventId,
-                    UtcDateRecorded = dateOfUpdate
+                    TicketCreatedEventId = ticketCreatedEventId
                 });
             }
 
@@ -177,13 +169,12 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     CausedBy = changedBy,
                     Tag = addedTag,
                     TagAdded = true,
-                    TicketCreatedEventId = ticketCreatedEventId,
-                    UtcDateRecorded = dateOfUpdate
+                    TicketCreatedEventId = ticketCreatedEventId
                 });
             }
         }
 
-        private void UpdateLinksIfChanged(EventsContext context, IAsyncDocumentSession session, Ticket ticketDocument, int ticketCreatedEventId, TicketLinkDTO[] newLinks, string changedBy, DateTime dateOfUpdate)
+        private void UpdateLinksIfChanged(EventsContext context, IAsyncDocumentSession session, Ticket ticketDocument, int ticketCreatedEventId, TicketLinkDTO[] newLinks, string changedBy)
         {
             var currentLinks = ticketDocument.Links?.LinkSet ?? Array.Empty<TicketLink>();
 
@@ -208,8 +199,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     ConnectionIsActive = false,
                     LinkType = removedLink.LinkType,
                     SourceTicketCreatedEventId = ticketCreatedEventId,
-                    TargetTicketCreatedEventId = int.Parse(session.TrimIdPrefix<Ticket>(removedLink.TargetTicketId)),
-                    UtcDateRecorded = dateOfUpdate
+                    TargetTicketCreatedEventId = int.Parse(session.TrimIdPrefix<Ticket>(removedLink.TargetTicketId))
                 });
             }
 
@@ -221,8 +211,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     ConnectionIsActive = true,
                     LinkType = addedLink.LinkType,
                     SourceTicketCreatedEventId = ticketCreatedEventId,
-                    TargetTicketCreatedEventId = int.Parse(session.TrimIdPrefix<Ticket>(addedLink.TargetTicketId)),
-                    UtcDateRecorded = dateOfUpdate
+                    TargetTicketCreatedEventId = int.Parse(session.TrimIdPrefix<Ticket>(addedLink.TargetTicketId))
                 });
             }
         }

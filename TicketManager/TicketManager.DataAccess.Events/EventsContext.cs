@@ -52,13 +52,25 @@ namespace TicketManager.DataAccess.Events
             SetupDateIndex<TicketCommentEditedEvent>(modelBuilder);
             SetupDateIndex<TicketCommentPostedEvent>(modelBuilder);
             SetupDateIndex<TicketCreatedEvent>(modelBuilder);
-            SetupDateIndex<TicketTitleChangedEvent>(modelBuilder);
             SetupDateIndex<TicketDescriptionChangedEvent>(modelBuilder);
             SetupDateIndex<TicketLinkChangedEvent>(modelBuilder);
+            SetupDateIndex<TicketPriorityChangedEvent>(modelBuilder);
             SetupDateIndex<TicketStatusChangedEvent>(modelBuilder);
             SetupDateIndex<TicketTagChangedEvent>(modelBuilder);
+            SetupDateIndex<TicketTitleChangedEvent>(modelBuilder);
             SetupDateIndex<TicketTypeChangedEvent>(modelBuilder);
-            SetupDateIndex<TicketPriorityChangedEvent>(modelBuilder);
+
+            SetupUtcDateRecordedDefault<TicketAssignedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketCommentEditedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketCommentPostedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketCreatedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketDescriptionChangedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketLinkChangedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketPriorityChangedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketStatusChangedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketTagChangedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketTitleChangedEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketTypeChangedEvent>(modelBuilder);
         }
 
         private void SetupDateIndex<TEvent>(ModelBuilder modelBuilder)
@@ -67,6 +79,15 @@ namespace TicketManager.DataAccess.Events
             modelBuilder
                 .Entity<TEvent>()
                 .HasIndex(x => x.UtcDateRecorded);
+        }
+
+        private void SetupUtcDateRecordedDefault<TEvent>(ModelBuilder modelBuilder)
+            where TEvent : EventBase
+        {
+            modelBuilder
+                .Entity<TEvent>()
+                .Property(x => x.UtcDateRecorded)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
         }
     }
 }

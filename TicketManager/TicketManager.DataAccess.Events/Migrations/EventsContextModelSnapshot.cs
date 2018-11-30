@@ -34,7 +34,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketCreatedEventId");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -60,7 +62,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketCommentPostedEventId");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -83,7 +87,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketCreatedEventId");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -104,7 +110,9 @@ namespace TicketManager.DataAccess.Events.Migrations
                         .IsRequired()
                         .HasMaxLength(256);
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -127,7 +135,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketCreatedEventId");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -156,7 +166,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TargetTicketCreatedEventId");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -183,7 +195,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketCreatedEventId");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -208,7 +222,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketStatus");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -237,7 +253,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketCreatedEventId");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -264,7 +282,9 @@ namespace TicketManager.DataAccess.Events.Migrations
                         .IsRequired()
                         .HasMaxLength(256);
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 
@@ -289,7 +309,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("TicketType");
 
-                    b.Property<DateTime>("UtcDateRecorded");
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
 
                     b.HasKey("Id");
 

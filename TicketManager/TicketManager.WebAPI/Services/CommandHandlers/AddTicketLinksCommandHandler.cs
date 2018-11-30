@@ -34,7 +34,6 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
             using (var context = eventsContextFactory.CreateContext())
             {
-                var now = DateTime.UtcNow;
                 foreach (var ticketLink in request.Links)
                 {
                     var ticketLinkChangedEvent = new TicketLinkChangedEvent
@@ -43,7 +42,6 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                         LinkType = ticketLink.LinkType,
                         SourceTicketCreatedEventId = request.SourceTicketId,
                         TargetTicketCreatedEventId = ticketLink.TargetTicketId,
-                        UtcDateRecorded = now,
                         ConnectionIsActive = true
                     };
 
