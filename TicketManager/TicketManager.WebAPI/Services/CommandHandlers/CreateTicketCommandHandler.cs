@@ -5,7 +5,6 @@ using FluentValidation;
 using MediatR;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
-using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Validation.CommandValidators;
@@ -72,12 +71,12 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     TicketCreatedEvent = ticketCreatedEvent,
                     CausedBy = request.Creator,
-                    TicketStatus = TicketStatus.NotStarted,
+                    TicketStatus = request.TicketStatus,
                     UtcDateRecorded = now
                 });
                 context.TicketAssignedEvents.Add(new TicketAssignedEvent
                 {
-                    AssignedTo = null,
+                    AssignedTo = request.AssignTo,
                     CausedBy = request.Creator,
                     TicketCreatedEvent = ticketCreatedEvent,
                     UtcDateRecorded = now

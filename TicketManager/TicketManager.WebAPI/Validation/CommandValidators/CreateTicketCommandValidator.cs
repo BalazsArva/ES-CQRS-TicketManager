@@ -23,6 +23,10 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.TicketType)
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket type"));
+
+            RuleFor(cmd => cmd.TicketStatus)
+                .IsInEnum()
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketType>("ticket status"));
         }
     }
 }

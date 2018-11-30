@@ -7,6 +7,8 @@ namespace TicketManager.WebAPI.DTOs.Commands
     {
         public string Creator { get; set; }
 
+        public string AssignTo { get; set; }
+
         public string Title { get; set; }
 
         public string Description { get; set; }
@@ -14,5 +16,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
         public Priority Priority { get; set; }
 
         public TicketType TicketType { get; set; }
+
+        public TicketStatus TicketStatus { get; set; }
     }
 }
