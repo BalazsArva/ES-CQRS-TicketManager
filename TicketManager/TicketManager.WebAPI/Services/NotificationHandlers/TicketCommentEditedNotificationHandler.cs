@@ -31,7 +31,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(notification.CommentId.ToString());
 
                 session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.CommentText, commentEditedEvent.CommentText);
-                session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.LastModifiedBy, commentEditedEvent.CausedBy);
+                session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.LastChangedBy, commentEditedEvent.CausedBy);
                 session.Advanced.Patch<Comment, DateTime>(commentDocumentId, c => c.UtcDateLastUpdated, commentEditedEvent.UtcDateRecorded);
 
                 await session.SaveChangesAsync();

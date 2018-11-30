@@ -31,14 +31,14 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(notification.TicketId.ToString());
 
                 var updates = new PropertyUpdateBatch<Ticket>()
-                    .Add(t => t.Details.ChangedBy, ticketDetailsChangedEvent.CausedBy)
+                    .Add(t => t.Details.LastChangedBy, ticketDetailsChangedEvent.CausedBy)
                     .Add(t => t.Details.Title, ticketDetailsChangedEvent.Title)
                     .Add(t => t.Details.Description, ticketDetailsChangedEvent.Description);
 
                 await documentStore.PatchToNewer(
                     ticketDocumentId,
                     updates,
-                    t => t.Details.UtcDateUpdated,
+                    t => t.Details.UtcDateLastUpdated,
                     ticketDetailsChangedEvent.UtcDateRecorded);
             }
         }

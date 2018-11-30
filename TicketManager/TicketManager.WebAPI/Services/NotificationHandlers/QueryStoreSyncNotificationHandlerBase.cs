@@ -59,45 +59,45 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
                 TicketStatus =
                 {
-                    ChangedBy = ticketStatusChangedEvent.CausedBy,
+                    LastChangedBy = ticketStatusChangedEvent.CausedBy,
                     Status = ticketStatusChangedEvent.TicketStatus,
-                    UtcDateUpdated = ticketStatusChangedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketStatusChangedEvent.UtcDateRecorded
                 },
                 Assignment =
                 {
-                    AssignedBy = ticketAssignedEvent.CausedBy,
+                    LastChangedBy = ticketAssignedEvent.CausedBy,
                     AssignedTo = ticketAssignedEvent.AssignedTo,
-                    UtcDateUpdated = ticketAssignedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketAssignedEvent.UtcDateRecorded
                 },
                 Details =
                 {
-                    ChangedBy = ticketEditedEvent.CausedBy,
+                    LastChangedBy = ticketEditedEvent.CausedBy,
                     Description = ticketEditedEvent.Description,
                     Title = ticketEditedEvent.Title,
-                    UtcDateUpdated = ticketEditedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketEditedEvent.UtcDateRecorded
                 },
                 TicketPriority =
                 {
-                    ChangedBy = ticketEditedEvent.CausedBy,
-                    UtcDateUpdated = ticketEditedEvent.UtcDateRecorded,
+                    LastChangedBy = ticketEditedEvent.CausedBy,
+                    UtcDateLastUpdated = ticketEditedEvent.UtcDateRecorded,
                     Priority = ticketPriorityChangedEvent.Priority
                 },
                 TicketType =
                 {
-                    ChangedBy = ticketEditedEvent.CausedBy,
-                    UtcDateUpdated = ticketEditedEvent.UtcDateRecorded,
+                    LastChangedBy = ticketEditedEvent.CausedBy,
+                    UtcDateLastUpdated = ticketEditedEvent.UtcDateRecorded,
                     Type = ticketTypeChangedEvent.TicketType
                 },
                 Tags =
                 {
-                    ChangedBy = tags.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
-                    UtcDateUpdated = tags.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
+                    LastChangedBy = tags.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
+                    UtcDateLastUpdated = tags.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
                     TagSet = tags.Tags
                 },
                 Links =
                 {
-                    ChangedBy = links.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
-                    UtcDateUpdated = links.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
+                    LastChangedBy = links.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
+                    UtcDateLastUpdated = links.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
                     LinkSet = links.Links
                 }
             };
@@ -113,16 +113,16 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.UtcDateUpdated, ticketDocument.Tags.TagSet);
+                var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.UtcDateLastUpdated, ticketDocument.Tags.TagSet);
                 var lastChange = updatedTags.LastChange;
 
                 if (lastChange != null)
                 {
                     var updates = new PropertyUpdateBatch<Ticket>()
-                        .Add(t => t.Tags.ChangedBy, lastChange.CausedBy)
+                        .Add(t => t.Tags.LastChangedBy, lastChange.CausedBy)
                         .Add(t => t.Tags.TagSet, updatedTags.Tags);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, lastChange.UtcDateRecorded);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateLastUpdated, lastChange.UtcDateRecorded);
                 }
             }
         }
@@ -135,16 +135,16 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedLinks = await GetUpdatedLinksAsync(context, session, ticketCreatedEventId, ticketDocument.Links.UtcDateUpdated, ticketDocument.Links.LinkSet);
+                var updatedLinks = await GetUpdatedLinksAsync(context, session, ticketCreatedEventId, ticketDocument.Links.UtcDateLastUpdated, ticketDocument.Links.LinkSet);
                 var lastChange = updatedLinks.LastChange;
 
                 if (lastChange != null)
                 {
                     var updates = new PropertyUpdateBatch<Ticket>()
-                        .Add(t => t.Links.ChangedBy, lastChange.CausedBy)
+                        .Add(t => t.Links.LastChangedBy, lastChange.CausedBy)
                         .Add(t => t.Links.LinkSet, updatedLinks.Links);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.UtcDateUpdated, lastChange.UtcDateRecorded);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.UtcDateLastUpdated, lastChange.UtcDateRecorded);
                 }
             }
         }

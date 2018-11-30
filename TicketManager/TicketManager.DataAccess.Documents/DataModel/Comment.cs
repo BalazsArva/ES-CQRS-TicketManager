@@ -2,7 +2,7 @@
 
 namespace TicketManager.DataAccess.Documents.DataModel
 {
-    public class Comment
+    public class Comment : ChangeTrackedObjectBase
     {
         public string Id { get; set; }
 
@@ -12,10 +12,6 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public string CreatedBy { get; set; }
 
-        public string LastModifiedBy { get; set; }
-
         public DateTime UtcDatePosted { get; set; }
-
-        public DateTime UtcDateLastUpdated { get; set; }
     }
 }
