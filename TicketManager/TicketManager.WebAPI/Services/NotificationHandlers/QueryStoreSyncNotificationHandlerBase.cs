@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
+using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.Extensions.Linq;
+using IAsyncDocumentSession = Raven.Client.Documents.Session.IAsyncDocumentSession;
+using IDocumentStore = Raven.Client.Documents.IDocumentStore;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
@@ -28,12 +29,15 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         {
             var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(ticketId);
             var ticketEditedEvent = await context.TicketDetailsChangedEvents
+                .AsNoTracking()
                 .OfTicket(ticketId)
                 .LatestAsync();
             var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
+                .AsNoTracking()
                 .OfTicket(ticketId)
                 .LatestAsync();
             var ticketAssignedEvent = await context.TicketAssignedEvents
+                .AsNoTracking()
                 .OfTicket(ticketId)
                 .LatestAsync();
 
@@ -131,9 +135,9 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         {
             currentTags = currentTags ?? Array.Empty<string>();
 
-            // TODO: Use .AsNoTracking() here and everywhere else where makes sense
             var tagChangesSinceLastSync = await context
                 .TicketTagChangedEvents
+                .AsNoTracking()
                 .OfTicket(ticketCreatedEventId)
                 .After(lastUpdate)
                 .ToChronologicalListAsync();
@@ -169,6 +173,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
             var linkChangesSinceLastSync = await context
                 .TicketLinkChangedEvents
+                .AsNoTracking()
                 .Where(evt => evt.SourceTicketCreatedEventId == sourceTicketCreatedEventId)
                 .After(lastUpdate)
                 .ToChronologicalListAsync();

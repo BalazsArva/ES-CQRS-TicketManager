@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Raven.Client.Documents;
+using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
@@ -13,7 +13,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
     public class TicketDetailsChangedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketDetailsChangedNotification>
     {
-        public TicketDetailsChangedNotificationHandler(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
+        public TicketDetailsChangedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
             : base(eventsContextFactory, documentStore)
         {
         }
@@ -24,6 +24,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketDetailsChangedEvent = await context.TicketDetailsChangedEvents
+                    .AsNoTracking()
                     .OfTicket(notification.TicketId)
                     .LatestAsync();
 

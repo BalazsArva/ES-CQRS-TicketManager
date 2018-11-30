@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Raven.Client.Documents;
+using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
@@ -13,7 +13,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
     public class TicketCommentEditedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketCommentEditedNotification>
     {
-        public TicketCommentEditedNotificationHandler(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
+        public TicketCommentEditedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
             : base(eventsContextFactory, documentStore)
         {
         }
@@ -24,6 +24,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var session = documentStore.OpenAsyncSession())
             {
                 var commentEditedEvent = await context.TicketCommentEditedEvents
+                    .AsNoTracking()
                     .OfComment(notification.CommentId)
                     .LatestAsync();
 
