@@ -5,16 +5,16 @@ using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public class AddTicketTagCommandValidator : TicketCommandValidatorBase<AddTicketTagCommand>
+    public class AddTicketTagsCommandValidator : TicketCommandValidatorBase<AddTicketTagsCommand>
     {
-        public AddTicketTagCommandValidator(IEventsContextFactory eventsContextFactory)
+        public AddTicketTagsCommandValidator(IEventsContextFactory eventsContextFactory)
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.User)
                 .Must(tag => !string.IsNullOrWhiteSpace(tag))
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
-            RuleFor(cmd => cmd.Tag)
+            RuleForEach(cmd => cmd.Tags)
                 .Must(tag => !string.IsNullOrWhiteSpace(tag))
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
 
@@ -23,7 +23,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
         }
 
-        protected override ISet<int> ExtractReferencedTicketIds(AddTicketTagCommand command)
+        protected override ISet<int> ExtractReferencedTicketIds(AddTicketTagsCommand command)
         {
             return new HashSet<int> { command.TicketId };
         }

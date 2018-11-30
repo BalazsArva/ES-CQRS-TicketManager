@@ -108,6 +108,28 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             }
         }
 
+        protected async Task SyncTagsForTicketAsync(int ticketId)
+        {
+            using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
+            {
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
+
+                var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.UtcDateUpdated, ticketDocument.Tags.TagSet);
+                var lastChange = updatedTags.LastChange;
+
+                if (lastChange != null)
+                {
+                    var updates = new PropertyUpdateBatch<Ticket>()
+                        .Add(t => t.Tags.ChangedBy, lastChange.CausedBy)
+                        .Add(t => t.Tags.TagSet, updatedTags.Tags);
+
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, lastChange.UtcDateRecorded);
+                }
+            }
+        }
+
         protected async Task SyncLinksAsync(int ticketCreatedEventId)
         {
             using (var context = eventsContextFactory.CreateContext())
@@ -134,6 +156,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         {
             currentTags = currentTags ?? Array.Empty<string>();
 
+            // TODO: Use .AsNoTracking() here and everywhere else where makes sense
             var tagChangesSinceLastSync = await context
                 .TicketTagChangedEvents
                 .OfTicket(ticketCreatedEventId)

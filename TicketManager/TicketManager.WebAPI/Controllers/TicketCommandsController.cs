@@ -65,16 +65,16 @@ namespace TicketManager.WebAPI.Controllers
                 User = "Balazs2"
             });
 
-            await mediator.Send(new AddTicketTagCommand
+            await mediator.Send(new AddTicketTagsCommand
             {
-                Tag = "Dev",
+                Tags = new[] { "Dev" },
                 TicketId = id,
                 User = "Balazs"
             });
 
-            await mediator.Send(new AddTicketTagCommand
+            await mediator.Send(new AddTicketTagsCommand
             {
-                Tag = "PoC",
+                Tags = new[] { "PoC", "Backend" },
                 TicketId = id,
                 User = "Balazs"
             });
@@ -86,9 +86,9 @@ namespace TicketManager.WebAPI.Controllers
                 User = "Balazs"
             });
 
-            await mediator.Send(new AddTicketTagCommand
+            await mediator.Send(new AddTicketTagsCommand
             {
-                Tag = "QA",
+                Tags = new[] { "QA" },
                 TicketId = id,
                 User = "Balazs"
             });

@@ -2,12 +2,12 @@
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class AddTicketTagCommand : IRequest
+    public class AddTicketTagsCommand : IRequest
     {
         public int TicketId { get; set; }
 
         public string User { get; set; }
 
-        public string Tag { get; set; }
+        public string[] Tags { get; set; }
     }
 }
