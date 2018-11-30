@@ -83,32 +83,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return ticket;
         }
 
-        protected async Task SyncTagsAsync(int tagChangedEventId)
-        {
-            using (var context = eventsContextFactory.CreateContext())
-            using (var session = documentStore.OpenAsyncSession())
-            {
-                var ticketTagChangedEvent = await context.TicketTagChangedEvents.FindAsync(tagChangedEventId);
-                var ticketCreatedEventId = ticketTagChangedEvent.TicketCreatedEventId;
-
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId.ToString());
-                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
-
-                var updatedTags = await GetUpdatedTagsAsync(context, ticketCreatedEventId, ticketDocument.Tags.UtcDateUpdated, ticketDocument.Tags.TagSet);
-                var lastChange = updatedTags.LastChange;
-
-                if (lastChange != null)
-                {
-                    var updates = new PropertyUpdateBatch<Ticket>()
-                        .Add(t => t.Tags.ChangedBy, lastChange.CausedBy)
-                        .Add(t => t.Tags.TagSet, updatedTags.Tags);
-
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateUpdated, lastChange.UtcDateRecorded);
-                }
-            }
-        }
-
-        protected async Task SyncTagsForTicketAsync(int ticketId)
+        protected async Task SyncTagsAsync(int ticketId)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
