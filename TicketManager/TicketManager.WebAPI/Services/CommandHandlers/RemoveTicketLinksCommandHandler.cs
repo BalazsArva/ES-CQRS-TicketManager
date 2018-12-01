@@ -7,7 +7,6 @@ using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
-using TicketManager.WebAPI.Validation.CommandValidators;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
@@ -15,18 +14,18 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
     {
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
-        private readonly RemoveTicketLinksCommandValidator removeTicketLinksCommandValidator;
+        private readonly IValidator<RemoveTicketLinksCommand> validator;
 
-        public RemoveTicketLinksCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, RemoveTicketLinksCommandValidator removeTicketLinksCommandValidator)
+        public RemoveTicketLinksCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<RemoveTicketLinksCommand> validator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
-            this.removeTicketLinksCommandValidator = removeTicketLinksCommandValidator ?? throw new ArgumentNullException(nameof(removeTicketLinksCommandValidator));
+            this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
         public async Task<Unit> Handle(RemoveTicketLinksCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await removeTicketLinksCommandValidator.ValidateAsync(request, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);

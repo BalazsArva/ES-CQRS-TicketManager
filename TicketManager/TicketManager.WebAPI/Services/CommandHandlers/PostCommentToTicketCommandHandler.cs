@@ -7,7 +7,6 @@ using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
-using TicketManager.WebAPI.Validation.CommandValidators;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
@@ -15,18 +14,18 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
     {
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
-        private readonly PostCommentToTicketCommandValidator postCommentToTicketCommandValidator;
+        private readonly IValidator<PostCommentToTicketCommand> validator;
 
-        public PostCommentToTicketCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, PostCommentToTicketCommandValidator postCommentToTicketCommandValidator)
+        public PostCommentToTicketCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<PostCommentToTicketCommand> validator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
-            this.postCommentToTicketCommandValidator = postCommentToTicketCommandValidator ?? throw new ArgumentNullException(nameof(postCommentToTicketCommandValidator));
+            this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
         public async Task<int> Handle(PostCommentToTicketCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await postCommentToTicketCommandValidator.ValidateAsync(request, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
