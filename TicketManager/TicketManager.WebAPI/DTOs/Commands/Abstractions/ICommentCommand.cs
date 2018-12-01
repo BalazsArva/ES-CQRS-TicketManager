@@ -1,8 +1,8 @@
 ﻿namespace TicketManager.WebAPI.DTOs.Commands.Abstractions
 {
-    public interface ITicketCommand
+    public interface ICommentCommand
     {
-        int TicketId { get; }
+        int CommentId { get; }
 
         string RaisedByUser { get; }
     }
