@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FluentValidation;
 using TicketManager.DataAccess.Events;
+using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators.Abstractions;
 
@@ -8,7 +10,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public class RemoveTicketLinksCommandValidator : TicketCommandValidatorBase<RemoveTicketLinksCommand>
     {
-        public RemoveTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, TicketLinkValidator ticketLinkValidator)
+        public RemoveTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, IValidator<TicketLinkDTO> ticketLinkValidator)
             : base(eventsContextFactory)
         {
             // TODO: Verify  that the link is actually added (or maybe can ignore that).
