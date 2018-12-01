@@ -7,7 +7,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class ChangeTicketTypeCommand : TicketCommandBase
     {
         [JsonConstructor]
-        public ChangeTicketTypeCommand(int ticketId, string raisedByUser, TicketTypes ticketType)
+        public ChangeTicketTypeCommand(long ticketId, string raisedByUser, TicketTypes ticketType)
            : base(ticketId, raisedByUser)
         {
             TicketType = ticketType;

@@ -41,7 +41,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
         }
 
-        protected override ISet<int> ExtractReferencedTicketIds(UpdateTicketCommand command)
+        protected override ISet<long> ExtractReferencedTicketIds(UpdateTicketCommand command)
         {
             return command.Links.Select(link => link.TargetTicketId).Concat(new[] { command.TicketId }).ToHashSet();
         }

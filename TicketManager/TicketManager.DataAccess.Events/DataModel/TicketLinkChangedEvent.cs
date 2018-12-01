@@ -5,12 +5,12 @@ namespace TicketManager.DataAccess.Events.DataModel
 {
     public class TicketLinkChangedEvent : EventBase
     {
-        public int SourceTicketCreatedEventId { get; set; }
+        public long SourceTicketCreatedEventId { get; set; }
 
         [ForeignKey(nameof(SourceTicketCreatedEventId))]
         public virtual TicketCreatedEvent SourceTicketCreatedEvent { get; set; }
 
-        public int TargetTicketCreatedEventId { get; set; }
+        public long TargetTicketCreatedEventId { get; set; }
 
         [ForeignKey(nameof(TargetTicketCreatedEventId))]
         public virtual TicketCreatedEvent TargetTicketCreatedEvent { get; set; }

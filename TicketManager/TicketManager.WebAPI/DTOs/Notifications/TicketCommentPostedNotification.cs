@@ -4,11 +4,11 @@ namespace TicketManager.WebAPI.DTOs.Notifications
 {
     public class TicketCommentPostedNotification : INotification
     {
-        public TicketCommentPostedNotification(int commentId)
+        public TicketCommentPostedNotification(long commentId)
         {
             CommentId = commentId;
         }
 
-        public int CommentId { get; }
+        public long CommentId { get; }
     }
 }

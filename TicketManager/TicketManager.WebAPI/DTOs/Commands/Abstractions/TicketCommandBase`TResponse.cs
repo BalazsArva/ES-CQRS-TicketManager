@@ -2,12 +2,12 @@
 {
     public abstract class TicketCommandBase<TResponse> : CommandBase<TResponse>, ITicketCommand
     {
-        protected TicketCommandBase(int ticketId, string raisedByUser)
+        protected TicketCommandBase(long ticketId, string raisedByUser)
             : base(raisedByUser)
         {
             TicketId = ticketId;
         }
 
-        public int TicketId { get; }
+        public long TicketId { get; }
     }
 }

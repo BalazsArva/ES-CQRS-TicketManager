@@ -30,10 +30,11 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
                 var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(notification.CommentId.ToString());
 
+                // No need to use the last updated patch because the comment can only be edited by its owner so it's not as prone to concurrency.
                 session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.CommentText, commentEditedEvent.CommentText);
                 session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.LastChangedBy, commentEditedEvent.CausedBy);
                 session.Advanced.Patch<Comment, DateTime>(commentDocumentId, c => c.UtcDateLastUpdated, commentEditedEvent.UtcDateRecorded);
-                session.Advanced.Patch<Comment, int>(commentDocumentId, c => c.LastKnownChangeId, commentEditedEvent.Id);
+                session.Advanced.Patch<Comment, long>(commentDocumentId, c => c.LastKnownChangeId, commentEditedEvent.Id);
 
                 await session.SaveChangesAsync();
             }

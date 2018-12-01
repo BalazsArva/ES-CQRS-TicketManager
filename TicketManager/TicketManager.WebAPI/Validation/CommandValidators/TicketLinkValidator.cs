@@ -17,7 +17,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(link => link.TargetTicketId)
                 .Must((link, index, context) =>
                 {
-                    if (context.ParentContext.RootContextData[ValidationContextKeys.FoundTicketIdsContextDataKey] is ISet<int> foundTicketIds)
+                    if (context.ParentContext.RootContextData[ValidationContextKeys.FoundTicketIdsContextDataKey] is ISet<long> foundTicketIds)
                     {
                         return foundTicketIds.Contains(link.TargetTicketId);
                     }

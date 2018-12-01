@@ -7,7 +7,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class AddTicketTagsCommand : TicketCommandBase
     {
         [JsonConstructor]
-        public AddTicketTagsCommand(int ticketId, string raisedByUser, string[] tags)
+        public AddTicketTagsCommand(long ticketId, string raisedByUser, string[] tags)
           : base(ticketId, raisedByUser)
         {
             Tags = tags ?? Array.Empty<string>();

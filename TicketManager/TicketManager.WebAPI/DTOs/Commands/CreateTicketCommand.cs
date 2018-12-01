@@ -4,7 +4,7 @@ using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class CreateTicketCommand : CommandBase<int>
+    public class CreateTicketCommand : CommandBase<long>
     {
         [JsonConstructor]
         public CreateTicketCommand(string raisedByUser, string assignTo, string title, string description, TicketPriorities priority, TicketTypes ticketType, TicketStatuses ticketStatus)

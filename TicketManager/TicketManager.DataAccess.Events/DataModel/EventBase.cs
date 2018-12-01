@@ -7,7 +7,7 @@ namespace TicketManager.DataAccess.Events.DataModel
     public abstract class EventBase
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public DateTime UtcDateRecorded { get; protected set; }
 

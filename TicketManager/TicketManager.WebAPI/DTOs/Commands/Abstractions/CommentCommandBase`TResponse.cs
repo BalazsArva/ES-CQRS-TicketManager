@@ -2,12 +2,12 @@
 {
     public abstract class CommentCommandBase<TResponse> : CommandBase<TResponse>, ICommentCommand
     {
-        protected CommentCommandBase(int commentId, string raisedByUser)
+        protected CommentCommandBase(long commentId, string raisedByUser)
             : base(raisedByUser)
         {
             CommentId = commentId;
         }
 
-        public int CommentId { get; }
+        public long CommentId { get; }
     }
 }

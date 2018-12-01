@@ -10,7 +10,7 @@ using TicketManager.WebAPI.DTOs.Notifications;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
-    public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, int>
+    public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, long>
     {
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
@@ -23,7 +23,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public async Task<int> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
+        public async Task<long> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
         {
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
@@ -31,7 +31,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 throw new ValidationException(validationResult.Errors);
             }
 
-            int ticketId;
+            long ticketId;
             using (var context = eventsContextFactory.CreateContext())
             {
                 var ticketCreatedEvent = new TicketCreatedEvent { CausedBy = request.RaisedByUser };

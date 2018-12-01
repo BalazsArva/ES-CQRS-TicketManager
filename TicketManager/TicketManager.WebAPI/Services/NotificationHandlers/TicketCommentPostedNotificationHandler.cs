@@ -43,8 +43,6 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     TicketId = ticketDocumentId
                 };
 
-                // No need to use the last updated patch because the comment can only be edited by its owner so it's not as prone to concurrency.
-                // If we did that, the comment text would also need to be updated by the patch to ensure the comment text is the latest.
                 await session.StoreAsync(commentDocument);
                 await session.SaveChangesAsync();
             }

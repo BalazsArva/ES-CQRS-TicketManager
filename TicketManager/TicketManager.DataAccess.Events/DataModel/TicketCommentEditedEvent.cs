@@ -5,7 +5,7 @@ namespace TicketManager.DataAccess.Events.DataModel
 {
     public class TicketCommentEditedEvent : EventBase
     {
-        public int TicketCommentPostedEventId { get; set; }
+        public long TicketCommentPostedEventId { get; set; }
 
         [ForeignKey(nameof(TicketCommentPostedEventId))]
         public virtual TicketCommentPostedEvent TicketCommentPostedEvent { get; set; }

@@ -2,7 +2,7 @@
 {
     public interface ITicketCommand
     {
-        int TicketId { get; }
+        long TicketId { get; }
 
         string RaisedByUser { get; }
     }

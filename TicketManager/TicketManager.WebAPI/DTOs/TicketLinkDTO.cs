@@ -4,7 +4,7 @@ namespace TicketManager.WebAPI.DTOs
 {
     public class TicketLinkDTO
     {
-        public int TargetTicketId { get; set; }
+        public long TargetTicketId { get; set; }
 
         public TicketLinkTypes LinkType { get; set; }
     }

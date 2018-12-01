@@ -12,7 +12,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketCreatedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false)
@@ -26,11 +26,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketAssignedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCreatedEventId = table.Column<int>(nullable: false),
+                    TicketCreatedEventId = table.Column<long>(nullable: false),
                     AssignedTo = table.Column<string>(maxLength: 256, nullable: true)
                 },
                 constraints: table =>
@@ -48,11 +48,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketCommentPostedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCreatedEventId = table.Column<int>(nullable: false)
+                    TicketCreatedEventId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -69,11 +69,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketDescriptionChangedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCreatedEventId = table.Column<int>(nullable: false),
+                    TicketCreatedEventId = table.Column<long>(nullable: false),
                     Description = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -91,12 +91,12 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketLinkChangedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    SourceTicketCreatedEventId = table.Column<int>(nullable: false),
-                    TargetTicketCreatedEventId = table.Column<int>(nullable: false),
+                    SourceTicketCreatedEventId = table.Column<long>(nullable: false),
+                    TargetTicketCreatedEventId = table.Column<long>(nullable: false),
                     LinkType = table.Column<int>(nullable: false),
                     ConnectionIsActive = table.Column<bool>(nullable: false)
                 },
@@ -121,11 +121,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketPriorityChangedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCreatedEventId = table.Column<int>(nullable: false),
+                    TicketCreatedEventId = table.Column<long>(nullable: false),
                     Priority = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -143,11 +143,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketStatusChangedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCreatedEventId = table.Column<int>(nullable: false),
+                    TicketCreatedEventId = table.Column<long>(nullable: false),
                     TicketStatus = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -165,11 +165,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketTagChangedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCreatedEventId = table.Column<int>(nullable: false),
+                    TicketCreatedEventId = table.Column<long>(nullable: false),
                     Tag = table.Column<string>(maxLength: 64, nullable: false),
                     TagAdded = table.Column<bool>(nullable: false)
                 },
@@ -188,11 +188,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketTitleChangedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCreatedEventId = table.Column<int>(nullable: false),
+                    TicketCreatedEventId = table.Column<long>(nullable: false),
                     Title = table.Column<string>(maxLength: 256, nullable: false)
                 },
                 constraints: table =>
@@ -210,11 +210,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketTypeChangedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCreatedEventId = table.Column<int>(nullable: false),
+                    TicketCreatedEventId = table.Column<long>(nullable: false),
                     TicketType = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -232,11 +232,11 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "TicketCommentEditedEvents",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
                     CausedBy = table.Column<string>(maxLength: 256, nullable: false),
-                    TicketCommentPostedEventId = table.Column<int>(nullable: false),
+                    TicketCommentPostedEventId = table.Column<long>(nullable: false),
                     CommentText = table.Column<string>(nullable: false)
                 },
                 constraints: table =>

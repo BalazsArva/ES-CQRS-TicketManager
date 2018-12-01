@@ -2,7 +2,7 @@
 {
     public interface ICommentCommand
     {
-        int CommentId { get; }
+        long CommentId { get; }
 
         string RaisedByUser { get; }
     }

@@ -8,6 +8,6 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public string LastChangedBy { get; set; }
 
-        public int LastKnownChangeId { get; set; }
+        public long LastKnownChangeId { get; set; }
     }
 }

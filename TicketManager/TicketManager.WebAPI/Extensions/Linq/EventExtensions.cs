@@ -25,18 +25,18 @@ namespace TicketManager.WebAPI.Extensions.Linq
             return events.OrderByDescending(x => x.UtcDateRecorded).FirstOrDefaultAsync();
         }
 
-        public static IQueryable<TEvent> OfTicket<TEvent>(this IQueryable<TEvent> events, int ticketId)
+        public static IQueryable<TEvent> OfTicket<TEvent>(this IQueryable<TEvent> events, long ticketId)
             where TEvent : ITicketEvent
         {
             return events.Where(x => x.TicketCreatedEventId == ticketId);
         }
 
-        public static IQueryable<TicketCommentEditedEvent> OfComment(this IQueryable<TicketCommentEditedEvent> ticketCommentEditedEvents, int commentId)
+        public static IQueryable<TicketCommentEditedEvent> OfComment(this IQueryable<TicketCommentEditedEvent> ticketCommentEditedEvents, long commentId)
         {
             return ticketCommentEditedEvents.Where(x => x.TicketCommentPostedEventId == commentId);
         }
 
-        public static IQueryable<TEvent> After<TEvent>(this IQueryable<TEvent> events, int lastKnownEventId)
+        public static IQueryable<TEvent> After<TEvent>(this IQueryable<TEvent> events, long lastKnownEventId)
              where TEvent : EventBase
         {
             return events.Where(x => x.Id > lastKnownEventId);

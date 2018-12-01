@@ -7,7 +7,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class RemoveTicketTagsCommand : TicketCommandBase
     {
         [JsonConstructor]
-        public RemoveTicketTagsCommand(int ticketId, string raisedByUser, string[] tags)
+        public RemoveTicketTagsCommand(long ticketId, string raisedByUser, string[] tags)
           : base(ticketId, raisedByUser)
         {
             Tags = tags ?? Array.Empty<string>();

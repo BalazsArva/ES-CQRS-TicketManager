@@ -37,9 +37,9 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
             return await base.ValidateAsync(context, cancellationToken);
         }
 
-        protected bool BeAnExistingComment(TCommand command, int commentId, PropertyValidatorContext context)
+        protected bool BeAnExistingComment(TCommand command, long commentId, PropertyValidatorContext context)
         {
-            if (context.ParentContext.RootContextData[ValidationContextKeys.FoundCommentIdsContextDataKey] is ISet<int> foundCommentIds)
+            if (context.ParentContext.RootContextData[ValidationContextKeys.FoundCommentIdsContextDataKey] is ISet<long> foundCommentIds)
             {
                 return foundCommentIds.Contains(commentId);
             }
@@ -61,7 +61,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
         /// <returns>
         /// A set which contains all comment ids which are referenced in any property of the validated object and verified to exist.
         /// </returns>
-        protected virtual async Task<ISet<int>> FindExistingReferencedCommentIdsAsync(TCommand command, CancellationToken cancellationToken = default)
+        protected virtual async Task<ISet<long>> FindExistingReferencedCommentIdsAsync(TCommand command, CancellationToken cancellationToken = default)
         {
             var requiredCommentIds = ExtractReferencedCommentIds(command);
 
@@ -89,9 +89,9 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
         /// <returns>
         /// A set which contains all comment ids which are referenced in any property of the validated object.
         /// </returns>
-        protected virtual ISet<int> ExtractReferencedCommentIds(TCommand command)
+        protected virtual ISet<long> ExtractReferencedCommentIds(TCommand command)
         {
-            return new HashSet<int> { command.CommentId };
+            return new HashSet<long> { command.CommentId };
         }
     }
 }

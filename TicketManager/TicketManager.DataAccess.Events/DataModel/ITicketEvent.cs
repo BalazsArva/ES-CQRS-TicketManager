@@ -2,7 +2,7 @@
 {
     public interface ITicketEvent
     {
-        int TicketCreatedEventId { get; }
+        long TicketCreatedEventId { get; }
 
         TicketCreatedEvent TicketCreatedEvent { get; }
     }

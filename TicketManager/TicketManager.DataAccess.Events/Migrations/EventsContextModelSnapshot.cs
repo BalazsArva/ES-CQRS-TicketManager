@@ -21,7 +21,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketAssignedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -32,7 +32,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                         .IsRequired()
                         .HasMaxLength(256);
 
-                    b.Property<int>("TicketCreatedEventId");
+                    b.Property<long>("TicketCreatedEventId");
 
                     b.Property<DateTime>("UtcDateRecorded")
                         .ValueGeneratedOnAdd()
@@ -49,7 +49,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketCommentEditedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -60,7 +60,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                     b.Property<string>("CommentText")
                         .IsRequired();
 
-                    b.Property<int>("TicketCommentPostedEventId");
+                    b.Property<long>("TicketCommentPostedEventId");
 
                     b.Property<DateTime>("UtcDateRecorded")
                         .ValueGeneratedOnAdd()
@@ -77,7 +77,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketCommentPostedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -85,7 +85,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                         .IsRequired()
                         .HasMaxLength(256);
 
-                    b.Property<int>("TicketCreatedEventId");
+                    b.Property<long>("TicketCreatedEventId");
 
                     b.Property<DateTime>("UtcDateRecorded")
                         .ValueGeneratedOnAdd()
@@ -102,7 +102,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketCreatedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -123,7 +123,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketDescriptionChangedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -133,7 +133,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<int>("TicketCreatedEventId");
+                    b.Property<long>("TicketCreatedEventId");
 
                     b.Property<DateTime>("UtcDateRecorded")
                         .ValueGeneratedOnAdd()
@@ -150,7 +150,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketLinkChangedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -162,9 +162,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("LinkType");
 
-                    b.Property<int>("SourceTicketCreatedEventId");
+                    b.Property<long>("SourceTicketCreatedEventId");
 
-                    b.Property<int>("TargetTicketCreatedEventId");
+                    b.Property<long>("TargetTicketCreatedEventId");
 
                     b.Property<DateTime>("UtcDateRecorded")
                         .ValueGeneratedOnAdd()
@@ -183,7 +183,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketPriorityChangedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -193,7 +193,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<int>("Priority");
 
-                    b.Property<int>("TicketCreatedEventId");
+                    b.Property<long>("TicketCreatedEventId");
 
                     b.Property<DateTime>("UtcDateRecorded")
                         .ValueGeneratedOnAdd()
@@ -210,7 +210,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketStatusChangedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -218,7 +218,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                         .IsRequired()
                         .HasMaxLength(256);
 
-                    b.Property<int>("TicketCreatedEventId");
+                    b.Property<long>("TicketCreatedEventId");
 
                     b.Property<int>("TicketStatus");
 
@@ -237,7 +237,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketTagChangedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -251,7 +251,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
                     b.Property<bool>("TagAdded");
 
-                    b.Property<int>("TicketCreatedEventId");
+                    b.Property<long>("TicketCreatedEventId");
 
                     b.Property<DateTime>("UtcDateRecorded")
                         .ValueGeneratedOnAdd()
@@ -268,7 +268,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketTitleChangedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -276,7 +276,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                         .IsRequired()
                         .HasMaxLength(256);
 
-                    b.Property<int>("TicketCreatedEventId");
+                    b.Property<long>("TicketCreatedEventId");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -297,7 +297,7 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketTypeChangedEvent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -305,7 +305,7 @@ namespace TicketManager.DataAccess.Events.Migrations
                         .IsRequired()
                         .HasMaxLength(256);
 
-                    b.Property<int>("TicketCreatedEventId");
+                    b.Property<long>("TicketCreatedEventId");
 
                     b.Property<int>("TicketType");
 

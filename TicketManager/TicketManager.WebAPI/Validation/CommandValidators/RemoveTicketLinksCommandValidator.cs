@@ -19,7 +19,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .SetValidator(ticketLinkValidator);
         }
 
-        protected override ISet<int> ExtractReferencedTicketIds(RemoveTicketLinksCommand command)
+        protected override ISet<long> ExtractReferencedTicketIds(RemoveTicketLinksCommand command)
         {
             return command.Links.Select(link => link.TargetTicketId).Concat(new[] { command.TicketId }).ToHashSet();
         }

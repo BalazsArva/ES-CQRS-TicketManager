@@ -25,7 +25,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, IAsyncDocumentSession session, int ticketId)
+        protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, IAsyncDocumentSession session, long ticketId)
         {
             var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(ticketId);
             var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
@@ -122,7 +122,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return ticket;
         }
 
-        protected async Task SyncTagsAsync(int ticketId)
+        protected async Task SyncTagsAsync(long ticketId)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
@@ -145,7 +145,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             }
         }
 
-        protected async Task SyncLinksAsync(int ticketCreatedEventId)
+        protected async Task SyncLinksAsync(long ticketCreatedEventId)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
@@ -168,7 +168,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             }
         }
 
-        protected async Task<(string[] Tags, TicketTagChangedEvent LastChange)> GetUpdatedTagsAsync(EventsContext context, int ticketCreatedEventId, int lastKnownChangeId, string[] currentTags)
+        protected async Task<(string[] Tags, TicketTagChangedEvent LastChange)> GetUpdatedTagsAsync(EventsContext context, long ticketCreatedEventId, long lastKnownChangeId, string[] currentTags)
         {
             currentTags = currentTags ?? Array.Empty<string>();
 
@@ -204,7 +204,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return (updatedTags, tagChangesSinceLastSync.Last());
         }
 
-        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, IAsyncDocumentSession session, int sourceTicketCreatedEventId, int lastKnownChangeId, TicketLink[] currentLinks)
+        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, IAsyncDocumentSession session, long sourceTicketCreatedEventId, long lastKnownChangeId, TicketLink[] currentLinks)
         {
             currentLinks = currentLinks ?? Array.Empty<TicketLink>();
 

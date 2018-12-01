@@ -7,7 +7,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class ChangeTicketPriorityCommand : TicketCommandBase
     {
         [JsonConstructor]
-        public ChangeTicketPriorityCommand(int ticketId, string raisedByUser, TicketPriorities priority)
+        public ChangeTicketPriorityCommand(long ticketId, string raisedByUser, TicketPriorities priority)
            : base(ticketId, raisedByUser)
         {
             Priority = priority;

@@ -65,7 +65,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             return Unit.Value;
         }
 
-        private void UpdateTitleIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newTitle, string changedBy)
+        private void UpdateTitleIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, string newTitle, string changedBy)
         {
             if (ticketDocument.TicketTitle?.Title != newTitle)
             {
@@ -78,7 +78,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateDescriptionIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string newDescription, string changedBy)
+        private void UpdateDescriptionIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, string newDescription, string changedBy)
         {
             if (ticketDocument.TicketDescription?.Description != newDescription)
             {
@@ -91,7 +91,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateAssignmentIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string assignTo, string assignBy)
+        private void UpdateAssignmentIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, string assignTo, string assignBy)
         {
             if (ticketDocument.Assignment?.AssignedTo != assignTo)
             {
@@ -104,7 +104,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketStatuses newStatus, string changedBy)
+        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketStatuses newStatus, string changedBy)
         {
             if (ticketDocument.TicketStatus?.Status != newStatus)
             {
@@ -117,7 +117,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketTypes newTicketType, string changedBy)
+        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketTypes newTicketType, string changedBy)
         {
             if (ticketDocument.TicketType?.Type != newTicketType)
             {
@@ -130,7 +130,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, Domain.Common.TicketPriorities newPriority, string changedBy)
+        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketPriorities newPriority, string changedBy)
         {
             if (ticketDocument.TicketPriority?.Priority != newPriority)
             {
@@ -143,7 +143,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateTagsIfChanged(EventsContext context, Ticket ticketDocument, int ticketCreatedEventId, string[] newTags, string changedBy)
+        private void UpdateTagsIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, string[] newTags, string changedBy)
         {
             var currentlyAssignedTags = ticketDocument.Tags?.TagSet ?? Array.Empty<string>();
 
@@ -173,7 +173,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateLinksIfChanged(EventsContext context, IAsyncDocumentSession session, Ticket ticketDocument, int ticketCreatedEventId, TicketLinkDTO[] newLinks, string changedBy)
+        private void UpdateLinksIfChanged(EventsContext context, IAsyncDocumentSession session, Ticket ticketDocument, long ticketCreatedEventId, TicketLinkDTO[] newLinks, string changedBy)
         {
             var currentLinks = ticketDocument.Links?.LinkSet ?? Array.Empty<TicketLink>();
 

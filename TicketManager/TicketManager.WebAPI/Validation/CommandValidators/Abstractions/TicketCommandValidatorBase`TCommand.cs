@@ -37,9 +37,9 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
             return await base.ValidateAsync(context, cancellationToken);
         }
 
-        protected bool BeAnExistingTicket(TCommand command, int ticketId, PropertyValidatorContext context)
+        protected bool BeAnExistingTicket(TCommand command, long ticketId, PropertyValidatorContext context)
         {
-            if (context.ParentContext.RootContextData[ValidationContextKeys.FoundTicketIdsContextDataKey] is ISet<int> foundTicketIds)
+            if (context.ParentContext.RootContextData[ValidationContextKeys.FoundTicketIdsContextDataKey] is ISet<long> foundTicketIds)
             {
                 return foundTicketIds.Contains(ticketId);
             }
@@ -61,7 +61,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
         /// <returns>
         /// A set which contains all ticket ids which are referenced in any property of the validated object and verified to exist.
         /// </returns>
-        protected virtual async Task<ISet<int>> FindExistingReferencedTicketIdsAsync(TCommand command, CancellationToken cancellationToken = default)
+        protected virtual async Task<ISet<long>> FindExistingReferencedTicketIdsAsync(TCommand command, CancellationToken cancellationToken = default)
         {
             var requiredTicketIds = ExtractReferencedTicketIds(command);
 
@@ -89,9 +89,9 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
         /// <returns>
         /// A set which contains all ticket ids which are referenced in any property of the validated object.
         /// </returns>
-        protected virtual ISet<int> ExtractReferencedTicketIds(TCommand command)
+        protected virtual ISet<long> ExtractReferencedTicketIds(TCommand command)
         {
-            return new HashSet<int> { command.TicketId };
+            return new HashSet<long> { command.TicketId };
         }
     }
 }

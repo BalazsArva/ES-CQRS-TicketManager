@@ -4,11 +4,11 @@ namespace TicketManager.WebAPI.DTOs.Notifications
 {
     public class TicketTitleChangedNotification : INotification
     {
-        public TicketTitleChangedNotification(int ticketId)
+        public TicketTitleChangedNotification(long ticketId)
         {
             TicketId = ticketId;
         }
 
-        public int TicketId { get; }
+        public long TicketId { get; }
     }
 }

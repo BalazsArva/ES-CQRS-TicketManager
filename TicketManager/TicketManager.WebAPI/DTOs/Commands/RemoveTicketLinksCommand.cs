@@ -7,7 +7,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class RemoveTicketLinksCommand : TicketCommandBase
     {
         [JsonConstructor]
-        public RemoveTicketLinksCommand(int ticketId, string raisedByUser, TicketLinkDTO[] links)
+        public RemoveTicketLinksCommand(long ticketId, string raisedByUser, TicketLinkDTO[] links)
             : base(ticketId, raisedByUser)
         {
             Links = links ?? Array.Empty<TicketLinkDTO>();

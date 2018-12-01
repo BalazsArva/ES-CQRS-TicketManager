@@ -60,12 +60,12 @@ namespace TicketManager.DataAccess.Documents.Extensions
             await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
         }
 
-        public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, int>> lastKnownChangeIdSelector, int lastKnownChangeId)
+        public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId)
         {
             return PatchToNewer(store, id, lastKnownChangeIdSelector, lastKnownChangeId, propertyUpdates.CreateBatch());
         }
 
-        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, int>> lastKnownChangeIdSelector, int lastKnownChangeId, params PropertyUpdateDescriptor[] propertyUpdates)
+        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId, params PropertyUpdateDescriptor[] propertyUpdates)
         {
             const string argumentName = "__AUTO_LastKnownChangeId";
             const string variableName = "shouldUpdate";

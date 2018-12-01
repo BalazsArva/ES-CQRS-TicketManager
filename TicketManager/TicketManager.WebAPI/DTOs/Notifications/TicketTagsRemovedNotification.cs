@@ -4,11 +4,11 @@ namespace TicketManager.WebAPI.DTOs.Notifications
 {
     public class TicketTagsRemovedNotification : INotification
     {
-        public TicketTagsRemovedNotification(int ticketId)
+        public TicketTagsRemovedNotification(long ticketId)
         {
             TicketId = ticketId;
         }
 
-        public int TicketId { get; }
+        public long TicketId { get; }
     }
 }

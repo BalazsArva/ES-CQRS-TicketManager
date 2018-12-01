@@ -8,7 +8,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class UpdateTicketCommand : TicketCommandBase
     {
         [JsonConstructor]
-        public UpdateTicketCommand(int ticketId, string raisedByUser, string title, string description, string assignedTo, TicketPriorities priority, TicketTypes ticketType, TicketStatuses ticketStatus, string[] tags, TicketLinkDTO[] links)
+        public UpdateTicketCommand(long ticketId, string raisedByUser, string title, string description, string assignedTo, TicketPriorities priority, TicketTypes ticketType, TicketStatuses ticketStatus, string[] tags, TicketLinkDTO[] links)
             : base(ticketId, raisedByUser)
 
         {

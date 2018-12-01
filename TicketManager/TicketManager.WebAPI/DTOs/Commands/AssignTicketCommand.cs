@@ -6,7 +6,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class AssignTicketCommand : TicketCommandBase
     {
         [JsonConstructor]
-        public AssignTicketCommand(int ticketId, string raisedByUser, string assignTo)
+        public AssignTicketCommand(long ticketId, string raisedByUser, string assignTo)
           : base(ticketId, raisedByUser)
         {
             AssignTo = assignTo;
