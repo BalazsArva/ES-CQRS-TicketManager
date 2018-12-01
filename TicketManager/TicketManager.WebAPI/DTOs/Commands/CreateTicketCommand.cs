@@ -1,12 +1,10 @@
-﻿using MediatR;
-using TicketManager.Domain.Common;
+﻿using TicketManager.Domain.Common;
+using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class CreateTicketCommand : IRequest<int>
+    public class CreateTicketCommand : CommandBase<int>
     {
-        public string Creator { get; set; }
-
         public string AssignTo { get; set; }
 
         public string Title { get; set; }

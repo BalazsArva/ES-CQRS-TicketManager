@@ -1,14 +1,10 @@
-﻿using MediatR;
-using TicketManager.Domain.Common;
+﻿using TicketManager.Domain.Common;
+using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class ChangeTicketTypeCommand : IRequest
+    public class ChangeTicketTypeCommand : TicketCommandBase
     {
-        public int TicketId { get; set; }
-
-        public string User { get; set; }
-
         public TicketTypes TicketType { get; set; }
     }
 }

@@ -37,7 +37,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 context.TicketAssignedEvents.Add(new TicketAssignedEvent
                 {
                     AssignedTo = request.AssignTo,
-                    CausedBy = request.Assigner,
+                    CausedBy = request.RaisedByUser,
                     TicketCreatedEventId = request.TicketId
                 });
 

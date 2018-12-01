@@ -10,7 +10,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public AssignTicketCommandValidator(IEventsContextFactory eventsContextFactory)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.Assigner)
+            RuleFor(cmd => cmd.RaisedByUser)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 

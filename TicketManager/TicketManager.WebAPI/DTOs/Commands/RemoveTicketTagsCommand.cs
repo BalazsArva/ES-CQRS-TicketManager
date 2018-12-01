@@ -1,14 +1,10 @@
 ﻿using System;
-using MediatR;
+using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class RemoveTicketTagsCommand : IRequest
+    public class RemoveTicketTagsCommand : TicketCommandBase
     {
-        public int TicketId { get; set; }
-
-        public string User { get; set; }
-
         public string[] Tags { get; set; } = Array.Empty<string>();
     }
 }

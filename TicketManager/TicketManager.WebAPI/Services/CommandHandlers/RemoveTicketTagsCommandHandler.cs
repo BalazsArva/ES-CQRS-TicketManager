@@ -39,7 +39,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     var ticketTagChangedEvent = new TicketTagChangedEvent
                     {
-                        CausedBy = request.User,
+                        CausedBy = request.RaisedByUser,
                         Tag = tag,
                         TagAdded = false,
                         TicketCreatedEventId = request.TicketId

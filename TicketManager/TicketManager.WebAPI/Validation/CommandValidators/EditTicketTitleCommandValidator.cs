@@ -10,9 +10,9 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public EditTicketTitleCommandValidator(IEventsContextFactory eventsContextFactory)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.Editor)
+            RuleFor(cmd => cmd.RaisedByUser)
                 .Must(NotBeWhitespaceOnly)
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("editor"));
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleFor(cmd => cmd.Title)
                 .Must(NotBeWhitespaceOnly)

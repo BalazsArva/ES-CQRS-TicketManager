@@ -11,7 +11,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public ChangeTicketPriorityCommandValidator(IEventsContextFactory eventsContextFactory)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.User)
+            RuleFor(cmd => cmd.RaisedByUser)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 

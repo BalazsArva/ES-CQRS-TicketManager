@@ -16,7 +16,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .Must(BeAnExistingTicket)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
 
-            RuleFor(cmd => cmd.User)
+            RuleFor(cmd => cmd.RaisedByUser)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 

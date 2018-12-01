@@ -8,7 +8,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
     {
         public CreateTicketCommandValidator()
         {
-            RuleFor(cmd => cmd.Creator)
+            RuleFor(cmd => cmd.RaisedByUser)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("creator"));
 

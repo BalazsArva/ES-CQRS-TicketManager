@@ -36,7 +36,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             {
                 context.TicketPriorityChangedEvents.Add(new TicketPriorityChangedEvent
                 {
-                    CausedBy = request.User,
+                    CausedBy = request.RaisedByUser,
                     TicketCreatedEventId = request.TicketId,
                     Priority = request.Priority
                 });

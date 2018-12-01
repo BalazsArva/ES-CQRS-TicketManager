@@ -32,7 +32,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatuses>("ticket status"));
 
-            RuleFor(cmd => cmd.User)
+            RuleFor(cmd => cmd.RaisedByUser)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 

@@ -1,13 +1,9 @@
-﻿using MediatR;
+﻿using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class EditTicketDescriptionCommand : IRequest
+    public class EditTicketDescriptionCommand : TicketCommandBase
     {
-        public int TicketId { get; set; }
-
-        public string Editor { get; set; }
-
         public string Description { get; set; }
     }
 }

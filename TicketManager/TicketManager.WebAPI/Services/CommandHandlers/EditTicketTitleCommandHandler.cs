@@ -36,7 +36,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             {
                 context.TicketTitleChangedEvents.Add(new TicketTitleChangedEvent
                 {
-                    CausedBy = request.Editor,
+                    CausedBy = request.RaisedByUser,
                     TicketCreatedEventId = request.TicketId,
                     Title = request.Title
                 });

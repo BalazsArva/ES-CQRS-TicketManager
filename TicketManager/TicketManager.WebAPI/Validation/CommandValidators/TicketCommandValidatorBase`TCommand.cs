@@ -35,7 +35,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             }
 
             throw new InvalidOperationException(
-                "The validation could not be performed because the collection of existing ticket identifiers was not found in the context data of the validation context.");
+                "The validation could not be performed because the collection of existing ticket identifiers was not found in the validation context data.");
         }
 
         /// <summary>

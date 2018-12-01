@@ -11,11 +11,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public RemoveTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, TicketLinkValidator ticketLinkValidator)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.User)
+            RuleFor(cmd => cmd.RaisedByUser)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
-            RuleFor(cmd => cmd.SourceTicketId)
+            RuleFor(cmd => cmd.TicketId)
                 .Must(BeAnExistingTicket)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("source ticket"));
 
@@ -25,7 +25,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         protected override ISet<int> ExtractReferencedTicketIds(RemoveTicketLinksCommand command)
         {
-            return command.Links.Select(link => link.TargetTicketId).Concat(new[] { command.SourceTicketId }).ToHashSet();
+            return command.Links.Select(link => link.TargetTicketId).Concat(new[] { command.TicketId }).ToHashSet();
         }
     }
 }

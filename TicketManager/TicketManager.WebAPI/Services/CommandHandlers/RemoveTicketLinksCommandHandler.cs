@@ -39,9 +39,9 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     var ticketLinkChangedEvent = new TicketLinkChangedEvent
                     {
-                        CausedBy = request.User,
+                        CausedBy = request.RaisedByUser,
                         LinkType = ticketLink.LinkType,
-                        SourceTicketCreatedEventId = request.SourceTicketId,
+                        SourceTicketCreatedEventId = request.TicketId,
                         TargetTicketCreatedEventId = ticketLink.TargetTicketId,
                         ConnectionIsActive = false
                     };
@@ -54,7 +54,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 await context.SaveChangesAsync();
             }
 
-            await mediator.Publish(new TicketLinksRemovedNotification(request.SourceTicketId));
+            await mediator.Publish(new TicketLinksRemovedNotification(request.TicketId));
 
             return Unit.Value;
         }

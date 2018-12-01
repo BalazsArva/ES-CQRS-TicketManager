@@ -1,18 +1,14 @@
 ﻿using System;
-using MediatR;
 using TicketManager.Domain.Common;
+using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class UpdateTicketCommand : IRequest
+    public class UpdateTicketCommand : TicketCommandBase
     {
-        public int TicketId { get; set; }
-
         public string Title { get; set; }
 
         public string Description { get; set; }
-
-        public string User { get; set; }
 
         public string AssignedTo { get; set; }
 

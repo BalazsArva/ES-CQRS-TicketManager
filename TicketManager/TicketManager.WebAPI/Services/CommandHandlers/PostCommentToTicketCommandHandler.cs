@@ -37,14 +37,14 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             {
                 var ticketCommentPostedEvent = new TicketCommentPostedEvent
                 {
-                    CausedBy = request.User,
+                    CausedBy = request.RaisedByUser,
                     TicketCreatedEventId = request.TicketId
                 };
 
                 context.TicketCommentPostedEvents.Add(ticketCommentPostedEvent);
                 context.TicketCommentEditedEvents.Add(new TicketCommentEditedEvent
                 {
-                    CausedBy = request.User,
+                    CausedBy = request.RaisedByUser,
                     CommentText = request.CommentText,
                     TicketCommentPostedEvent = ticketCommentPostedEvent
                 });

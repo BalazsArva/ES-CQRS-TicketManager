@@ -11,16 +11,16 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public AddTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, TicketLinkValidator ticketLinkValidator)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.User)
+            RuleFor(cmd => cmd.RaisedByUser)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
-            RuleFor(cmd => cmd.SourceTicketId)
+            RuleFor(cmd => cmd.TicketId)
                 .Must(BeAnExistingTicket)
                 .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("source ticket"));
 
             RuleForEach(cmd => cmd.Links)
-                .Must((command, link) => link.TargetTicketId != command.SourceTicketId)
+                .Must((command, link) => link.TargetTicketId != command.TicketId)
                 .WithMessage("A ticket cannot be linked to itself.");
 
             RuleForEach(cmd => cmd.Links)
@@ -29,7 +29,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         protected override ISet<int> ExtractReferencedTicketIds(AddTicketLinksCommand command)
         {
-            return command.Links.Select(link => link.TargetTicketId).Concat(new[] { command.SourceTicketId }).ToHashSet();
+            return command.Links.Select(link => link.TargetTicketId).Concat(new[] { command.TicketId }).ToHashSet();
         }
     }
 }

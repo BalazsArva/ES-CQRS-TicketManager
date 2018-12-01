@@ -23,7 +23,7 @@ namespace TicketManager.WebAPI.Controllers
         {
             var id = await mediator.Send(new CreateTicketCommand
             {
-                Creator = "Balazs",
+                RaisedByUser = "Balazs",
                 Description = "Test",
                 Priority = Domain.Common.TicketPriorities.Lowest,
                 TicketType = Domain.Common.TicketTypes.Task,
@@ -32,7 +32,7 @@ namespace TicketManager.WebAPI.Controllers
 
             var id2 = await mediator.Send(new CreateTicketCommand
             {
-                Creator = "Balazs2",
+                RaisedByUser = "Balazs2",
                 Description = "Test2",
                 Priority = Domain.Common.TicketPriorities.Lowest,
                 TicketType = Domain.Common.TicketTypes.Task,
@@ -44,21 +44,21 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(new AssignTicketCommand
             {
                 TicketId = id,
-                Assigner = "Balazs2",
+                RaisedByUser = "Balazs2",
                 AssignTo = "Balazs",
             });
 
             await mediator.Send(new EditTicketTitleCommand
             {
                 Title = "New title",
-                Editor = "Balazs2",
+                RaisedByUser = "Balazs2",
                 TicketId = id
             });
 
             await mediator.Send(new EditTicketDescriptionCommand
             {
                 Description = "New description",
-                Editor = "Balazs2",
+                RaisedByUser = "Balazs2",
                 TicketId = id
             });
 
@@ -66,35 +66,35 @@ namespace TicketManager.WebAPI.Controllers
             {
                 NewStatus = Domain.Common.TicketStatuses.InProgress,
                 TicketId = id,
-                User = "Balazs2"
+                RaisedByUser = "Balazs2"
             });
 
             await mediator.Send(new AddTicketTagsCommand
             {
                 Tags = new[] { "Dev" },
                 TicketId = id,
-                User = "Balazs"
+                RaisedByUser = "Balazs"
             });
 
             await mediator.Send(new AddTicketTagsCommand
             {
                 Tags = new[] { "PoC", "Backend" },
                 TicketId = id,
-                User = "Balazs"
+                RaisedByUser = "Balazs"
             });
 
             await mediator.Send(new RemoveTicketTagsCommand
             {
                 Tags = new[] { "Dev" },
                 TicketId = id,
-                User = "Balazs"
+                RaisedByUser = "Balazs"
             });
 
             await mediator.Send(new AddTicketTagsCommand
             {
                 Tags = new[] { "QA" },
                 TicketId = id,
-                User = "Balazs"
+                RaisedByUser = "Balazs"
             });
 
             await mediator.Send(new AddTicketLinksCommand
@@ -112,8 +112,8 @@ namespace TicketManager.WebAPI.Controllers
                         TargetTicketId = id2,
                     },
                 },
-                SourceTicketId = id,
-                User = "Balazs"
+                TicketId = id,
+                RaisedByUser = "Balazs"
             });
 
             await mediator.Send(new AddTicketLinksCommand
@@ -131,8 +131,8 @@ namespace TicketManager.WebAPI.Controllers
                         TargetTicketId = id2,
                     },
                 },
-                SourceTicketId = id,
-                User = "Balazs"
+                TicketId = id,
+                RaisedByUser = "Balazs"
             });
 
             return Ok();

@@ -35,43 +35,43 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             int ticketId;
             using (var context = eventsContextFactory.CreateContext())
             {
-                var ticketCreatedEvent = new TicketCreatedEvent { CausedBy = request.Creator };
+                var ticketCreatedEvent = new TicketCreatedEvent { CausedBy = request.RaisedByUser };
 
                 context.TicketCreatedEvents.Add(ticketCreatedEvent);
                 context.TicketTitleChangedEvents.Add(new TicketTitleChangedEvent
                 {
-                    CausedBy = request.Creator,
+                    CausedBy = request.RaisedByUser,
                     TicketCreatedEvent = ticketCreatedEvent,
                     Title = request.Title
                 });
                 context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
-                    CausedBy = request.Creator,
+                    CausedBy = request.RaisedByUser,
                     Description = request.Description,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketPriorityChangedEvents.Add(new TicketPriorityChangedEvent
                 {
-                    CausedBy = request.Creator,
+                    CausedBy = request.RaisedByUser,
                     Priority = request.Priority,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketTypeChangedEvents.Add(new TicketTypeChangedEvent
                 {
-                    CausedBy = request.Creator,
+                    CausedBy = request.RaisedByUser,
                     TicketType = request.TicketType,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
                 {
                     TicketCreatedEvent = ticketCreatedEvent,
-                    CausedBy = request.Creator,
+                    CausedBy = request.RaisedByUser,
                     TicketStatus = request.TicketStatus
                 });
                 context.TicketAssignedEvents.Add(new TicketAssignedEvent
                 {
                     AssignedTo = request.AssignTo,
-                    CausedBy = request.Creator,
+                    CausedBy = request.RaisedByUser,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
 

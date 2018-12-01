@@ -29,13 +29,13 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         protected bool BeAnExistingComment(TCommand command, int commentId, PropertyValidatorContext context)
         {
-            if (context.ParentContext.RootContextData[ValidationContextKeys.FoundCommentIdsContextDataKey] is ISet<int> foundTicketIds)
+            if (context.ParentContext.RootContextData[ValidationContextKeys.FoundCommentIdsContextDataKey] is ISet<int> foundCommentIds)
             {
-                return foundTicketIds.Contains(commentId);
+                return foundCommentIds.Contains(commentId);
             }
 
             throw new InvalidOperationException(
-                "The validation could not be performed because the collection of existing comment identifiers was not found in the context data of the validation context.");
+                "The validation could not be performed because the collection of existing comment identifiers was not found in the validation context data.");
         }
 
         /// <summary>

@@ -43,7 +43,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var updatedBy = request.User;
+                var updatedBy = request.RaisedByUser;
                 var ticketId = request.TicketId;
 
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
