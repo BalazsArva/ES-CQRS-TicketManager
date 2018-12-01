@@ -9,7 +9,7 @@ using FluentValidation.Validators;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.Extensions;
 
-namespace TicketManager.WebAPI.Validation.CommandValidators
+namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
 {
     public abstract class CommentCommandValidatorBase<TCommand> : ValidatorBase<TCommand>
     {

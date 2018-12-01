@@ -10,7 +10,7 @@ using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
-namespace TicketManager.WebAPI.Validation.CommandValidators
+namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
 {
     public abstract class TicketCommandValidatorBase<TCommand> : ValidatorBase<TCommand>
         where TCommand : ITicketCommand
