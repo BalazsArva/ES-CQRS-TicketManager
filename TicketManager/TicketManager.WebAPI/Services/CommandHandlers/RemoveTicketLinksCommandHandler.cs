@@ -33,21 +33,18 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
             using (var context = eventsContextFactory.CreateContext())
             {
-                var now = DateTime.UtcNow;
                 foreach (var ticketLink in request.Links)
                 {
-                    var ticketLinkChangedEvent = new TicketLinkChangedEvent
+                    // TODO: Consider whether: there should be validation that the link is already established, OR simply ignore as the query won't return it anyway.
+
+                    context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
                     {
                         CausedBy = request.RaisedByUser,
                         LinkType = ticketLink.LinkType,
                         SourceTicketCreatedEventId = request.TicketId,
                         TargetTicketCreatedEventId = ticketLink.TargetTicketId,
                         ConnectionIsActive = false
-                    };
-
-                    // TODO: Consider whether: there should be validation that the link is already established, OR simply ignore as the query won't return it anyway.
-
-                    context.TicketLinkChangedEvents.Add(ticketLinkChangedEvent);
+                    });
                 }
 
                 await context.SaveChangesAsync();

@@ -35,17 +35,15 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             {
                 foreach (var ticketLink in request.Links)
                 {
-                    var ticketLinkChangedEvent = new TicketLinkChangedEvent
+                    // TODO: Consider whether: there should be validation that the link is not yet established, OR simply ignore and get the distinct links on the query level.
+                    context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
                     {
                         CausedBy = request.RaisedByUser,
                         LinkType = ticketLink.LinkType,
                         SourceTicketCreatedEventId = request.TicketId,
                         TargetTicketCreatedEventId = ticketLink.TargetTicketId,
                         ConnectionIsActive = true
-                    };
-
-                    // TODO: Consider whether: there should be validation that the link is not yet established, OR simply ignore and get the distinct links on the query level.
-                    context.TicketLinkChangedEvents.Add(ticketLinkChangedEvent);
+                    });
                 }
 
                 await context.SaveChangesAsync();

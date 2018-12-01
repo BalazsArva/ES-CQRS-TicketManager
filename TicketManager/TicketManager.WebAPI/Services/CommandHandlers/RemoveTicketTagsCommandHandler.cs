@@ -36,16 +36,14 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             {
                 foreach (var tag in request.Tags)
                 {
-                    var ticketTagChangedEvent = new TicketTagChangedEvent
+                    // TODO: Consider whether: there should be validation that the tag is already assigned to the ticket, OR simply ignore as the query won't return it anyway.
+                    context.TicketTagChangedEvents.Add(new TicketTagChangedEvent
                     {
                         CausedBy = request.RaisedByUser,
                         Tag = tag,
                         TagAdded = false,
                         TicketCreatedEventId = request.TicketId
-                    };
-
-                    // TODO: Consider whether: there should be validation that the tag is already assigned to the ticket, OR simply ignore as the query won't return it anyway.
-                    context.TicketTagChangedEvents.Add(ticketTagChangedEvent);
+                    });
                 }
 
                 await context.SaveChangesAsync();
