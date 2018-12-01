@@ -28,7 +28,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     .OfComment(notification.CommentId)
                     .LatestAsync();
 
-                var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(notification.CommentId.ToString());
+                var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(notification.CommentId);
 
                 // No need to use the last updated patch because the comment can only be edited by its owner so it's not as prone to concurrency.
                 session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.CommentText, commentEditedEvent.CommentText);

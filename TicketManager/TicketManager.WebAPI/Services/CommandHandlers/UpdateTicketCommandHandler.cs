@@ -45,7 +45,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 var updatedBy = request.RaisedByUser;
                 var ticketId = request.TicketId;
 
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId);
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
                 UpdateAssignmentIfChanged(context, ticketDocument, ticketId, request.AssignedTo, updatedBy);
@@ -178,14 +178,14 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             var currentLinks = ticketDocument.Links?.LinkSet ?? Array.Empty<TicketLink>();
 
             var removedLinks = currentLinks
-                .Where(lnk => !newLinks.Any(newLnk => newLnk.LinkType == lnk.LinkType && session.GeneratePrefixedDocumentId<Ticket>(newLnk.TargetTicketId.ToString()) == lnk.TargetTicketId))
+                .Where(lnk => !newLinks.Any(newLnk => newLnk.LinkType == lnk.LinkType && session.GeneratePrefixedDocumentId<Ticket>(newLnk.TargetTicketId) == lnk.TargetTicketId))
                 .ToList();
 
             var addedLinks = newLinks
                 .Select(newLnk => new TicketLink
                 {
                     LinkType = newLnk.LinkType,
-                    TargetTicketId = session.GeneratePrefixedDocumentId<Ticket>(newLnk.TargetTicketId.ToString())
+                    TargetTicketId = session.GeneratePrefixedDocumentId<Ticket>(newLnk.TargetTicketId)
                 })
                 .Where(newLnk => !currentLinks.Any(currLnk => currLnk.LinkType == newLnk.LinkType && currLnk.TargetTicketId == newLnk.TargetTicketId))
                 .ToList();

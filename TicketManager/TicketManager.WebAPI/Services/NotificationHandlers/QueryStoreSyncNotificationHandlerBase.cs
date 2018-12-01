@@ -58,7 +58,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
             var ticket = new Ticket
             {
-                Id = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString()),
+                Id = session.GeneratePrefixedDocumentId<Ticket>(ticketId),
                 CreatedBy = ticketCreatedEvent.CausedBy,
                 UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
                 TicketStatus =
@@ -127,7 +127,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId);
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
                 var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.LastKnownChangeId, ticketDocument.Tags.TagSet);
@@ -150,7 +150,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId.ToString());
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId);
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
                 var updatedLinks = await GetUpdatedLinksAsync(context, session, ticketCreatedEventId, ticketDocument.Links.LastKnownChangeId, ticketDocument.Links.LinkSet);
@@ -224,7 +224,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .GroupBy(
                     lnk => new TicketLink
                     {
-                        TargetTicketId = session.GeneratePrefixedDocumentId<Ticket>(lnk.TargetTicketCreatedEventId.ToString()),
+                        TargetTicketId = session.GeneratePrefixedDocumentId<Ticket>(lnk.TargetTicketCreatedEventId),
                         LinkType = lnk.LinkType
                     },
                     (key, elements) => new

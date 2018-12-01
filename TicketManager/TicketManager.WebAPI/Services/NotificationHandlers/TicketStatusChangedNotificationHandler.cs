@@ -29,7 +29,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     .OfTicket(ticketId)
                     .LatestAsync();
 
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
+                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId);
 
                 var updates = new PropertyUpdateBatch<Ticket>()
                     .Add(t => t.TicketStatus.LastChangedBy, ticketStatusChangedEvent.CausedBy)
