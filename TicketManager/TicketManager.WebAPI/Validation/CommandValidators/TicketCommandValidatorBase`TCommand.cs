@@ -8,16 +8,26 @@ using FluentValidation.Results;
 using FluentValidation.Validators;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.Extensions;
+using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public abstract class TicketCommandValidatorBase<TCommand> : ValidatorBase<TCommand>
+        where TCommand : ITicketCommand
     {
         protected readonly IEventsContextFactory eventsContextFactory;
 
         protected TicketCommandValidatorBase(IEventsContextFactory eventsContextFactory)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
+
+            RuleFor(cmd => cmd.TicketId)
+                .Must(BeAnExistingTicket)
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
+
+            RuleFor(cmd => cmd.RaisedByUser)
+                .Must(NotBeWhitespaceOnly)
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
         }
 
         public override async Task<ValidationResult> ValidateAsync(ValidationContext<TCommand> context, CancellationToken cancellationToken = default)
@@ -66,10 +76,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         }
 
         /// <summary>
-        /// When overridden in a derived class, returns a set which contains all ticket Ids which can be found in any
-        /// appropriate property of the validated object. Override this method to collect all ticket Ids from all
-        /// properties to support batch retrievals from data sources rather than quering them one-by-one for each
-        /// item/property which concerns a ticket. The existence check can later be performed by retrieving the result of
+        /// Returns a set which contains all ticket Ids which can be found in any appropriate property of the validated
+        /// object. If the <typeparamref name="TCommand"/> type contains properties other than <see
+        /// cref="ITicketCommand.TicketId"/> which represents a ticket, then override this method to collect all ticket
+        /// Ids from all appropriate properties to support batch retrievals from data sources rather than quering them
+        /// one-by-one for each item/property. The existence check can later be performed by retrieving the result of
         /// this method which is stored in the <see cref="ValidationContext.RootContextData"/> with the key <see cref="ValidationContextKeys.FoundTicketIdsContextDataKey"/>.
         /// </summary>
         /// <param name="command">
@@ -78,6 +89,9 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         /// <returns>
         /// A set which contains all ticket ids which are referenced in any property of the validated object.
         /// </returns>
-        protected abstract ISet<int> ExtractReferencedTicketIds(TCommand command);
+        protected virtual ISet<int> ExtractReferencedTicketIds(TCommand command)
+        {
+            return new HashSet<int> { command.TicketId };
+        }
     }
 }

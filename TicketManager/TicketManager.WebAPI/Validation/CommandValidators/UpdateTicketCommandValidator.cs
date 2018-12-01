@@ -12,10 +12,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, TicketLinkValidator ticketLinkValidator)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.TicketId)
-                .Must(BeAnExistingTicket)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
-
             RuleFor(cmd => cmd.Title)
                 .Must(NotBeWhitespaceOnly)
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("title"));
@@ -31,10 +27,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.TicketStatus)
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatuses>("ticket status"));
-
-            RuleFor(cmd => cmd.RaisedByUser)
-                .Must(NotBeWhitespaceOnly)
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
 
             RuleForEach(cmd => cmd.Links)
                 .Must((command, link) => link.TargetTicketId != command.TicketId)

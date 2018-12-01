@@ -11,14 +11,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public AddTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, TicketLinkValidator ticketLinkValidator)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.RaisedByUser)
-                .Must(NotBeWhitespaceOnly)
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
-
-            RuleFor(cmd => cmd.TicketId)
-                .Must(BeAnExistingTicket)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("source ticket"));
-
             RuleForEach(cmd => cmd.Links)
                 .Must((command, link) => link.TargetTicketId != command.TicketId)
                 .WithMessage("A ticket cannot be linked to itself.");

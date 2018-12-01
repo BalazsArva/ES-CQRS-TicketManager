@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FluentValidation;
+﻿using FluentValidation;
 using TicketManager.DataAccess.Events;
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
@@ -11,22 +10,9 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public ChangeTicketStatusCommandValidator(IEventsContextFactory eventsContextFactory)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.RaisedByUser)
-                .Must(NotBeWhitespaceOnly)
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
-
             RuleFor(cmd => cmd.NewStatus)
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketPriorities>("new status"));
-
-            RuleFor(cmd => cmd.TicketId)
-                .Must(BeAnExistingTicket)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("ticket"));
-        }
-
-        protected override ISet<int> ExtractReferencedTicketIds(ChangeTicketStatusCommand command)
-        {
-            return new HashSet<int> { command.TicketId };
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FluentValidation;
 using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Commands;
 
@@ -11,13 +10,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public RemoveTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, TicketLinkValidator ticketLinkValidator)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.RaisedByUser)
-                .Must(NotBeWhitespaceOnly)
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
-
-            RuleFor(cmd => cmd.TicketId)
-                .Must(BeAnExistingTicket)
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("source ticket"));
+            // TODO: Verify  that the link is actually added (or maybe can ignore that).
 
             RuleForEach(cmd => cmd.Links)
                 .SetValidator(ticketLinkValidator);

@@ -70,7 +70,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         /// appropriate property of the validated object. Override this method to collect all comment Ids from all
         /// properties to support batch retrievals from data sources rather than quering them one-by-one for each
         /// item/property which concerns a comment. The existence check can later be performed by retrieving the result of
-        /// this method which is stored in the <see cref="ValidationContext.RootContextData"/> with the key <see cref="ValidationContextKeys.FoundTicketIdsContextDataKey"/>.
+        /// this method which is stored in the <see cref="ValidationContext.RootContextData"/> with the key <see cref="ValidationContextKeys.FoundCommentIdsContextDataKey"/>.
         /// </summary>
         /// <param name="command">
         /// The command to extract referenced comment Ids from.
