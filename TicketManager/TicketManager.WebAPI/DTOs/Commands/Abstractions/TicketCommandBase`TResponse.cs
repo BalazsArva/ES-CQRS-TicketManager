@@ -2,6 +2,12 @@
 {
     public abstract class TicketCommandBase<TResponse> : CommandBase<TResponse>, ITicketCommand
     {
-        public int TicketId { get; set; }
+        protected TicketCommandBase(int ticketId, string raisedByUser)
+            : base(raisedByUser)
+        {
+            TicketId = ticketId;
+        }
+
+        public int TicketId { get; }
     }
 }

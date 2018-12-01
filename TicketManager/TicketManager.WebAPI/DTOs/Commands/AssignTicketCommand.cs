@@ -1,9 +1,17 @@
-﻿using TicketManager.WebAPI.DTOs.Commands.Abstractions;
+﻿using Newtonsoft.Json;
+using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
     public class AssignTicketCommand : TicketCommandBase
     {
-        public string AssignTo { get; set; }
+        [JsonConstructor]
+        public AssignTicketCommand(int ticketId, string raisedByUser, string assignTo)
+          : base(ticketId, raisedByUser)
+        {
+            AssignTo = assignTo;
+        }
+
+        public string AssignTo { get; }
     }
 }

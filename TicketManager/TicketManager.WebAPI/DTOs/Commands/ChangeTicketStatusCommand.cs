@@ -1,10 +1,18 @@
-﻿using TicketManager.Domain.Common;
+﻿using Newtonsoft.Json;
+using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
     public class ChangeTicketStatusCommand : TicketCommandBase
     {
-        public TicketStatuses NewStatus { get; set; }
+        [JsonConstructor]
+        public ChangeTicketStatusCommand(int ticketId, string raisedByUser, TicketStatuses newStatus)
+           : base(ticketId, raisedByUser)
+        {
+            NewStatus = newStatus;
+        }
+
+        public TicketStatuses NewStatus { get; }
     }
 }

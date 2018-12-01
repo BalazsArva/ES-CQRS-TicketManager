@@ -1,10 +1,18 @@
-﻿using TicketManager.Domain.Common;
+﻿using Newtonsoft.Json;
+using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
     public class ChangeTicketTypeCommand : TicketCommandBase
     {
-        public TicketTypes TicketType { get; set; }
+        [JsonConstructor]
+        public ChangeTicketTypeCommand(int ticketId, string raisedByUser, TicketTypes ticketType)
+           : base(ticketId, raisedByUser)
+        {
+            TicketType = ticketType;
+        }
+
+        public TicketTypes TicketType { get; }
     }
 }

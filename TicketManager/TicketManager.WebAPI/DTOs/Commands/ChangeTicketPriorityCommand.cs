@@ -1,10 +1,18 @@
-﻿using TicketManager.Domain.Common;
+﻿using Newtonsoft.Json;
+using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
     public class ChangeTicketPriorityCommand : TicketCommandBase
     {
-        public TicketPriorities Priority { get; set; }
+        [JsonConstructor]
+        public ChangeTicketPriorityCommand(int ticketId, string raisedByUser, TicketPriorities priority)
+           : base(ticketId, raisedByUser)
+        {
+            Priority = priority;
+        }
+
+        public TicketPriorities Priority { get; }
     }
 }

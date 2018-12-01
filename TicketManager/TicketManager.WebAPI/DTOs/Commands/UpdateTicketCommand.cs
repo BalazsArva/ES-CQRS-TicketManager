@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
@@ -6,20 +7,35 @@ namespace TicketManager.WebAPI.DTOs.Commands
 {
     public class UpdateTicketCommand : TicketCommandBase
     {
-        public string Title { get; set; }
+        [JsonConstructor]
+        public UpdateTicketCommand(int ticketId, string raisedByUser, string title, string description, string assignedTo, TicketPriorities priority, TicketTypes ticketType, TicketStatuses ticketStatus, string[] tags, TicketLinkDTO[] links)
+            : base(ticketId, raisedByUser)
 
-        public string Description { get; set; }
+        {
+            Title = title;
+            Description = description;
+            AssignedTo = assignedTo;
+            Priority = priority;
+            TicketType = ticketType;
+            TicketStatus = ticketStatus;
+            Tags = tags ?? Array.Empty<string>();
+            Links = links ?? Array.Empty<TicketLinkDTO>();
+        }
 
-        public string AssignedTo { get; set; }
+        public string Title { get; }
 
-        public TicketPriorities Priority { get; set; }
+        public string Description { get; }
 
-        public TicketTypes TicketType { get; set; }
+        public string AssignedTo { get; }
 
-        public TicketStatuses TicketStatus { get; set; }
+        public TicketPriorities Priority { get; }
 
-        public string[] Tags { get; set; } = Array.Empty<string>();
+        public TicketTypes TicketType { get; }
 
-        public TicketLinkDTO[] Links { get; set; } = Array.Empty<TicketLinkDTO>();
+        public TicketStatuses TicketStatus { get; }
+
+        public string[] Tags { get; }
+
+        public TicketLinkDTO[] Links { get; }
     }
 }

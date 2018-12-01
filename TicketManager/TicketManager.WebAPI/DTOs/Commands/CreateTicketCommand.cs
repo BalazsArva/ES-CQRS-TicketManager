@@ -1,20 +1,33 @@
-﻿using TicketManager.Domain.Common;
+﻿using Newtonsoft.Json;
+using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
     public class CreateTicketCommand : CommandBase<int>
     {
-        public string AssignTo { get; set; }
+        [JsonConstructor]
+        public CreateTicketCommand(string raisedByUser, string assignTo, string title, string description, TicketPriorities priority, TicketTypes ticketType, TicketStatuses ticketStatus)
+            : base(raisedByUser)
+        {
+            AssignTo = assignTo;
+            Title = title;
+            Description = description;
+            Priority = priority;
+            TicketType = ticketType;
+            TicketStatus = ticketStatus;
+        }
 
-        public string Title { get; set; }
+        public string AssignTo { get; }
 
-        public string Description { get; set; }
+        public string Title { get; }
 
-        public TicketPriorities Priority { get; set; }
+        public string Description { get; }
 
-        public TicketTypes TicketType { get; set; }
+        public TicketPriorities Priority { get; }
 
-        public TicketStatuses TicketStatus { get; set; }
+        public TicketTypes TicketType { get; }
+
+        public TicketStatuses TicketStatus { get; }
     }
 }
