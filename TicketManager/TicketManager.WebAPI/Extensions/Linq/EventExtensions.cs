@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -43,17 +42,11 @@ namespace TicketManager.WebAPI.Extensions.Linq
             return events.Where(x => x.Id > lastKnownEventId);
         }
 
-        public static IQueryable<TEvent> After<TEvent>(this IQueryable<TEvent> events, DateTime lastKnownEventDateTime)
-             where TEvent : EventBase
-        {
-            return events.Where(x => x.UtcDateRecorded > lastKnownEventDateTime);
-        }
-
-        public static Task<List<TEvent>> ToChronologicalListAsync<TEvent>(this IQueryable<TEvent> events)
+        public static Task<List<TEvent>> ToOrderedEventListAsync<TEvent>(this IQueryable<TEvent> events)
             where TEvent : EventBase
         {
             return events
-                .OrderBy(evt => evt.UtcDateRecorded)
+                .OrderBy(evt => evt.Id)
                 .ToListAsync();
         }
     }

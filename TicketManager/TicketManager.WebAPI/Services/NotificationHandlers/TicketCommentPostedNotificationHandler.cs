@@ -37,6 +37,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     Id = commentDocumentId,
                     UtcDatePosted = commentPostedEvent.UtcDateRecorded,
                     UtcDateLastUpdated = commentEditedEvent.UtcDateRecorded,
+                    LastKnownChangeId = commentEditedEvent.Id,
                     CreatedBy = commentPostedEvent.CausedBy,
                     LastChangedBy = commentPostedEvent.CausedBy,
                     TicketId = ticketDocumentId

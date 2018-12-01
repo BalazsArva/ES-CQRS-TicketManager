@@ -53,8 +53,8 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .OfTicket(ticketId)
                 .LatestAsync();
 
-            var tags = await GetUpdatedTagsAsync(context, ticketId, DateTime.MinValue, Array.Empty<string>());
-            var links = await GetUpdatedLinksAsync(context, session, ticketId, DateTime.MinValue, Array.Empty<TicketLink>());
+            var tags = await GetUpdatedTagsAsync(context, ticketId, 0, Array.Empty<string>());
+            var links = await GetUpdatedLinksAsync(context, session, ticketId, 0, Array.Empty<TicketLink>());
 
             var ticket = new Ticket
             {
@@ -65,49 +65,57 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 {
                     LastChangedBy = ticketStatusChangedEvent.CausedBy,
                     Status = ticketStatusChangedEvent.TicketStatus,
-                    UtcDateLastUpdated = ticketStatusChangedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketStatusChangedEvent.UtcDateRecorded,
+                    LastKnownChangeId = ticketStatusChangedEvent.Id
                 },
                 Assignment =
                 {
                     LastChangedBy = ticketAssignedEvent.CausedBy,
                     AssignedTo = ticketAssignedEvent.AssignedTo,
-                    UtcDateLastUpdated = ticketAssignedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketAssignedEvent.UtcDateRecorded,
+                    LastKnownChangeId = ticketAssignedEvent.Id
                 },
                 TicketDescription =
                 {
                     LastChangedBy = ticketDescriptionChangedEvent.CausedBy,
                     Description = ticketDescriptionChangedEvent.Description,
-                    UtcDateLastUpdated = ticketDescriptionChangedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketDescriptionChangedEvent.UtcDateRecorded,
+                    LastKnownChangeId = ticketDescriptionChangedEvent.Id
                 },
                 TicketTitle =
                 {
                     LastChangedBy = ticketTitleChangedEvent.CausedBy,
                     Title = ticketTitleChangedEvent.Title,
-                    UtcDateLastUpdated = ticketTitleChangedEvent.UtcDateRecorded
+                    UtcDateLastUpdated = ticketTitleChangedEvent.UtcDateRecorded,
+                    LastKnownChangeId = ticketTitleChangedEvent.Id
                 },
                 TicketPriority =
                 {
                     LastChangedBy = ticketPriorityChangedEvent.CausedBy,
                     UtcDateLastUpdated = ticketPriorityChangedEvent.UtcDateRecorded,
-                    Priority = ticketPriorityChangedEvent.Priority
+                    Priority = ticketPriorityChangedEvent.Priority,
+                    LastKnownChangeId = ticketPriorityChangedEvent.Id
                 },
                 TicketType =
                 {
                     LastChangedBy = ticketTypeChangedEvent.CausedBy,
                     UtcDateLastUpdated = ticketTypeChangedEvent.UtcDateRecorded,
-                    Type = ticketTypeChangedEvent.TicketType
+                    Type = ticketTypeChangedEvent.TicketType,
+                    LastKnownChangeId = ticketTypeChangedEvent.Id
                 },
                 Tags =
                 {
                     LastChangedBy = tags.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
                     UtcDateLastUpdated = tags.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
-                    TagSet = tags.Tags
+                    TagSet = tags.Tags,
+                    LastKnownChangeId = tags.LastChange?.Id ?? 0
                 },
                 Links =
                 {
                     LastChangedBy = links.LastChange?.CausedBy ?? ticketCreatedEvent.CausedBy,
                     UtcDateLastUpdated = links.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
-                    LinkSet = links.Links
+                    LinkSet = links.Links,
+                    LastKnownChangeId = links.LastChange?.Id ?? 0
                 }
             };
 
@@ -122,16 +130,17 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.UtcDateLastUpdated, ticketDocument.Tags.TagSet);
+                var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.LastKnownChangeId, ticketDocument.Tags.TagSet);
                 var lastChange = updatedTags.LastChange;
 
                 if (lastChange != null)
                 {
                     var updates = new PropertyUpdateBatch<Ticket>()
                         .Add(t => t.Tags.LastChangedBy, lastChange.CausedBy)
+                        .Add(t => t.Tags.UtcDateLastUpdated, lastChange.UtcDateRecorded)
                         .Add(t => t.Tags.TagSet, updatedTags.Tags);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.UtcDateLastUpdated, lastChange.UtcDateRecorded);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.LastKnownChangeId, lastChange.Id);
                 }
             }
         }
@@ -144,21 +153,22 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId.ToString());
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedLinks = await GetUpdatedLinksAsync(context, session, ticketCreatedEventId, ticketDocument.Links.UtcDateLastUpdated, ticketDocument.Links.LinkSet);
+                var updatedLinks = await GetUpdatedLinksAsync(context, session, ticketCreatedEventId, ticketDocument.Links.LastKnownChangeId, ticketDocument.Links.LinkSet);
                 var lastChange = updatedLinks.LastChange;
 
                 if (lastChange != null)
                 {
                     var updates = new PropertyUpdateBatch<Ticket>()
                         .Add(t => t.Links.LastChangedBy, lastChange.CausedBy)
+                        .Add(t => t.Links.UtcDateLastUpdated, lastChange.UtcDateRecorded)
                         .Add(t => t.Links.LinkSet, updatedLinks.Links);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.UtcDateLastUpdated, lastChange.UtcDateRecorded);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.LastKnownChangeId, lastChange.Id);
                 }
             }
         }
 
-        protected async Task<(string[] Tags, TicketTagChangedEvent LastChange)> GetUpdatedTagsAsync(EventsContext context, int ticketCreatedEventId, DateTime lastUpdate, string[] currentTags)
+        protected async Task<(string[] Tags, TicketTagChangedEvent LastChange)> GetUpdatedTagsAsync(EventsContext context, int ticketCreatedEventId, int lastKnownChangeId, string[] currentTags)
         {
             currentTags = currentTags ?? Array.Empty<string>();
 
@@ -166,8 +176,8 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .TicketTagChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketCreatedEventId)
-                .After(lastUpdate)
-                .ToChronologicalListAsync();
+                .After(lastKnownChangeId)
+                .ToOrderedEventListAsync();
 
             if (tagChangesSinceLastSync.Count == 0)
             {
@@ -178,7 +188,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .GroupBy(t => t.Tag, (key, elements) => new
                 {
                     Tag = key,
-                    IsAdded = elements.OrderByDescending(e => e.UtcDateRecorded).First().TagAdded
+                    IsAdded = elements.OrderByDescending(e => e.Id).First().TagAdded
                 })
                 .ToList();
 
@@ -194,7 +204,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return (updatedTags, tagChangesSinceLastSync.Last());
         }
 
-        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, IAsyncDocumentSession session, int sourceTicketCreatedEventId, DateTime lastUpdate, TicketLink[] currentLinks)
+        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, IAsyncDocumentSession session, int sourceTicketCreatedEventId, int lastKnownChangeId, TicketLink[] currentLinks)
         {
             currentLinks = currentLinks ?? Array.Empty<TicketLink>();
 
@@ -202,8 +212,8 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .TicketLinkChangedEvents
                 .AsNoTracking()
                 .Where(evt => evt.SourceTicketCreatedEventId == sourceTicketCreatedEventId)
-                .After(lastUpdate)
-                .ToChronologicalListAsync();
+                .After(lastKnownChangeId)
+                .ToOrderedEventListAsync();
 
             if (linkChangesSinceLastSync.Count == 0)
             {
@@ -220,7 +230,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     (key, elements) => new
                     {
                         Link = key,
-                        IsAdded = elements.OrderByDescending(e => e.UtcDateRecorded).First().ConnectionIsActive
+                        IsAdded = elements.OrderByDescending(e => e.Id).First().ConnectionIsActive
                     })
                 .ToList();
 

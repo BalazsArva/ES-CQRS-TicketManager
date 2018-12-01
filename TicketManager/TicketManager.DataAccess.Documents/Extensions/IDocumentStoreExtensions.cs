@@ -22,8 +22,8 @@ namespace TicketManager.DataAccess.Documents.Extensions
             const string argumentName = "__AUTO_DateUpdated";
             const string variableName = "shouldUpdate";
 
-            var timestampPropertyPath = GetTimestampPropertyPath(timestampSelector);
-            var conditionVariableScript = CreateConditionVariableScript(timestampSelector, utcUpdateDate, argumentName, variableName, timestampPropertyPath);
+            var timestampPropertyPath = GetPropertyPathFromExpression(timestampSelector);
+            var conditionVariableScript = CreateConditionVariableScript(argumentName, variableName, timestampPropertyPath);
 
             // +1 for the update timestamp which does not need to be provided explicitly.
             var assignmentScripts = new List<string>(propertyUpdates.Length + 1);
@@ -60,6 +60,54 @@ namespace TicketManager.DataAccess.Documents.Extensions
             await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
         }
 
+        public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, int>> lastKnownChangeIdSelector, int lastKnownChangeId)
+        {
+            return PatchToNewer(store, id, lastKnownChangeIdSelector, lastKnownChangeId, propertyUpdates.CreateBatch());
+        }
+
+        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, int>> lastKnownChangeIdSelector, int lastKnownChangeId, params PropertyUpdateDescriptor[] propertyUpdates)
+        {
+            const string argumentName = "__AUTO_LastKnownChangeId";
+            const string variableName = "shouldUpdate";
+
+            var timestampPropertyPath = GetPropertyPathFromExpression(lastKnownChangeIdSelector);
+            var conditionVariableScript = CreateConditionVariableScript(argumentName, variableName, timestampPropertyPath);
+
+            // +1 for the last known change Id which does not need to be provided explicitly.
+            var assignmentScripts = new List<string>(propertyUpdates.Length + 1);
+            var scriptParameters = new ScriptParameterDictionary
+            {
+                [argumentName] = lastKnownChangeId
+            };
+
+            for (var i = 0; i < propertyUpdates.Length; ++i)
+            {
+                var propertyUpdate = propertyUpdates[i];
+                var parameterName = string.Concat("__AUTO_Parameter", i);
+
+                assignmentScripts.Add(CreateUpdateScript(propertyUpdate, scriptParameters, parameterName));
+                scriptParameters.AddParameter(parameterName, propertyUpdate.NewValue);
+            }
+
+            assignmentScripts.Add("\t" + timestampPropertyPath + " = args.__AUTO_LastKnownChangeId;");
+
+            var script = string.Join(
+                Environment.NewLine,
+                conditionVariableScript,
+                $"if ({variableName})",
+                "{",
+                string.Join(Environment.NewLine, assignmentScripts),
+                "}");
+
+            var patchRequest = new PatchRequest
+            {
+                Script = script,
+                Values = scriptParameters
+            };
+
+            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
+        }
+
         private static string CreateUpdateScript(PropertyUpdateDescriptor propertyUpdateDescriptor, Dictionary<string, object> parameters, string parameterName)
         {
             var returnValue = new StringBuilder();
@@ -73,7 +121,7 @@ namespace TicketManager.DataAccess.Documents.Extensions
             return returnValue.ToString();
         }
 
-        private static string CreateConditionVariableScript<TDocument>(Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate, string argumentName, string variableName, string conditionPropertyPath)
+        private static string CreateConditionVariableScript(string argumentName, string variableName, string conditionPropertyPath)
         {
             var returnValue = new StringBuilder();
 
@@ -88,10 +136,10 @@ namespace TicketManager.DataAccess.Documents.Extensions
             return returnValue.ToString();
         }
 
-        private static string GetTimestampPropertyPath<TDocument>(Expression<Func<TDocument, DateTime>> timestampSelector)
+        private static string GetPropertyPathFromExpression(LambdaExpression lambdaExpression)
         {
-            // If the expression is something like doc => doc.LastUpdate.UtcDateUpdated, this returns [ "LastUpdate", "UtcDateUpdated" ], so it omits the "doc" parameter.
-            var pathToTimestampProperty = ExpressionHelper.GetMemberList(timestampSelector);
+            // If the expression is something like doc => doc.LastUpdate.LastKnownChangeId, this returns [ "LastUpdate", "UtcDateUpdated" ], so it omits the "doc" parameter.
+            var pathToTimestampProperty = ExpressionHelper.GetMemberList(lambdaExpression);
             pathToTimestampProperty.Insert(0, "this");
 
             return string.Join(".", pathToTimestampProperty);

@@ -33,6 +33,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.CommentText, commentEditedEvent.CommentText);
                 session.Advanced.Patch<Comment, string>(commentDocumentId, c => c.LastChangedBy, commentEditedEvent.CausedBy);
                 session.Advanced.Patch<Comment, DateTime>(commentDocumentId, c => c.UtcDateLastUpdated, commentEditedEvent.UtcDateRecorded);
+                session.Advanced.Patch<Comment, int>(commentDocumentId, c => c.LastKnownChangeId, commentEditedEvent.Id);
 
                 await session.SaveChangesAsync();
             }

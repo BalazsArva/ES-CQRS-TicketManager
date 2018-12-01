@@ -7,5 +7,7 @@ namespace TicketManager.DataAccess.Documents.DataModel
         public DateTime UtcDateLastUpdated { get; set; }
 
         public string LastChangedBy { get; set; }
+
+        public int LastKnownChangeId { get; set; }
     }
 }

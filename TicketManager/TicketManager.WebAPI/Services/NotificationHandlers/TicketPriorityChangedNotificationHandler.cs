@@ -33,13 +33,14 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
                 var updates = new PropertyUpdateBatch<Ticket>()
                     .Add(t => t.TicketPriority.LastChangedBy, ticketPriorityChangedEvent.CausedBy)
+                    .Add(t => t.TicketPriority.UtcDateLastUpdated, ticketPriorityChangedEvent.UtcDateRecorded)
                     .Add(t => t.TicketPriority.Priority, ticketPriorityChangedEvent.Priority);
 
                 await documentStore.PatchToNewer(
                     ticketDocumentId,
                     updates,
-                    t => t.TicketPriority.UtcDateLastUpdated,
-                    ticketPriorityChangedEvent.UtcDateRecorded);
+                    t => t.TicketPriority.LastKnownChangeId,
+                    ticketPriorityChangedEvent.Id);
             }
         }
     }
