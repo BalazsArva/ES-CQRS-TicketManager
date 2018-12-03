@@ -6,6 +6,8 @@ namespace TicketManager.WebAPI.Validation
     {
         public static string CannotBeNull(string propertyDisplayName) => $"The {propertyDisplayName} cannot be null.";
 
+        public static string CannotBeNullOrEmptyCollection(string elementDisplayName) => $"At least one {elementDisplayName} must be provided.";
+
         // Do not include null in the message because that's technical, the general user won't understand it.
         public static string CannotBeNullOrEmpty(string propertyDisplayName) => $"The {propertyDisplayName} cannot be empty.";
 
@@ -25,5 +27,7 @@ namespace TicketManager.WebAPI.Validation
         public static string MustReferenceAnExistingTicket(string propertyDisplayName) => $"The {propertyDisplayName} must be an existing ticket.";
 
         public static string MustReferenceAnExistingComment(string propertyDisplayName) => $"The {propertyDisplayName} must be an existing comment.";
+
+        public static string MustNotBeAnAssignedTag(string propertyDisplayName) => $"The {propertyDisplayName} is already assigned.";
     }
 }
