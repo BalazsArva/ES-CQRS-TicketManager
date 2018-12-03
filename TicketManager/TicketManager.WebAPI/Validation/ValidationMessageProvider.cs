@@ -28,6 +28,8 @@ namespace TicketManager.WebAPI.Validation
 
         public static string MustReferenceAnExistingComment(string propertyDisplayName) => $"The {propertyDisplayName} must be an existing comment.";
 
-        public static string MustNotBeAnAssignedTag(string propertyDisplayName) => $"The {propertyDisplayName} is already assigned.";
+        public static string MustNotBeAnAssignedTag(string propertyDisplayName) => $"The {propertyDisplayName} is already assigned to the ticket.";
+
+        public static string MustBeAnAssignedTag(string propertyDisplayName) => $"The {propertyDisplayName} is not assigned to the ticket.";
     }
 }

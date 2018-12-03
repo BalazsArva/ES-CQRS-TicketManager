@@ -36,7 +36,6 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             {
                 foreach (var tag in request.Tags)
                 {
-                    // TODO: Consider whether: there should be validation that the tag is already assigned to the ticket, OR simply ignore as the query won't return it anyway.
                     context.TicketTagChangedEvents.Add(new TicketTagChangedEvent
                     {
                         CausedBy = request.RaisedByUser,
