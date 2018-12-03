@@ -29,11 +29,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .DependentRules(() =>
                 {
                     RuleForEach(cmd => cmd.Tags)
-                        .Must(NotBeWhitespaceOnly)
-                        .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"))
-                        .WithErrorCode(ValidationErrorCodes.BadRequest);
-
-                    RuleForEach(cmd => cmd.Tags)
                         .Must(TagValidationHelper.BeAUniqueTag)
                         .WithMessage("This tag is being removed multiple times.")
                         .WithErrorCode(ValidationErrorCodes.Conflict);
