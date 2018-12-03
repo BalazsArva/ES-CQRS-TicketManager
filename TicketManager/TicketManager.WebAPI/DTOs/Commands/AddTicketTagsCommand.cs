@@ -4,7 +4,7 @@ using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class AddTicketTagsCommand : TicketCommandBase
+    public class AddTicketTagsCommand : TicketCommandBase, ITagOperationCommand
     {
         [JsonConstructor]
         public AddTicketTagsCommand(long ticketId, string raisedByUser, string[] tags)
