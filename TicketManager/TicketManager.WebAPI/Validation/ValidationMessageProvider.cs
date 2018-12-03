@@ -31,5 +31,7 @@ namespace TicketManager.WebAPI.Validation
         public static string MustNotBeAnAssignedTag(string propertyDisplayName) => $"The {propertyDisplayName} is already assigned to the ticket.";
 
         public static string MustBeAnAssignedTag(string propertyDisplayName) => $"The {propertyDisplayName} is not assigned to the ticket.";
+
+        public static string MustNotBeAnAssignedLink() => "This ticket is already linked.";
     }
 }

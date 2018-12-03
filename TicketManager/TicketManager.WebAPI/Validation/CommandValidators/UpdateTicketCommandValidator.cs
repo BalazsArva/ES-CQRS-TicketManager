@@ -8,6 +8,7 @@ using FluentValidation.Results;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Events;
 using TicketManager.Domain.Common;
+using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators.Abstractions;
 using TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers;
@@ -18,7 +19,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
     {
         private readonly IDocumentStore documentStore;
 
-        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore, TicketLinkValidator ticketLinkValidator)
+        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore, IValidator<TicketLinkDTO> ticketLinkValidator)
             : base(eventsContextFactory)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
@@ -43,14 +44,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .Must((command, link) => link.TargetTicketId != command.TicketId)
                 .WithMessage("A ticket cannot be linked to itself.");
 
-            RuleForEach(cmd => cmd.Links)
-                .SetValidator(ticketLinkValidator);
-
             // Unlike in Add/RemoveCommandValidator, here we can allow nulls because in Add/Remove, the list of tags
             // means the difference (i.e. what to add or remove), but here it's a complete replacement. It is acceptable
             // to erase all the tags.
             When(
-                cmd => cmd.Tags != null,
+                cmd => cmd.Tags != null && cmd.Tags.Length > 0,
                 () =>
                 {
                     RuleForEach(cmd => cmd.Tags)
@@ -62,11 +60,20 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                         .WithMessage("This tag is being removed multiple times.")
                         .WithErrorCode(ValidationErrorCodes.Conflict);
                 });
+
+            When(
+                cmd => cmd.Links != null && cmd.Links.Length > 0,
+                () =>
+                {
+                    // TODO: This is not completely correct because the ticketLinkValidator does a check whether a link with same source, target and type already exists. That is not correct here, because the Links array does not represent a changeset here but an array of replacements.
+                    RuleForEach(cmd => cmd.Links).SetValidator(ticketLinkValidator);
+                });
         }
 
         public override async Task<ValidationResult> ValidateAsync(ValidationContext<UpdateTicketCommand> context, CancellationToken cancellationToken = default)
         {
             context.RootContextData[ValidationContextKeys.FoundTicketTagsContextDataKey] = await TagValidationHelper.GetAssignedTagsAsync(documentStore, context.InstanceToValidate);
+            context.RootContextData[ValidationContextKeys.FoundTicketLinksContextDataKey] = await LinkValidationHelper.GetAssignedLinksAsync(documentStore, context.InstanceToValidate);
 
             return await base.ValidateAsync(context, cancellationToken);
         }

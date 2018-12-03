@@ -1,24 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentValidation;
+using FluentValidation.Results;
+using Raven.Client.Documents;
 using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators.Abstractions;
+using TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public class AddTicketLinksCommandValidator : TicketCommandValidatorBase<AddTicketLinksCommand>
     {
-        public AddTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, IValidator<TicketLinkDTO> ticketLinkValidator)
+        private readonly IDocumentStore documentStore;
+
+        public AddTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore, IValidator<TicketLinkDTO> ticketLinkValidator)
             : base(eventsContextFactory)
         {
-            RuleForEach(cmd => cmd.Links)
-                .Must((command, link) => link.TargetTicketId != command.TicketId)
-                .WithMessage("A ticket cannot be linked to itself.");
+            this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
 
-            RuleForEach(cmd => cmd.Links)
-                .SetValidator(ticketLinkValidator);
+            RuleFor(cmd => cmd.Links)
+                .NotEmpty()
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyCollection("link"))
+                .WithErrorCode(ValidationErrorCodes.BadRequest)
+                .DependentRules(() =>
+                {
+                    RuleForEach(cmd => cmd.Links)
+                        .SetValidator(ticketLinkValidator);
+                });
+        }
+
+        public override async Task<ValidationResult> ValidateAsync(ValidationContext<AddTicketLinksCommand> context, CancellationToken cancellationToken = default)
+        {
+            context.RootContextData[ValidationContextKeys.FoundTicketLinksContextDataKey] = await LinkValidationHelper.GetAssignedLinksAsync(documentStore, context.InstanceToValidate);
+
+            return await base.ValidateAsync(context, cancellationToken);
         }
 
         protected override ISet<long> ExtractReferencedTicketIds(AddTicketLinksCommand command)
