@@ -21,14 +21,13 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         public async Task Handle(TicketTitleChangedNotification notification, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
-            using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
                     .AsNoTracking()
                     .OfTicket(notification.TicketId)
                     .LatestAsync();
 
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(notification.TicketId);
+                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(notification.TicketId);
 
                 var updates = new PropertyUpdateBatch<Ticket>()
                     .Add(t => t.TicketTitle.LastChangedBy, ticketTitleChangedEvent.CausedBy)

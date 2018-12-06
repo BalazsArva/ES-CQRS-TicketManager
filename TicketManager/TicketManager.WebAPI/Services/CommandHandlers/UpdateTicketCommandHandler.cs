@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
@@ -45,7 +44,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 var updatedBy = request.RaisedByUser;
                 var ticketId = request.TicketId;
 
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId);
+                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId);
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
                 UpdateAssignmentIfChanged(context, ticketDocument, ticketId, request.AssignedTo, updatedBy);
@@ -55,7 +54,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 UpdateTypeIfChanged(context, ticketDocument, ticketId, request.TicketType, updatedBy);
                 UpdatePriorityIfChanged(context, ticketDocument, ticketId, request.Priority, updatedBy);
                 UpdateTagsIfChanged(context, ticketDocument, ticketId, request.Tags, updatedBy);
-                UpdateLinksIfChanged(context, session, ticketDocument, ticketId, request.Links, updatedBy);
+                UpdateLinksIfChanged(context, ticketDocument, ticketId, request.Links, updatedBy);
 
                 await context.SaveChangesAsync();
             }
@@ -173,19 +172,19 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateLinksIfChanged(EventsContext context, IAsyncDocumentSession session, Ticket ticketDocument, long ticketCreatedEventId, TicketLinkDTO[] newLinks, string changedBy)
+        private void UpdateLinksIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, TicketLinkDTO[] newLinks, string changedBy)
         {
             var currentLinks = ticketDocument.Links?.LinkSet ?? Array.Empty<TicketLink>();
 
             var removedLinks = currentLinks
-                .Where(lnk => !newLinks.Any(newLnk => newLnk.LinkType == lnk.LinkType && session.GeneratePrefixedDocumentId<Ticket>(newLnk.TargetTicketId) == lnk.TargetTicketId))
+                .Where(lnk => !newLinks.Any(newLnk => newLnk.LinkType == lnk.LinkType && documentStore.GeneratePrefixedDocumentId<Ticket>(newLnk.TargetTicketId) == lnk.TargetTicketId))
                 .ToList();
 
             var addedLinks = newLinks
                 .Select(newLnk => new TicketLink
                 {
                     LinkType = newLnk.LinkType,
-                    TargetTicketId = session.GeneratePrefixedDocumentId<Ticket>(newLnk.TargetTicketId)
+                    TargetTicketId = documentStore.GeneratePrefixedDocumentId<Ticket>(newLnk.TargetTicketId)
                 })
                 .Where(newLnk => !currentLinks.Any(currLnk => currLnk.LinkType == newLnk.LinkType && currLnk.TargetTicketId == newLnk.TargetTicketId))
                 .ToList();
@@ -198,7 +197,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     ConnectionIsActive = false,
                     LinkType = removedLink.LinkType,
                     SourceTicketCreatedEventId = ticketCreatedEventId,
-                    TargetTicketCreatedEventId = int.Parse(session.TrimIdPrefix<Ticket>(removedLink.TargetTicketId))
+                    TargetTicketCreatedEventId = int.Parse(documentStore.TrimIdPrefix<Ticket>(removedLink.TargetTicketId))
                 });
             }
 
@@ -210,7 +209,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     ConnectionIsActive = true,
                     LinkType = addedLink.LinkType,
                     SourceTicketCreatedEventId = ticketCreatedEventId,
-                    TargetTicketCreatedEventId = int.Parse(session.TrimIdPrefix<Ticket>(addedLink.TargetTicketId))
+                    TargetTicketCreatedEventId = int.Parse(documentStore.TrimIdPrefix<Ticket>(addedLink.TargetTicketId))
                 });
             }
         }

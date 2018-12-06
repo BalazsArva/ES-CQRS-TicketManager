@@ -20,6 +20,20 @@ namespace TicketManager.DataAccess.Documents.Extensions
             return string.Concat(collectionName, separator, customIdValue.ToString());
         }
 
+        public static string TrimIdPrefix<TDocument>(this IDocumentStore store, string documentId)
+        {
+            var separator = store.Conventions.IdentityPartsSeparator;
+            var collectionName = store.Conventions.GetCollectionName(typeof(TDocument));
+
+            var prefix = collectionName + separator;
+            if (!documentId.StartsWith(prefix))
+            {
+                throw new ArgumentException($"The parameter '{nameof(documentId)}' must start with '{prefix}' to be able to remove the prefix.", nameof(documentId));
+            }
+
+            return documentId.Substring(prefix.Length);
+        }
+
         public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate)
         {
             return PatchToNewer(store, id, timestampSelector, utcUpdateDate, propertyUpdates.CreateBatch());

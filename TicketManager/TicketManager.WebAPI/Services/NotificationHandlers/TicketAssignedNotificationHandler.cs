@@ -21,7 +21,6 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         public async Task Handle(TicketAssignedNotification notification, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
-            using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketId = notification.TicketId;
                 var ticketAssignedEvent = await context.TicketAssignedEvents
@@ -29,7 +28,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     .OfTicket(ticketId)
                     .LatestAsync();
 
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId);
+                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId);
 
                 var updates = new PropertyUpdateBatch<Ticket>()
                     .Add(t => t.Assignment.LastChangedBy, ticketAssignedEvent.CausedBy)

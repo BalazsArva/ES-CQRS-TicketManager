@@ -9,7 +9,6 @@ using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.Extensions.Linq;
-using IAsyncDocumentSession = Raven.Client.Documents.Session.IAsyncDocumentSession;
 using IDocumentStore = Raven.Client.Documents.IDocumentStore;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
@@ -25,7 +24,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, IAsyncDocumentSession session, long ticketId)
+        protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, long ticketId)
         {
             var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(ticketId);
             var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
@@ -54,11 +53,11 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .LatestAsync();
 
             var tags = await GetUpdatedTagsAsync(context, ticketId, 0, Array.Empty<string>());
-            var links = await GetUpdatedLinksAsync(context, session, ticketId, 0, Array.Empty<TicketLink>());
+            var links = await GetUpdatedLinksAsync(context, ticketId, 0, Array.Empty<TicketLink>());
 
             var ticket = new Ticket
             {
-                Id = session.GeneratePrefixedDocumentId<Ticket>(ticketId),
+                Id = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId),
                 CreatedBy = ticketCreatedEvent.CausedBy,
                 UtcDateCreated = ticketCreatedEvent.UtcDateRecorded,
                 TicketStatus =
@@ -127,7 +126,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketId);
+                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId);
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
                 var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.LastKnownChangeId, ticketDocument.Tags.TagSet);
@@ -150,10 +149,10 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId);
+                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId);
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
-                var updatedLinks = await GetUpdatedLinksAsync(context, session, ticketCreatedEventId, ticketDocument.Links.LastKnownChangeId, ticketDocument.Links.LinkSet);
+                var updatedLinks = await GetUpdatedLinksAsync(context, ticketCreatedEventId, ticketDocument.Links.LastKnownChangeId, ticketDocument.Links.LinkSet);
                 var lastChange = updatedLinks.LastChange;
 
                 if (lastChange != null)
@@ -204,7 +203,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return (updatedTags, tagChangesSinceLastSync.Last());
         }
 
-        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, IAsyncDocumentSession session, long sourceTicketCreatedEventId, long lastKnownChangeId, TicketLink[] currentLinks)
+        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, long sourceTicketCreatedEventId, long lastKnownChangeId, TicketLink[] currentLinks)
         {
             currentLinks = currentLinks ?? Array.Empty<TicketLink>();
 
@@ -224,7 +223,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .GroupBy(
                     lnk => new TicketLink
                     {
-                        TargetTicketId = session.GeneratePrefixedDocumentId<Ticket>(lnk.TargetTicketCreatedEventId),
+                        TargetTicketId = documentStore.GeneratePrefixedDocumentId<Ticket>(lnk.TargetTicketCreatedEventId),
                         LinkType = lnk.LinkType
                     },
                     (key, elements) => new

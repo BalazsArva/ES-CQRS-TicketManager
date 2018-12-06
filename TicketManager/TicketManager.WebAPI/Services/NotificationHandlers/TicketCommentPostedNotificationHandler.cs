@@ -28,8 +28,8 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     .OfComment(notification.CommentId)
                     .LatestAsync();
 
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(commentPostedEvent.TicketCreatedEventId);
-                var commentDocumentId = session.GeneratePrefixedDocumentId<Comment>(notification.CommentId);
+                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(commentPostedEvent.TicketCreatedEventId);
+                var commentDocumentId = documentStore.GeneratePrefixedDocumentId<Comment>(notification.CommentId);
 
                 var commentDocument = new Comment
                 {
