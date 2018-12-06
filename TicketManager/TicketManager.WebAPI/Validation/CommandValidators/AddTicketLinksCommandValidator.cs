@@ -7,7 +7,6 @@ using FluentValidation;
 using FluentValidation.Results;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Events;
-using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators.Abstractions;
 using TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers;
@@ -18,7 +17,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
     {
         private readonly IDocumentStore documentStore;
 
-        public AddTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore, IValidator<TicketLinkDTO> ticketLinkValidator)
+        public AddTicketLinksCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore, TicketLinkValidator_AddLinks ticketLinkValidator)
             : base(eventsContextFactory)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));

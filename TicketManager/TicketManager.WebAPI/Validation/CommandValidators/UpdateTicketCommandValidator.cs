@@ -8,7 +8,6 @@ using FluentValidation.Results;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Events;
 using TicketManager.Domain.Common;
-using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators.Abstractions;
 using TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers;
@@ -19,7 +18,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
     {
         private readonly IDocumentStore documentStore;
 
-        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore, IValidator<TicketLinkDTO> ticketLinkValidator)
+        public UpdateTicketCommandValidator(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore, TicketLinkValidator_UpdateLinks ticketLinkValidator)
             : base(eventsContextFactory)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
@@ -63,11 +62,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
             When(
                 cmd => cmd.Links != null && cmd.Links.Length > 0,
-                () =>
-                {
-                    // TODO: This is not completely correct because the ticketLinkValidator does a check whether a link with same source, target and type already exists. That is not correct here, because the Links array does not represent a changeset here but an array of replacements.
-                    RuleForEach(cmd => cmd.Links).SetValidator(ticketLinkValidator);
-                });
+                () => RuleForEach(cmd => cmd.Links).SetValidator(ticketLinkValidator));
         }
 
         public override async Task<ValidationResult> ValidateAsync(ValidationContext<UpdateTicketCommand> context, CancellationToken cancellationToken = default)

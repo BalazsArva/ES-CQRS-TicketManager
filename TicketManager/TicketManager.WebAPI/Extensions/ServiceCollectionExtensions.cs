@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Events;
-using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators;
 
@@ -61,7 +60,8 @@ namespace TicketManager.WebAPI.Extensions
                 .AddSingleton<IValidator<RemoveTicketLinksCommand>, RemoveTicketLinksCommandValidator>()
                 .AddSingleton<IValidator<RemoveTicketTagsCommand>, RemoveTicketTagsCommandValidator>()
                 .AddSingleton<IValidator<UpdateTicketCommand>, UpdateTicketCommandValidator>()
-                .AddSingleton<IValidator<TicketLinkDTO>, TicketLinkValidator>();
+                .AddSingleton<TicketLinkValidator_AddLinks>()
+                .AddSingleton<TicketLinkValidator_UpdateLinks>();
         }
     }
 }

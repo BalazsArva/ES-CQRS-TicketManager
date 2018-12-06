@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
 using Raven.Client.Documents;
-using TicketManager.DataAccess.Documents.DataModel;
-using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
-namespace TicketManager.WebAPI.Validation.CommandValidators
+namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
 {
-    public class TicketLinkValidator : AbstractValidator<TicketLinkDTO>
+    public abstract class TicketLinkDTOValidatorBase : AbstractValidator<TicketLinkDTO>
     {
-        private readonly IDocumentStore documentStore;
+        protected readonly IDocumentStore documentStore;
 
-        public TicketLinkValidator(IDocumentStore documentStore)
+        protected TicketLinkDTOValidatorBase(IDocumentStore documentStore)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
 
@@ -28,24 +26,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                     return numberOfLinksWithSameProperties == 1;
                 })
                 .WithMessage("This link is being added multiple times.")
-                .WithErrorCode(ValidationErrorCodes.Conflict);
-
-            RuleFor(link => link)
-                .Must((link, _, context) =>
-                {
-                    if (context.ParentContext.RootContextData[ValidationContextKeys.FoundTicketLinksContextDataKey] is ISet<TicketLink> assignedLinkSet)
-                    {
-                        return !assignedLinkSet.Contains(new TicketLink
-                        {
-                            LinkType = link.LinkType,
-                            TargetTicketId = documentStore.GeneratePrefixedDocumentId<Ticket>(link.TargetTicketId)
-                        });
-                    }
-
-                    throw new InvalidOperationException(
-                        "The validation could not be performed because the collection of assigned links was not found in the validation context data.");
-                })
-                .WithMessage(ValidationMessageProvider.MustNotBeAnAssignedLink())
                 .WithErrorCode(ValidationErrorCodes.Conflict);
 
             RuleFor(link => link.LinkType)
