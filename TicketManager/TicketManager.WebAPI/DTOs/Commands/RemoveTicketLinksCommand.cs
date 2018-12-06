@@ -4,7 +4,7 @@ using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class RemoveTicketLinksCommand : TicketCommandBase
+    public class RemoveTicketLinksCommand : TicketCommandBase, ILinkOperationCommand
     {
         [JsonConstructor]
         public RemoveTicketLinksCommand(long ticketId, string raisedByUser, TicketLinkDTO[] links)

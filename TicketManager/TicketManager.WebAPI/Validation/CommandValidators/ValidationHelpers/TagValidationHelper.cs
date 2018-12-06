@@ -21,7 +21,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers
         {
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketDocumentId = session.GeneratePrefixedDocumentId<Ticket>(command.TicketId);
+                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(command.TicketId);
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
 
                 return new HashSet<string>(ticketDocument?.Tags?.TagSet ?? Enumerable.Empty<string>());

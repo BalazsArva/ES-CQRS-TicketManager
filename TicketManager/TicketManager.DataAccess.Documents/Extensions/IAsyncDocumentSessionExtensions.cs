@@ -5,6 +5,7 @@ namespace TicketManager.DataAccess.Documents.Extensions
 {
     public static class IAsyncDocumentSessionExtensions
     {
+        // TODO: Change all references to the Store extensions one as this operation does not actually use the session.
         public static string GeneratePrefixedDocumentId<TDocument>(this IAsyncDocumentSession documentSession, long customIdValue)
         {
             var separator = documentSession.Advanced.DocumentStore.Conventions.IdentityPartsSeparator;

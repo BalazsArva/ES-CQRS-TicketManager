@@ -12,6 +12,14 @@ namespace TicketManager.DataAccess.Documents.Extensions
 {
     public static class IDocumentStoreExtensions
     {
+        public static string GeneratePrefixedDocumentId<TDocument>(this IDocumentStore store, long customIdValue)
+        {
+            var separator = store.Conventions.IdentityPartsSeparator;
+            var collectionName = store.Conventions.GetCollectionName(typeof(TDocument));
+
+            return string.Concat(collectionName, separator, customIdValue.ToString());
+        }
+
         public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate)
         {
             return PatchToNewer(store, id, timestampSelector, utcUpdateDate, propertyUpdates.CreateBatch());

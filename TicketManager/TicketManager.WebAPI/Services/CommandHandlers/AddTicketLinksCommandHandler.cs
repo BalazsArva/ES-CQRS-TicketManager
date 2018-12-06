@@ -35,7 +35,6 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             {
                 foreach (var ticketLink in request.Links)
                 {
-                    // TODO: Consider whether: there should be validation that the link is not yet established, OR simply ignore and get the distinct links on the query level.
                     context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
                     {
                         CausedBy = request.RaisedByUser,
