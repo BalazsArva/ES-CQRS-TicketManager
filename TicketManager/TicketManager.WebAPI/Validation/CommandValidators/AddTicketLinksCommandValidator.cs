@@ -36,6 +36,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
         public override async Task<ValidationResult> ValidateAsync(ValidationContext<AddTicketLinksCommand> context, CancellationToken cancellationToken = default)
         {
+            context.RootContextData[ValidationContextKeys.TicketLinkOperationCommandContextDataKey] = context.InstanceToValidate;
             context.RootContextData[ValidationContextKeys.FoundTicketLinksContextDataKey] = await LinkValidationHelper.GetAssignedLinksAsync(documentStore, context.InstanceToValidate);
 
             return await base.ValidateAsync(context, cancellationToken);

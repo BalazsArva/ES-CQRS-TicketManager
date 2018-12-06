@@ -2,6 +2,8 @@
 {
     public interface ILinkOperationCommand
     {
+        long TicketId { get; }
+
         TicketLinkDTO[] Links { get; }
     }
 }

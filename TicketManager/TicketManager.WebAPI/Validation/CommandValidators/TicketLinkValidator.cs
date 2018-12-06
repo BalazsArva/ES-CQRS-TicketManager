@@ -22,7 +22,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(link => link)
                 .Must((link, _, context) =>
                 {
-                    var parent = (ILinkOperationCommand)context.ParentContext.InstanceToValidate;
+                    var parent = (ILinkOperationCommand)context.ParentContext.RootContextData[ValidationContextKeys.TicketLinkOperationCommandContextDataKey];
                     var numberOfLinksWithSameProperties = parent.Links.Count(x => x.TargetTicketId == link.TargetTicketId && x.LinkType == link.LinkType);
 
                     return numberOfLinksWithSameProperties == 1;
@@ -55,7 +55,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(link => link.TargetTicketId)
                 .Must((link, targetTicketId, context) =>
                 {
-                    var parent = (TicketCommandBase)context.ParentContext.InstanceToValidate;
+                    var parent = (ILinkOperationCommand)context.ParentContext.RootContextData[ValidationContextKeys.TicketLinkOperationCommandContextDataKey];
 
                     return targetTicketId != parent.TicketId;
                 })
