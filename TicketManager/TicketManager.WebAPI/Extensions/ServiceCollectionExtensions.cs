@@ -47,21 +47,21 @@ namespace TicketManager.WebAPI.Extensions
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             return services
-                .AddTransient<IValidator<AddTicketLinksCommand>, AddTicketLinksCommandValidator>()
-                .AddTransient<IValidator<AddTicketTagsCommand>, AddTicketTagsCommandValidator>()
-                .AddTransient<IValidator<AssignTicketCommand>, AssignTicketCommandValidator>()
-                .AddTransient<IValidator<ChangeTicketPriorityCommand>, ChangeTicketPriorityCommandValidator>()
-                .AddTransient<IValidator<ChangeTicketStatusCommand>, ChangeTicketStatusCommandValidator>()
-                .AddTransient<IValidator<ChangeTicketTypeCommand>, ChangeTicketTypeCommandValidator>()
-                .AddTransient<IValidator<CreateTicketCommand>, CreateTicketCommandValidator>()
-                .AddTransient<IValidator<EditTicketCommentCommand>, EditTicketCommentCommandValidator>()
-                .AddTransient<IValidator<EditTicketTitleCommand>, EditTicketTitleCommandValidator>()
-                .AddTransient<IValidator<EditTicketDescriptionCommand>, EditTicketDescriptionCommandValidator>()
-                .AddTransient<IValidator<PostCommentToTicketCommand>, PostCommentToTicketCommandValidator>()
-                .AddTransient<IValidator<RemoveTicketLinksCommand>, RemoveTicketLinksCommandValidator>()
-                .AddTransient<IValidator<RemoveTicketTagsCommand>, RemoveTicketTagsCommandValidator>()
-                .AddTransient<IValidator<UpdateTicketCommand>, UpdateTicketCommandValidator>()
-                .AddTransient<IValidator<TicketLinkDTO>, TicketLinkValidator>();
+                .AddSingleton<IValidator<AddTicketLinksCommand>, AddTicketLinksCommandValidator>()
+                .AddSingleton<IValidator<AddTicketTagsCommand>, AddTicketTagsCommandValidator>()
+                .AddSingleton<IValidator<AssignTicketCommand>, AssignTicketCommandValidator>()
+                .AddSingleton<IValidator<ChangeTicketPriorityCommand>, ChangeTicketPriorityCommandValidator>()
+                .AddSingleton<IValidator<ChangeTicketStatusCommand>, ChangeTicketStatusCommandValidator>()
+                .AddSingleton<IValidator<ChangeTicketTypeCommand>, ChangeTicketTypeCommandValidator>()
+                .AddSingleton<IValidator<CreateTicketCommand>, CreateTicketCommandValidator>()
+                .AddSingleton<IValidator<EditTicketCommentCommand>, EditTicketCommentCommandValidator>()
+                .AddSingleton<IValidator<EditTicketTitleCommand>, EditTicketTitleCommandValidator>()
+                .AddSingleton<IValidator<EditTicketDescriptionCommand>, EditTicketDescriptionCommandValidator>()
+                .AddSingleton<IValidator<PostCommentToTicketCommand>, PostCommentToTicketCommandValidator>()
+                .AddSingleton<IValidator<RemoveTicketLinksCommand>, RemoveTicketLinksCommandValidator>()
+                .AddSingleton<IValidator<RemoveTicketTagsCommand>, RemoveTicketTagsCommandValidator>()
+                .AddSingleton<IValidator<UpdateTicketCommand>, UpdateTicketCommandValidator>()
+                .AddSingleton<IValidator<TicketLinkDTO>, TicketLinkValidator>();
         }
     }
 }
