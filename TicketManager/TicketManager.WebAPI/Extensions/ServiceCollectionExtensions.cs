@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
+using TicketManager.DataAccess.Documents;
 using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators;
@@ -16,11 +17,14 @@ namespace TicketManager.WebAPI.Extensions
             var ravenDbUrls = configuration.GetSection("DataAccess:RavenDb:Urls").Get<string[]>();
             var ravenDbDatabase = configuration["DataAccess:RavenDb:Database"];
 
-            services.AddSingleton(new DocumentStore
+            var store = new DocumentStore
             {
                 Urls = ravenDbUrls,
                 Database = ravenDbDatabase
-            }.Initialize());
+            }.Initialize();
+
+            IndexCreator.CreateIndexes(store);
+            services.AddSingleton(store);
 
             return services;
         }

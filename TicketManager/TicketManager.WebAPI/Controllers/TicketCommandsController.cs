@@ -40,7 +40,7 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(
                 new AddTicketLinksCommand(
                     id,
-                    "Balazs",
+                    user1,
                     new[]
                     {
                         new TicketLinkDTO
@@ -58,7 +58,7 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(
                 new RemoveTicketLinksCommand(
                     id,
-                    "Balazs",
+                    user1,
                     new[]
                     {
                         new TicketLinkDTO
@@ -71,7 +71,7 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(
                 new AddTicketLinksCommand(
                     id,
-                    "Balazs",
+                    user2,
                     new[]
                     {
                         new TicketLinkDTO
@@ -81,7 +81,7 @@ namespace TicketManager.WebAPI.Controllers
                         },
                         new TicketLinkDTO
                         {
-                            LinkType = TicketLinkTypes.RelatedTo,
+                            LinkType = TicketLinkTypes.BlockedBy,
                             TargetTicketId = id2
                         }
                     }));
