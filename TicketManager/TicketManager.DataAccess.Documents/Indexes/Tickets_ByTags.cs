@@ -4,7 +4,7 @@ using TicketManager.DataAccess.Documents.DataModel;
 
 namespace TicketManager.DataAccess.Documents.Indexes
 {
-    public class Tickets_ByTags : AbstractIndexCreationTask<Ticket>
+    public class Tickets_ByTags : AbstractIndexCreationTask<Ticket, Tickets_ByTags.IndexEntry>
     {
         public class IndexEntry
         {
@@ -21,6 +21,8 @@ namespace TicketManager.DataAccess.Documents.Indexes
                              {
                                  Tag = tag
                              };
+
+            Stores.Add(entry => entry.Tag, FieldStorage.Yes);
         }
     }
 }
