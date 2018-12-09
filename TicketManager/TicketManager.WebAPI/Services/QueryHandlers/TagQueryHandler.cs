@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Linq;
 using TicketManager.DataAccess.Documents.Indexes;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;

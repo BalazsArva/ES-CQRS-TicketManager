@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TicketManager.WebAPI.Controllers.Abstractions;
+using TicketManager.WebAPI.DTOs.Queries;
 
 namespace TicketManager.WebAPI.Controllers
 {
@@ -14,6 +17,17 @@ namespace TicketManager.WebAPI.Controllers
         public TicketQueriesController(IMediator mediator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        }
+
+        [HttpGet]
+        [Route("page/{page:int}/pagesize/{pageSize:int}", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
+        public async Task<IActionResult> Get([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, CancellationToken cancellationToken)
+        {
+            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy);
+
+            var results = await mediator.Send(searchRequest, cancellationToken);
+
+            return FromQueryResult(results);
         }
     }
 }
