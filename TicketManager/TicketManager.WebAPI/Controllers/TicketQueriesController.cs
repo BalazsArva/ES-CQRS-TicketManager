@@ -24,10 +24,26 @@ namespace TicketManager.WebAPI.Controllers
         public async Task<IActionResult> Get([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, CancellationToken cancellationToken)
         {
             var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy);
-
             var results = await mediator.Send(searchRequest, cancellationToken);
 
             return FromQueryResult(results);
+        }
+
+        [HttpGet]
+        [Route("{id:int}", Name = RouteNames.Tickets_Queries_Get_ById)]
+        public Task<IActionResult> Get([FromRoute]long id, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpHead]
+        [Route("{id:int}", Name = RouteNames.Tickets_Queries_Head_ById)]
+        public async Task<IActionResult> Head([FromRoute]long id, CancellationToken cancellationToken)
+        {
+            var request = new TicketExistsRequest(id);
+            var result = await mediator.Send(request, cancellationToken);
+
+            return FromQueryResult(result);
         }
     }
 }

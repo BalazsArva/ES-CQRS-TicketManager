@@ -25,5 +25,15 @@ namespace TicketManager.WebAPI.Controllers.Abstractions
 
             return Ok(queryResult.Result);
         }
+
+        public IActionResult FromQueryResult(ExistenceCheckQueryResult existenceCheckQueryResult)
+        {
+            if (existenceCheckQueryResult == ExistenceCheckQueryResult.NotFound)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
     }
 }
