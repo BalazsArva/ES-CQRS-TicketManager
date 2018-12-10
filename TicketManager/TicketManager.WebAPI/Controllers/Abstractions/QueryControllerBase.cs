@@ -28,9 +28,14 @@ namespace TicketManager.WebAPI.Controllers.Abstractions
 
         public IActionResult FromQueryResult(ExistenceCheckQueryResult existenceCheckQueryResult)
         {
-            if (existenceCheckQueryResult == ExistenceCheckQueryResult.NotFound)
+            if (existenceCheckQueryResult.ResultType == ExistenceCheckQueryResultType.NotFound)
             {
                 return NotFound();
+            }
+
+            if (!string.IsNullOrWhiteSpace(existenceCheckQueryResult.ETag))
+            {
+                Response.Headers[StandardResponseHeaders.ETag] = existenceCheckQueryResult.ETag;
             }
 
             return Ok();

@@ -21,7 +21,7 @@ namespace TicketManager.WebAPI.Controllers
 
         [HttpGet]
         [Route("page/{page:int}/pagesize/{pageSize:int}", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
-        public async Task<IActionResult> Get([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, CancellationToken cancellationToken)
+        public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, CancellationToken cancellationToken)
         {
             var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy);
             var results = await mediator.Send(searchRequest, cancellationToken);
@@ -31,14 +31,14 @@ namespace TicketManager.WebAPI.Controllers
 
         [HttpGet]
         [Route("{id:int}", Name = RouteNames.Tickets_Queries_Get_ById)]
-        public Task<IActionResult> Get([FromRoute]long id, CancellationToken cancellationToken)
+        public Task<IActionResult> GetTicketById([FromRoute]long id, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
         [HttpHead]
         [Route("{id:int}", Name = RouteNames.Tickets_Queries_Head_ById)]
-        public async Task<IActionResult> Head([FromRoute]long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetTicketMetaData([FromRoute]long id, CancellationToken cancellationToken)
         {
             var request = new TicketExistsRequest(id);
             var result = await mediator.Send(request, cancellationToken);

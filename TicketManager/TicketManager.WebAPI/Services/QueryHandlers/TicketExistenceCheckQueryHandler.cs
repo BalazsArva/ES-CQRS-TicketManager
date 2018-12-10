@@ -5,6 +5,7 @@ using MediatR;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
+using TicketManager.DataAccess.Documents.Utilities;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
@@ -26,10 +27,16 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(request.TicketId);
 
                 var exists = await session.Advanced.ExistsAsync(ticketDocumentId, cancellationToken);
+                if (!exists)
+                {
+                    return ExistenceCheckQueryResult.NotFound;
+                }
 
-                return exists
-                    ? ExistenceCheckQueryResult.Found
-                    : ExistenceCheckQueryResult.NotFound;
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
+                var changeVector = session.Advanced.GetChangeVectorFor(ticketDocument);
+                var etag = ETagProvider.CreeateETagFromChangeVector(changeVector);
+
+                return new ExistenceCheckQueryResult(ExistenceCheckQueryResultType.Found, etag);
             }
         }
     }
