@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TicketManager.Domain.Common;
+using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 

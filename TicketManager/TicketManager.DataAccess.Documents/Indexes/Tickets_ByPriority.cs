@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Raven.Client.Documents.Indexes;
+using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
-using TicketManager.Domain.Common;
 
 namespace TicketManager.DataAccess.Documents.Indexes
 {

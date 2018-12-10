@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using TicketManager.Domain.Common;
+using TicketManager.Contracts.Common;
 
 namespace TicketManager.DataAccess.Events.DataModel
 {

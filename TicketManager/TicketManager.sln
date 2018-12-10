@@ -13,19 +13,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiClients", "ApiClients", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "APIs", "APIs", "{71D60599-1F09-434F-8CCB-4A0828D45B90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.DataAccess.Events", "TicketManager.DataAccess.Events\TicketManager.DataAccess.Events.csproj", "{1076A675-778B-404A-A8E2-238D8B07B9C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.DataAccess.Events", "TicketManager.DataAccess.Events\TicketManager.DataAccess.Events.csproj", "{1076A675-778B-404A-A8E2-238D8B07B9C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Domain.Common", "TicketManager.Domain.Common\TicketManager.Domain.Common.csproj", "{4A0C2F6D-9F1C-4801-B6B8-E8523A66DEEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Domain.Common", "TicketManager.Domain.Common\TicketManager.Domain.Common.csproj", "{4A0C2F6D-9F1C-4801-B6B8-E8523A66DEEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.DataAccess.Documents", "TicketManager.DataAccess.Documents\TicketManager.DataAccess.Documents.csproj", "{7F9CA671-355D-4497-840F-5CC81DB11145}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.DataAccess.Documents", "TicketManager.DataAccess.Documents\TicketManager.DataAccess.Documents.csproj", "{7F9CA671-355D-4497-840F-5CC81DB11145}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Contracts.QueryApi", "TicketManager.Contracts.QueryApi\TicketManager.Contracts.QueryApi.csproj", "{495AE17B-B62B-423C-BA58-2990A29CDE9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Contracts.QueryApi", "TicketManager.Contracts.QueryApi\TicketManager.Contracts.QueryApi.csproj", "{495AE17B-B62B-423C-BA58-2990A29CDE9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Contracts.CommandApi", "TicketManager.Contracts.CommandApi\TicketManager.Contracts.CommandApi.csproj", "{D14976CA-395C-4E1A-828F-6B8993662F94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Contracts.CommandApi", "TicketManager.Contracts.CommandApi\TicketManager.Contracts.CommandApi.csproj", "{D14976CA-395C-4E1A-828F-6B8993662F94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.WebAPI", "TicketManager.WebAPI\TicketManager.WebAPI.csproj", "{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.WebAPI", "TicketManager.WebAPI\TicketManager.WebAPI.csproj", "{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Common", "TicketManager.Common\TicketManager.Common.csproj", "{AD8A7585-61AB-493F-8A05-B11E534F6656}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Common", "TicketManager.Common\TicketManager.Common.csproj", "{AD8A7585-61AB-493F-8A05-B11E534F6656}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Contracts.Common", "TicketManager.Contracts.Common\TicketManager.Contracts.Common.csproj", "{5C50CE42-5CC2-4FC5-864D-1334B76C4168}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,10 @@ Global
 		{AD8A7585-61AB-493F-8A05-B11E534F6656}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD8A7585-61AB-493F-8A05-B11E534F6656}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD8A7585-61AB-493F-8A05-B11E534F6656}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C50CE42-5CC2-4FC5-864D-1334B76C4168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C50CE42-5CC2-4FC5-864D-1334B76C4168}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C50CE42-5CC2-4FC5-864D-1334B76C4168}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C50CE42-5CC2-4FC5-864D-1334B76C4168}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{D14976CA-395C-4E1A-828F-6B8993662F94} = {ECAFD88E-E879-4165-B09E-C7D8323FB674}
 		{F9AEC956-D15D-48B7-BA1E-20D37EBFF0C0} = {71D60599-1F09-434F-8CCB-4A0828D45B90}
 		{AD8A7585-61AB-493F-8A05-B11E534F6656} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
+		{5C50CE42-5CC2-4FC5-864D-1334B76C4168} = {ECAFD88E-E879-4165-B09E-C7D8323FB674}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05F4388B-9026-4AC2-BF48-6D615D2CECBA}

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
+using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Events;
-using TicketManager.Domain.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators.Abstractions;
 

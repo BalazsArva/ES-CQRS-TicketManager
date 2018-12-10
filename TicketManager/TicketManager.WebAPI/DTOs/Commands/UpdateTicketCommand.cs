@@ -1,6 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
-using TicketManager.Domain.Common;
+using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands

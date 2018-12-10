@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
 using Raven.Client.Documents;
-using TicketManager.Domain.Common;
+using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 

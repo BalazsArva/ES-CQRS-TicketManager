@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using TicketManager.Domain.Common;
+using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs.Commands;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators

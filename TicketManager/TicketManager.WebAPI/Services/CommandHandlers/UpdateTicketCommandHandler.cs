@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents;
+using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
@@ -103,7 +104,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketStatuses newStatus, string changedBy)
+        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, TicketStatuses newStatus, string changedBy)
         {
             if (ticketDocument.TicketStatus?.Status != newStatus)
             {
@@ -116,7 +117,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketTypes newTicketType, string changedBy)
+        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, TicketTypes newTicketType, string changedBy)
         {
             if (ticketDocument.TicketType?.Type != newTicketType)
             {
@@ -129,7 +130,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketPriorities newPriority, string changedBy)
+        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, TicketPriorities newPriority, string changedBy)
         {
             if (ticketDocument.TicketPriority?.Priority != newPriority)
             {
