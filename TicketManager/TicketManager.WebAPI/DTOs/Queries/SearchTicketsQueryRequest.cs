@@ -7,7 +7,28 @@ namespace TicketManager.WebAPI.DTOs.Queries
 {
     public class SearchTicketsQueryRequest : IRequest<QueryResult<SearchTicketsResponse>>
     {
-        public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy)
+        public enum OrderByProperty
+        {
+            Id,
+
+            UtcDateCreated,
+
+            CreatedBy,
+
+            UtcDateLastModified,
+
+            LastModifiedBy,
+
+            Title,
+
+            Status,
+
+            Priority,
+
+            Type
+        }
+
+        public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy, OrderByProperty orderBy)
         {
             // TODO: Create custom exception and map to BadRequest
             if (page < 1)
@@ -24,6 +45,7 @@ namespace TicketManager.WebAPI.DTOs.Queries
             PageSize = pageSize;
             Title = title;
             CreatedBy = createdBy;
+            OrderBy = orderBy;
         }
 
         public int Page { get; }
@@ -33,5 +55,7 @@ namespace TicketManager.WebAPI.DTOs.Queries
         public string Title { get; }
 
         public string CreatedBy { get; }
+
+        public OrderByProperty OrderBy { get; set; }
     }
 }

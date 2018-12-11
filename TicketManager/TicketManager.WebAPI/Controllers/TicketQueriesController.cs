@@ -21,9 +21,16 @@ namespace TicketManager.WebAPI.Controllers
 
         [HttpGet]
         [Route("page/{page:int}/pagesize/{pageSize:int}", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
-        public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, CancellationToken cancellationToken)
+        public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string orderBy, [FromQuery]string orderDirection, CancellationToken cancellationToken)
         {
-            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy);
+            orderBy = orderBy ?? SearchTicketsQueryRequest.OrderByProperty.Id.ToString();
+            if (!Enum.TryParse<SearchTicketsQueryRequest.OrderByProperty>(orderBy, out var orderByProperty))
+            {
+                // TODO: Add validator for this and direction
+                return BadRequest("Unknown orderby property");
+            }
+
+            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderByProperty);
             var results = await mediator.Send(searchRequest, cancellationToken);
 
             return FromQueryResult(results);
