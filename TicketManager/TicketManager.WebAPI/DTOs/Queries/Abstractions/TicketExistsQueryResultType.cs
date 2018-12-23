@@ -1,6 +1,6 @@
 ﻿namespace TicketManager.WebAPI.DTOs.Queries.Abstractions
 {
-    public enum ExistenceCheckQueryResultType
+    public enum TicketExistsQueryResultType
     {
         Found,
 

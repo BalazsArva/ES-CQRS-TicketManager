@@ -23,14 +23,7 @@ namespace TicketManager.WebAPI.Controllers
         [Route("page/{page:int}/pagesize/{pageSize:int}", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
         public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string orderBy, [FromQuery]string orderDirection, CancellationToken cancellationToken)
         {
-            orderBy = orderBy ?? SearchTicketsQueryRequest.OrderByProperty.Id.ToString();
-            if (!Enum.TryParse<SearchTicketsQueryRequest.OrderByProperty>(orderBy, out var orderByProperty))
-            {
-                // TODO: Add validator for this and direction
-                return BadRequest("Unknown orderby property");
-            }
-
-            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderByProperty);
+            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderBy, orderDirection);
             var results = await mediator.Send(searchRequest, cancellationToken);
 
             return FromQueryResult(results);
@@ -47,7 +40,7 @@ namespace TicketManager.WebAPI.Controllers
         [Route("{id:int}", Name = RouteNames.Tickets_Queries_Head_ById)]
         public async Task<IActionResult> GetTicketMetaData([FromRoute]long id, CancellationToken cancellationToken)
         {
-            var request = new TicketExistsRequest(id);
+            var request = new TicketExistsQueryRequest(id);
             var result = await mediator.Send(request, cancellationToken);
 
             return FromQueryResult(result);

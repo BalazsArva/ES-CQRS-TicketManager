@@ -3,9 +3,9 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Queries
 {
-    public class TicketExistsRequest : IRequest<ExistenceCheckQueryResult>
+    public class TicketExistsQueryRequest : IRequest<TicketExistsQueryResult>
     {
-        public TicketExistsRequest(long ticketId)
+        public TicketExistsQueryRequest(long ticketId)
         {
             TicketId = ticketId;
         }

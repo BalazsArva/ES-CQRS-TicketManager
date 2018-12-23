@@ -11,16 +11,16 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers
 {
-    public class TicketExistenceCheckQueryHandler : IRequestHandler<TicketExistsRequest, ExistenceCheckQueryResult>
+    public class TicketExistsQueryRequestHandler : IRequestHandler<TicketExistsQueryRequest, TicketExistsQueryResult>
     {
         private readonly IDocumentStore documentStore;
 
-        public TicketExistenceCheckQueryHandler(IDocumentStore documentStore)
+        public TicketExistsQueryRequestHandler(IDocumentStore documentStore)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        public async Task<ExistenceCheckQueryResult> Handle(TicketExistsRequest request, CancellationToken cancellationToken)
+        public async Task<TicketExistsQueryResult> Handle(TicketExistsQueryRequest request, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {
@@ -29,14 +29,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 var exists = await session.Advanced.ExistsAsync(ticketDocumentId, cancellationToken);
                 if (!exists)
                 {
-                    return ExistenceCheckQueryResult.NotFound;
+                    return TicketExistsQueryResult.NotFound;
                 }
 
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
                 var changeVector = session.Advanced.GetChangeVectorFor(ticketDocument);
                 var etag = ETagProvider.CreeateETagFromChangeVector(changeVector);
 
-                return new ExistenceCheckQueryResult(ExistenceCheckQueryResultType.Found, etag);
+                return new TicketExistsQueryResult(TicketExistsQueryResultType.Found, etag);
             }
         }
     }

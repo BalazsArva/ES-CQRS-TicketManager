@@ -11,11 +11,11 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers
 {
-    public class TagQueryHandler : IRequestHandler<SearchTagsQueryRequest, QueryResult<SearchTagsQueryResponse>>
+    public class SearchTagsQueryRequestHandler : IRequestHandler<SearchTagsQueryRequest, QueryResult<SearchTagsQueryResponse>>
     {
         private readonly IDocumentStore documentStore;
 
-        public TagQueryHandler(IDocumentStore documentStore)
+        public SearchTagsQueryRequestHandler(IDocumentStore documentStore)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }

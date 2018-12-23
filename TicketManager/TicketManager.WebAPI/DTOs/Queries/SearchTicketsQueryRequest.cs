@@ -1,10 +1,17 @@
-﻿using System;
-using MediatR;
+﻿using MediatR;
 using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Queries
 {
+    // TODO: Move to correct location
+    public enum OrderDirection
+    {
+        Ascending,
+
+        Descending
+    }
+
     public class SearchTicketsQueryRequest : IRequest<QueryResult<SearchTicketsResponse>>
     {
         public enum OrderByProperty
@@ -28,24 +35,14 @@ namespace TicketManager.WebAPI.DTOs.Queries
             Type
         }
 
-        public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy, OrderByProperty orderBy)
+        public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy, string orderBy, string orderDirection)
         {
-            // TODO: Create custom exception and map to BadRequest
-            if (page < 1)
-            {
-                throw new ArgumentOutOfRangeException("Page must be at least 1.");
-            }
-
-            if (pageSize < 1)
-            {
-                throw new ArgumentOutOfRangeException("Page must be at least 1.");
-            }
-
             Page = page;
             PageSize = pageSize;
             Title = title;
             CreatedBy = createdBy;
             OrderBy = orderBy;
+            OrderDirection = orderDirection;
         }
 
         public int Page { get; }
@@ -56,6 +53,8 @@ namespace TicketManager.WebAPI.DTOs.Queries
 
         public string CreatedBy { get; }
 
-        public OrderByProperty OrderBy { get; set; }
+        public string OrderBy { get; }
+
+        public string OrderDirection { get; }
     }
 }
