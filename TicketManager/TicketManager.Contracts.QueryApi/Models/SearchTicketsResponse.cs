@@ -4,14 +4,14 @@ namespace TicketManager.Contracts.QueryApi.Models
 {
     public class SearchTicketsResponse
     {
-        public SearchTicketsResponse(IEnumerable<TicketBasicDetails> results, int totalResults)
+        public SearchTicketsResponse(IEnumerable<TicketBasicDetails> results, int total)
         {
             PagedResults = results;
-            TotalResultCount = totalResults;
+            Total = total;
         }
 
         public IEnumerable<TicketBasicDetails> PagedResults { get; }
 
-        public int TotalResultCount { get; }
+        public int Total { get; }
     }
 }

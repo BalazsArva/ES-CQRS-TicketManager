@@ -23,7 +23,7 @@ namespace TicketManager.WebAPI.Controllers
         [Route("page/{page:int}/pagesize/{pageSize:int}", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
         public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string orderBy, [FromQuery]string orderDirection, CancellationToken cancellationToken)
         {
-            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderBy, orderDirection);
+            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderBy ?? SearchTicketsQueryRequest.OrderByProperty.Id.ToString(), orderDirection ?? OrderDirection.Ascending.ToString());
             var results = await mediator.Send(searchRequest, cancellationToken);
 
             return FromQueryResult(results);
