@@ -45,5 +45,15 @@ namespace TicketManager.WebAPI.Controllers
 
             return FromQueryResult(result);
         }
+
+        [HttpGet]
+        [Route("{id:int}/history", Name = RouteNames.Tickets_Queries_History_ById)]
+        public async Task<IActionResult> GetTicketHistoryById([FromRoute]long id, CancellationToken cancellationToken, string historyTypes = null)
+        {
+            var request = new GetTicketHistoryQueryRequest(id, historyTypes);
+
+            var result = await mediator.Send(request, cancellationToken).ConfigureAwait(false);
+            return FromQueryResult(result);
+        }
     }
 }

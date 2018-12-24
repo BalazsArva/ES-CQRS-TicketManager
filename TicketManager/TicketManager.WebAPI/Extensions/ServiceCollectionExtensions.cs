@@ -70,7 +70,8 @@ namespace TicketManager.WebAPI.Extensions
                 .AddSingleton<TicketLinkValidator_UpdateLinks>();
 
             services
-                .AddSingleton<IValidator<SearchTicketsQueryRequest>, SearchTicketsQueryRequestValidator>();
+                .AddSingleton<IValidator<SearchTicketsQueryRequest>, SearchTicketsQueryRequestValidator>()
+                .AddSingleton<IValidator<GetTicketHistoryQueryRequest>, GetTicketHistoryQueryRequestValidator>();
 
             return services;
         }
