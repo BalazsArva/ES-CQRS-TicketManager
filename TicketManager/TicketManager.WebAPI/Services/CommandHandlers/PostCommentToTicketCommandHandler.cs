@@ -25,7 +25,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         public async Task<long> Handle(PostCommentToTicketCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -48,12 +48,12 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     TicketCommentPostedEvent = ticketCommentPostedEvent
                 });
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
                 commentId = ticketCommentPostedEvent.Id;
             }
 
-            await mediator.Publish(new TicketCommentPostedNotification(commentId));
+            await mediator.Publish(new TicketCommentPostedNotification(commentId), cancellationToken).ConfigureAwait(false);
 
             return commentId;
         }

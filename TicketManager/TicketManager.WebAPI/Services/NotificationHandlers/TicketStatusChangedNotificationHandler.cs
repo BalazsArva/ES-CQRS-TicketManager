@@ -23,10 +23,12 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var context = eventsContextFactory.CreateContext())
             {
                 var ticketId = notification.TicketId;
-                var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
+                var ticketStatusChangedEvent = await context
+                    .TicketStatusChangedEvents
                     .AsNoTracking()
                     .OfTicket(ticketId)
-                    .LatestAsync();
+                    .LatestAsync(cancellationToken)
+                    .ConfigureAwait(false);
 
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId);
 
@@ -35,11 +37,14 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     .Add(t => t.TicketStatus.UtcDateLastUpdated, ticketStatusChangedEvent.UtcDateRecorded)
                     .Add(t => t.TicketStatus.Status, ticketStatusChangedEvent.TicketStatus);
 
-                await documentStore.PatchToNewer(
-                    ticketDocumentId,
-                    updates,
-                    t => t.TicketStatus.LastKnownChangeId,
-                    ticketStatusChangedEvent.Id);
+                await documentStore
+                    .PatchToNewer(
+                        ticketDocumentId,
+                        updates,
+                        t => t.TicketStatus.LastKnownChangeId,
+                        ticketStatusChangedEvent.Id,
+                        cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
     }

@@ -25,7 +25,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         public async Task<Unit> Handle(EditTicketTitleCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -40,10 +40,10 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     Title = request.Title
                 });
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await mediator.Publish(new TicketTitleChangedNotification(request.TicketId));
+            await mediator.Publish(new TicketTitleChangedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
 
             return Unit.Value;
         }

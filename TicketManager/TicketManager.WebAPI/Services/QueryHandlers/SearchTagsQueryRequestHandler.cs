@@ -30,7 +30,8 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     .OrderBy(e => e.Tag)
                     .Select(e => e.Tag)
                     .Distinct()
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false);
 
                 return new QueryResult<SearchTagsQueryResponse>(new SearchTagsQueryResponse(tags));
             }

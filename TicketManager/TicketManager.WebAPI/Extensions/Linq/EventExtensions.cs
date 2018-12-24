@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Events.DataModel;
@@ -8,10 +9,10 @@ namespace TicketManager.WebAPI.Extensions.Linq
 {
     public static class EventExtensions
     {
-        public static Task<TEvent> LatestAsync<TEvent>(this IQueryable<TEvent> events)
+        public static Task<TEvent> LatestAsync<TEvent>(this IQueryable<TEvent> events, CancellationToken cancellationToken)
             where TEvent : EventBase
         {
-            return events.OrderByDescending(x => x.UtcDateRecorded).FirstAsync();
+            return events.OrderByDescending(x => x.UtcDateRecorded).FirstAsync(cancellationToken);
         }
 
         public static EventBase Latest(this IEnumerable<EventBase> events)
@@ -19,10 +20,10 @@ namespace TicketManager.WebAPI.Extensions.Linq
             return events.OrderByDescending(x => x.UtcDateRecorded).First();
         }
 
-        public static Task<TEvent> LatestOrDefaultAsync<TEvent>(this IQueryable<TEvent> events)
+        public static Task<TEvent> LatestOrDefaultAsync<TEvent>(this IQueryable<TEvent> events, CancellationToken cancellationToken)
             where TEvent : EventBase
         {
-            return events.OrderByDescending(x => x.UtcDateRecorded).FirstOrDefaultAsync();
+            return events.OrderByDescending(x => x.UtcDateRecorded).FirstOrDefaultAsync(cancellationToken);
         }
 
         public static IQueryable<TEvent> OfTicket<TEvent>(this IQueryable<TEvent> events, long ticketId)
@@ -42,12 +43,12 @@ namespace TicketManager.WebAPI.Extensions.Linq
             return events.Where(x => x.Id > lastKnownEventId);
         }
 
-        public static Task<List<TEvent>> ToOrderedEventListAsync<TEvent>(this IQueryable<TEvent> events)
+        public static Task<List<TEvent>> ToOrderedEventListAsync<TEvent>(this IQueryable<TEvent> events, CancellationToken cancellationToken)
             where TEvent : EventBase
         {
             return events
                 .OrderBy(evt => evt.Id)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
     }
 }

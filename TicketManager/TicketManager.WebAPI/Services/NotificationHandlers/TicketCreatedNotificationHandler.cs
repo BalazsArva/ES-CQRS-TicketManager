@@ -19,10 +19,10 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticket = await ReconstructTicketAsync(context, notification.TicketId);
+                var ticket = await ReconstructTicketAsync(context, notification.TicketId, cancellationToken).ConfigureAwait(false);
 
-                await session.StoreAsync(ticket);
-                await session.SaveChangesAsync();
+                await session.StoreAsync(ticket, cancellationToken).ConfigureAwait(false);
+                await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
         }
     }

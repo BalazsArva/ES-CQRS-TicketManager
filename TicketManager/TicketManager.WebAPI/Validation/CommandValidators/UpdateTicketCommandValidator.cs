@@ -65,13 +65,17 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 () => RuleForEach(cmd => cmd.Links).SetValidator(ticketLinkValidator));
         }
 
-        public override async Task<ValidationResult> ValidateAsync(ValidationContext<UpdateTicketCommand> context, CancellationToken cancellationToken = default)
+        public override async Task<ValidationResult> ValidateAsync(ValidationContext<UpdateTicketCommand> context, CancellationToken cancellationToken)
         {
             context.RootContextData[ValidationContextKeys.TicketLinkOperationCommandContextDataKey] = context.InstanceToValidate;
-            context.RootContextData[ValidationContextKeys.FoundTicketTagsContextDataKey] = await TagValidationHelper.GetAssignedTagsAsync(documentStore, context.InstanceToValidate);
-            context.RootContextData[ValidationContextKeys.FoundTicketLinksContextDataKey] = await LinkValidationHelper.GetAssignedLinksAsync(documentStore, context.InstanceToValidate);
+            context.RootContextData[ValidationContextKeys.FoundTicketTagsContextDataKey] = await TagValidationHelper
+                .GetAssignedTagsAsync(documentStore, context.InstanceToValidate, cancellationToken)
+                .ConfigureAwait(false);
+            context.RootContextData[ValidationContextKeys.FoundTicketLinksContextDataKey] = await LinkValidationHelper
+                .GetAssignedLinksAsync(documentStore, context.InstanceToValidate, cancellationToken)
+                .ConfigureAwait(false);
 
-            return await base.ValidateAsync(context, cancellationToken);
+            return await base.ValidateAsync(context, cancellationToken).ConfigureAwait(false);
         }
 
         protected override ISet<long> ExtractReferencedTicketIds(UpdateTicketCommand command)

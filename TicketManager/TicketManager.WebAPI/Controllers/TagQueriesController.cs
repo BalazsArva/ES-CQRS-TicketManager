@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +20,9 @@ namespace TicketManager.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery]string query)
+        public async Task<IActionResult> Get([FromQuery]string query, CancellationToken cancellationToken)
         {
-            var result = await mediator.Send(new SearchTagsQueryRequest(query ?? string.Empty));
+            var result = await mediator.Send(new SearchTagsQueryRequest(query ?? string.Empty), cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(result);
         }

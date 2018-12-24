@@ -22,11 +22,12 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var commentPostedEvent = await context.TicketCommentPostedEvents.FindAsync(notification.CommentId);
+                var commentPostedEvent = await context.TicketCommentPostedEvents.FindAsync(new object[] { notification.CommentId }, cancellationToken).ConfigureAwait(false);
                 var commentEditedEvent = await context.TicketCommentEditedEvents
                     .AsNoTracking()
                     .OfComment(notification.CommentId)
-                    .LatestAsync();
+                    .LatestAsync(cancellationToken)
+                    .ConfigureAwait(false);
 
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(commentPostedEvent.TicketCreatedEventId);
                 var commentDocumentId = documentStore.GeneratePrefixedDocumentId<Comment>(notification.CommentId);
@@ -43,8 +44,8 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     TicketId = ticketDocumentId
                 };
 
-                await session.StoreAsync(commentDocument);
-                await session.SaveChangesAsync();
+                await session.StoreAsync(commentDocument, cancellationToken).ConfigureAwait(false);
+                await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
         }
     }

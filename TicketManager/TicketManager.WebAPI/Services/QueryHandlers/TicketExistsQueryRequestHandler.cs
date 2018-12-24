@@ -26,7 +26,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             {
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(request.TicketId);
 
-                var exists = await session.Advanced.ExistsAsync(ticketDocumentId, cancellationToken);
+                var exists = await session.Advanced.ExistsAsync(ticketDocumentId, cancellationToken).ConfigureAwait(false);
                 if (!exists)
                 {
                     return TicketExistsQueryResult.NotFound;

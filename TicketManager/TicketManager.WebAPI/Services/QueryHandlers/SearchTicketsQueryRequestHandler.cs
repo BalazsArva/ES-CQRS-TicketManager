@@ -60,9 +60,10 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         t.TicketPriority.Priority,
                         t.TicketType.Type
                     })
-                    .ToListAsync(cancellationToken);
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false);
 
-                var total = await totalLazy.Value;
+                var total = await totalLazy.Value.ConfigureAwait(false);
                 var mappedResults = dbResults
                     .Select(t => new TicketBasicDetails
                     {

@@ -24,7 +24,7 @@ namespace TicketManager.WebAPI.Controllers
         public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string orderBy, [FromQuery]string orderDirection, CancellationToken cancellationToken)
         {
             var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderBy ?? SearchTicketsQueryRequest.OrderByProperty.Id.ToString(), orderDirection ?? OrderDirection.Ascending.ToString());
-            var results = await mediator.Send(searchRequest, cancellationToken);
+            var results = await mediator.Send(searchRequest, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(results);
         }
@@ -41,7 +41,7 @@ namespace TicketManager.WebAPI.Controllers
         public async Task<IActionResult> GetTicketMetaData([FromRoute]long id, CancellationToken cancellationToken)
         {
             var request = new TicketExistsQueryRequest(id);
-            var result = await mediator.Send(request, cancellationToken);
+            var result = await mediator.Send(request, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(result);
         }

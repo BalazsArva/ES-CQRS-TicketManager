@@ -33,12 +33,14 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 });
         }
 
-        public override async Task<ValidationResult> ValidateAsync(ValidationContext<AddTicketLinksCommand> context, CancellationToken cancellationToken = default)
+        public override async Task<ValidationResult> ValidateAsync(ValidationContext<AddTicketLinksCommand> context, CancellationToken cancellationToken)
         {
             context.RootContextData[ValidationContextKeys.TicketLinkOperationCommandContextDataKey] = context.InstanceToValidate;
-            context.RootContextData[ValidationContextKeys.FoundTicketLinksContextDataKey] = await LinkValidationHelper.GetAssignedLinksAsync(documentStore, context.InstanceToValidate);
+            context.RootContextData[ValidationContextKeys.FoundTicketLinksContextDataKey] = await LinkValidationHelper
+                .GetAssignedLinksAsync(documentStore, context.InstanceToValidate, cancellationToken)
+                .ConfigureAwait(false);
 
-            return await base.ValidateAsync(context, cancellationToken);
+            return await base.ValidateAsync(context, cancellationToken).ConfigureAwait(false);
         }
 
         protected override ISet<long> ExtractReferencedTicketIds(AddTicketLinksCommand command)

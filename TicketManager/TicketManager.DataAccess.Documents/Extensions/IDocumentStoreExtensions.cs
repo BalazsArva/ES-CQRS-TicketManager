@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Operations;
@@ -34,60 +35,12 @@ namespace TicketManager.DataAccess.Documents.Extensions
             return documentId.Substring(prefix.Length);
         }
 
-        public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate)
+        public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId, CancellationToken cancellationToken)
         {
-            return PatchToNewer(store, id, timestampSelector, utcUpdateDate, propertyUpdates.CreateBatch());
+            return PatchToNewer(store, id, lastKnownChangeIdSelector, lastKnownChangeId, cancellationToken, propertyUpdates.CreateBatch());
         }
 
-        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, DateTime>> timestampSelector, DateTime utcUpdateDate, params PropertyUpdateDescriptor[] propertyUpdates)
-        {
-            const string argumentName = "__AUTO_DateUpdated";
-            const string variableName = "shouldUpdate";
-
-            var timestampPropertyPath = GetPropertyPathFromExpression(timestampSelector);
-            var conditionVariableScript = CreateConditionVariableScript(argumentName, variableName, timestampPropertyPath);
-
-            // +1 for the update timestamp which does not need to be provided explicitly.
-            var assignmentScripts = new List<string>(propertyUpdates.Length + 1);
-            var scriptParameters = new ScriptParameterDictionary
-            {
-                [argumentName] = utcUpdateDate
-            };
-
-            for (var i = 0; i < propertyUpdates.Length; ++i)
-            {
-                var propertyUpdate = propertyUpdates[i];
-                var parameterName = string.Concat("__AUTO_Parameter", i);
-
-                assignmentScripts.Add(CreateUpdateScript(propertyUpdate, scriptParameters, parameterName));
-                scriptParameters.AddParameter(parameterName, propertyUpdate.NewValue);
-            }
-
-            assignmentScripts.Add("\t" + timestampPropertyPath + " = args.__AUTO_DateUpdated;");
-
-            var script = string.Join(
-                Environment.NewLine,
-                conditionVariableScript,
-                $"if ({variableName})",
-                "{",
-                string.Join(Environment.NewLine, assignmentScripts),
-                "}");
-
-            var patchRequest = new PatchRequest
-            {
-                Script = script,
-                Values = scriptParameters
-            };
-
-            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
-        }
-
-        public static Task PatchToNewer<TDocument>(this IDocumentStore store, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId)
-        {
-            return PatchToNewer(store, id, lastKnownChangeIdSelector, lastKnownChangeId, propertyUpdates.CreateBatch());
-        }
-
-        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId, params PropertyUpdateDescriptor[] propertyUpdates)
+        public static async Task PatchToNewer<TDocument>(this IDocumentStore store, string id, Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId, CancellationToken cancellationToken, params PropertyUpdateDescriptor[] propertyUpdates)
         {
             const string argumentName = "__AUTO_LastKnownChangeId";
             const string variableName = "shouldUpdate";
@@ -127,7 +80,7 @@ namespace TicketManager.DataAccess.Documents.Extensions
                 Values = scriptParameters
             };
 
-            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest));
+            await store.Operations.SendAsync(new PatchOperation(id, null, patchRequest), token: cancellationToken).ConfigureAwait(false);
         }
 
         private static string CreateUpdateScript(PropertyUpdateDescriptor propertyUpdateDescriptor, Dictionary<string, object> parameters, string parameterName)

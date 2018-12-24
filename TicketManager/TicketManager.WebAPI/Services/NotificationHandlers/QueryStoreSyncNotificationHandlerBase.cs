@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Documents.DataModel;
@@ -24,36 +25,42 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, long ticketId)
+        protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(ticketId);
+            var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(new object[] { ticketId }, cancellationToken).ConfigureAwait(false);
             var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .LatestAsync();
+                .LatestAsync(cancellationToken)
+                .ConfigureAwait(false);
             var ticketDescriptionChangedEvent = await context.TicketDescriptionChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .LatestAsync();
+                .LatestAsync(cancellationToken)
+                .ConfigureAwait(false);
             var ticketStatusChangedEvent = await context.TicketStatusChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .LatestAsync();
+                .LatestAsync(cancellationToken)
+                .ConfigureAwait(false);
             var ticketAssignedEvent = await context.TicketAssignedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .LatestAsync();
+                .LatestAsync(cancellationToken)
+                .ConfigureAwait(false);
             var ticketTypeChangedEvent = await context.TicketTypeChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .LatestAsync();
+                .LatestAsync(cancellationToken)
+                .ConfigureAwait(false);
             var ticketPriorityChangedEvent = await context.TicketPriorityChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .LatestAsync();
+                .LatestAsync(cancellationToken)
+                .ConfigureAwait(false);
 
-            var tags = await GetUpdatedTagsAsync(context, ticketId, 0, Array.Empty<string>());
-            var links = await GetUpdatedLinksAsync(context, ticketId, 0, Array.Empty<TicketLink>());
+            var tags = await GetUpdatedTagsAsync(context, ticketId, 0, Array.Empty<string>(), cancellationToken).ConfigureAwait(false);
+            var links = await GetUpdatedLinksAsync(context, ticketId, 0, Array.Empty<TicketLink>(), cancellationToken).ConfigureAwait(false);
 
             var ticket = new Ticket
             {
@@ -121,15 +128,15 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return ticket;
         }
 
-        protected async Task SyncTagsAsync(long ticketId)
+        protected async Task SyncTagsAsync(long ticketId, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId);
-                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId, cancellationToken).ConfigureAwait(false);
 
-                var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.LastKnownChangeId, ticketDocument.Tags.TagSet);
+                var updatedTags = await GetUpdatedTagsAsync(context, ticketId, ticketDocument.Tags.LastKnownChangeId, ticketDocument.Tags.TagSet, cancellationToken).ConfigureAwait(false);
                 var lastChange = updatedTags.LastChange;
 
                 if (lastChange != null)
@@ -139,20 +146,20 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                         .Add(t => t.Tags.UtcDateLastUpdated, lastChange.UtcDateRecorded)
                         .Add(t => t.Tags.TagSet, updatedTags.Tags);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.LastKnownChangeId, lastChange.Id);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.LastKnownChangeId, lastChange.Id, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
 
-        protected async Task SyncLinksAsync(long ticketCreatedEventId)
+        protected async Task SyncLinksAsync(long ticketCreatedEventId, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketCreatedEventId);
-                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId, cancellationToken).ConfigureAwait(false);
 
-                var updatedLinks = await GetUpdatedLinksAsync(context, ticketCreatedEventId, ticketDocument.Links.LastKnownChangeId, ticketDocument.Links.LinkSet);
+                var updatedLinks = await GetUpdatedLinksAsync(context, ticketCreatedEventId, ticketDocument.Links.LastKnownChangeId, ticketDocument.Links.LinkSet, cancellationToken).ConfigureAwait(false);
                 var lastChange = updatedLinks.LastChange;
 
                 if (lastChange != null)
@@ -162,12 +169,12 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                         .Add(t => t.Links.UtcDateLastUpdated, lastChange.UtcDateRecorded)
                         .Add(t => t.Links.LinkSet, updatedLinks.Links);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.LastKnownChangeId, lastChange.Id);
+                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.LastKnownChangeId, lastChange.Id, cancellationToken);
                 }
             }
         }
 
-        protected async Task<(string[] Tags, TicketTagChangedEvent LastChange)> GetUpdatedTagsAsync(EventsContext context, long ticketCreatedEventId, long lastKnownChangeId, string[] currentTags)
+        protected async Task<(string[] Tags, TicketTagChangedEvent LastChange)> GetUpdatedTagsAsync(EventsContext context, long ticketCreatedEventId, long lastKnownChangeId, string[] currentTags, CancellationToken cancellationToken)
         {
             currentTags = currentTags ?? Array.Empty<string>();
 
@@ -176,7 +183,8 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .AsNoTracking()
                 .OfTicket(ticketCreatedEventId)
                 .After(lastKnownChangeId)
-                .ToOrderedEventListAsync();
+                .ToOrderedEventListAsync(cancellationToken)
+                .ConfigureAwait(false);
 
             if (tagChangesSinceLastSync.Count == 0)
             {
@@ -203,7 +211,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return (updatedTags, tagChangesSinceLastSync.Last());
         }
 
-        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, long sourceTicketCreatedEventId, long lastKnownChangeId, TicketLink[] currentLinks)
+        protected async Task<(TicketLink[] Links, TicketLinkChangedEvent LastChange)> GetUpdatedLinksAsync(EventsContext context, long sourceTicketCreatedEventId, long lastKnownChangeId, TicketLink[] currentLinks, CancellationToken cancellationToken)
         {
             currentLinks = currentLinks ?? Array.Empty<TicketLink>();
 
@@ -212,7 +220,8 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .AsNoTracking()
                 .Where(evt => evt.SourceTicketCreatedEventId == sourceTicketCreatedEventId)
                 .After(lastKnownChangeId)
-                .ToOrderedEventListAsync();
+                .ToOrderedEventListAsync(cancellationToken)
+                .ConfigureAwait(false);
 
             if (linkChangesSinceLastSync.Count == 0)
             {
