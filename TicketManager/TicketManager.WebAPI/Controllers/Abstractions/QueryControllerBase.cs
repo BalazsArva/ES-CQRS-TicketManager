@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TicketManager.Common.Http;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;
@@ -7,7 +7,7 @@ namespace TicketManager.WebAPI.Controllers.Abstractions
 {
     public abstract class QueryControllerBase : ControllerBase
     {
-        public IActionResult FromQueryResult<TResponse>(QueryResult<TResponse> queryResult)
+        protected IActionResult FromQueryResult<TResponse>(QueryResult<TResponse> queryResult)
         {
             if (queryResult.ResultType == QueryResultType.NotFound)
             {
@@ -15,7 +15,7 @@ namespace TicketManager.WebAPI.Controllers.Abstractions
             }
             else if (queryResult.ResultType == QueryResultType.NotModified)
             {
-                return StatusCode((int)HttpStatusCode.NotModified);
+                return StatusCode(StatusCodes.Status304NotModified);
             }
 
             if (!string.IsNullOrWhiteSpace(queryResult.ETag))
@@ -26,7 +26,7 @@ namespace TicketManager.WebAPI.Controllers.Abstractions
             return Ok(queryResult.Result);
         }
 
-        public IActionResult FromQueryResult(TicketExistsQueryResult existenceCheckQueryResult)
+        protected IActionResult FromQueryResult(TicketExistsQueryResult existenceCheckQueryResult)
         {
             if (existenceCheckQueryResult.ResultType == TicketExistsQueryResultType.NotFound)
             {
