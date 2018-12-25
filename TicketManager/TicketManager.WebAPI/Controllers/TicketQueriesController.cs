@@ -39,7 +39,7 @@ namespace TicketManager.WebAPI.Controllers
         {
             var eTagArray = (eTags ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-            var request = new GetTicketDetailsByIdQueryRequest(id, eTagArray);
+            var request = new GetTicketBasicDetailsByIdQueryRequest(id, eTagArray);
             var result = await mediator.Send(request, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(result);

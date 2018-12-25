@@ -13,16 +13,16 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers
 {
-    public class GetTicketDetailsByIdQueryRequestHandler : IRequestHandler<GetTicketDetailsByIdQueryRequest, QueryResult<TicketBasicDetails>>
+    public class GetTicketBasicDetailsByIdQueryRequestHandler : IRequestHandler<GetTicketBasicDetailsByIdQueryRequest, QueryResult<TicketBasicDetails>>
     {
         private readonly IDocumentStore documentStore;
 
-        public GetTicketDetailsByIdQueryRequestHandler(IDocumentStore documentStore)
+        public GetTicketBasicDetailsByIdQueryRequestHandler(IDocumentStore documentStore)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        public async Task<QueryResult<TicketBasicDetails>> Handle(GetTicketDetailsByIdQueryRequest request, CancellationToken cancellationToken)
+        public async Task<QueryResult<TicketBasicDetails>> Handle(GetTicketBasicDetailsByIdQueryRequest request, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {
