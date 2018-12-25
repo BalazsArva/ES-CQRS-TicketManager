@@ -91,6 +91,19 @@ namespace TicketManager.WebAPI.Controllers
                         }
                     }));
 
+            await mediator.Send(
+                new AddTicketLinksCommand(
+                    id2,
+                    user2,
+                    new[]
+                    {
+                        new TicketLinkDTO
+                        {
+                            LinkType = TicketLinkTypes.RelatedTo,
+                            TargetTicketId = id
+                        }
+                    }));
+
             return Ok();
         }
     }

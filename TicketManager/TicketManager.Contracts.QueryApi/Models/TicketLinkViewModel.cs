@@ -1,4 +1,6 @@
-﻿using TicketManager.Contracts.Common;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using TicketManager.Contracts.Common;
 
 namespace TicketManager.Contracts.QueryApi.Models
 {
@@ -8,6 +10,7 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         public long TargetTicketId { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public TicketLinkTypes LinkType { get; set; }
     }
 }
