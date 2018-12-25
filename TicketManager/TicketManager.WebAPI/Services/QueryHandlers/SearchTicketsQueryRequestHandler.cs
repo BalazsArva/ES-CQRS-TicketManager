@@ -47,18 +47,24 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     query = query.Where(t => t.TicketTitle.Title.StartsWith(request.Title));
                 }
 
+                if (!string.IsNullOrWhiteSpace(request.AssignedTo))
+                {
+                    query = query.Where(t => t.Assignment.AssignedTo.StartsWith(request.AssignedTo));
+                }
+
                 var totalLazy = query.CountLazilyAsync(cancellationToken);
                 var dbResults = await SetSorting(query, request)
                     .Paginate(request.Page, request.PageSize)
                     .Select(t => new
                     {
-                        CreatedAtUTC = t.UtcDateCreated,
+                        t.UtcDateCreated,
                         t.CreatedBy,
                         t.Id,
                         t.TicketTitle.Title,
                         t.TicketStatus.Status,
                         t.TicketPriority.Priority,
-                        t.TicketType.Type
+                        t.TicketType.Type,
+                        t.Assignment.AssignedTo
                     })
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
@@ -67,13 +73,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 var mappedResults = dbResults
                     .Select(t => new TicketBasicDetails
                     {
-                        CreatedAtUTC = t.CreatedAtUTC,
+                        UtcDateCreated = t.UtcDateCreated,
                         CreatedBy = t.CreatedBy,
                         Title = t.Title,
                         Id = long.Parse(documentStore.TrimIdPrefix<Ticket>(t.Id)),
                         Type = t.Type,
                         Status = t.Status,
-                        Priority = t.Priority
+                        Priority = t.Priority,
+                        AssignedTo = t.AssignedTo
                     })
                     .ToList();
 
@@ -115,6 +122,11 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.TicketTitle.Title)
                         : query.OrderByDescending(t => t.TicketTitle.Title);
+
+                case SearchTicketsQueryRequest.OrderByProperty.AssignedTo:
+                    return orderDirection == OrderDirection.Ascending
+                        ? query.OrderBy(t => t.Assignment.AssignedTo)
+                        : query.OrderByDescending(t => t.Assignment.AssignedTo);
 
                 case SearchTicketsQueryRequest.OrderByProperty.Type:
                     return orderDirection == OrderDirection.Ascending

@@ -16,6 +16,8 @@
 
         public static QueryResult<TResult> NotFound { get; } = new QueryResult<TResult>(default, QueryResultType.NotFound, null);
 
+        public static QueryResult<TResult> NotModified { get; } = new QueryResult<TResult>(default, QueryResultType.NotModified, null);
+
         public TResult Result { get; }
 
         public QueryResultType ResultType { get; }

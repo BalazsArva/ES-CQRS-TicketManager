@@ -28,6 +28,8 @@ namespace TicketManager.WebAPI.DTOs.Queries
 
             Title,
 
+            AssignedTo,
+
             Status,
 
             Priority,
@@ -50,6 +52,8 @@ namespace TicketManager.WebAPI.DTOs.Queries
         public int PageSize { get; }
 
         public string Title { get; }
+
+        public string AssignedTo { get; }
 
         public string CreatedBy { get; }
 

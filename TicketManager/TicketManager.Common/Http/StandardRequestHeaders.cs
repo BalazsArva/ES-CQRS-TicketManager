@@ -2,6 +2,6 @@
 {
     public static class StandardRequestHeaders
     {
-        public const string IfMatch = "If-Match";
+        public const string IfNoneMatch = "If-None-Match";
     }
 }

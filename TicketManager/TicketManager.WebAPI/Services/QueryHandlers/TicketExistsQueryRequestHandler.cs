@@ -34,7 +34,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
                 var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
                 var changeVector = session.Advanced.GetChangeVectorFor(ticketDocument);
-                var etag = ETagProvider.CreeateETagFromChangeVector(changeVector);
+                var etag = ETagProvider.CreateETagFromChangeVector(changeVector);
 
                 return new TicketExistsQueryResult(TicketExistsQueryResultType.Found, etag);
             }

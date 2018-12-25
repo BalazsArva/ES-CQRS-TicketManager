@@ -5,7 +5,7 @@ namespace TicketManager.DataAccess.Documents.Utilities
 {
     public static class ETagProvider
     {
-        public static string CreeateETagFromChangeVector(string changeVector)
+        public static string CreateETagFromChangeVector(string changeVector)
         {
             if (changeVector == null)
             {

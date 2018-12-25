@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TicketManager.Common.Http;
 using TicketManager.WebAPI.Controllers.Abstractions;
 using TicketManager.WebAPI.DTOs.Queries;
 
@@ -34,9 +35,14 @@ namespace TicketManager.WebAPI.Controllers
 
         [HttpGet]
         [Route("{id:int}", Name = RouteNames.Tickets_Queries_Get_ById)]
-        public Task<IActionResult> GetTicketById([FromRoute]long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetTicketById([FromRoute]long id, CancellationToken cancellationToken, [FromHeader(Name = StandardRequestHeaders.IfNoneMatch)]string eTags = null)
         {
-            throw new NotImplementedException();
+            var eTagArray = (eTags ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            var request = new GetTicketDetailsByIdQueryRequest(id, eTagArray);
+            var result = await mediator.Send(request, cancellationToken).ConfigureAwait(false);
+
+            return FromQueryResult(result);
         }
 
         [HttpHead]
