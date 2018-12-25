@@ -37,54 +37,49 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
                 var result = new GetTicketHistoryQueryResponse();
 
-                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Title))
+                await Task.WhenAll(new List<Task>
                 {
-                    result.TitleChanges = await GetTicketTitleChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
-                }
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Title))
+                        ? PopulateTicketTitleChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask,
 
-                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Description))
-                {
-                    result.DescriptionChanges = await GetTicketDescriptionChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
-                }
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Description))
+                        ? PopulateTicketDescriptionChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask,
 
-                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Type))
-                {
-                    result.TypeChanges = await GetTicketTypeChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
-                }
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Type))
+                        ? PopulateTicketTypeChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask,
 
-                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Status))
-                {
-                    result.StatusChanges = await GetTicketStatusChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
-                }
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Status))
+                        ? PopulateTicketStatusChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask,
 
-                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Priority))
-                {
-                    result.PriorityChanges = await GetTicketPriorityChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
-                }
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Priority))
+                        ? PopulateTicketPriorityChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask,
 
-                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Assignment))
-                {
-                    result.AssignmentChanges = await GetTicketAssignmentChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
-                }
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Assignment))
+                        ? PopulateTicketAssignmentChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask,
 
-                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Tags))
-                {
-                    result.TagChanges = await GetTicketTagChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
-                }
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Tags))
+                        ? PopulateTicketTagChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask,
 
-                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Links))
-                {
-                    result.LinkChanges = await GetTicketLinkChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
-                }
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Links))
+                        ? PopulateTicketLinkChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask
+                }).ConfigureAwait(false);
 
                 // TODO: Add support for eTags. Also consider that even though a client may have a cached version, it might contain different history types from what is requested.
                 return new QueryResult<GetTicketHistoryQueryResponse>(result);
             }
         }
 
-        private Task<List<Change<string>>> GetTicketTitleChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketTitleChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            return context
+            var result = await context
                 .TicketTitleChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
@@ -95,12 +90,15 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     ChangedTo = evt.Title,
                     UtcDateChanged = evt.UtcDateRecorded
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.TitleChanges = result;
         }
 
-        private Task<List<Change<string>>> GetTicketDescriptionChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketDescriptionChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            return context
+            var result = await context
                 .TicketDescriptionChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
@@ -111,12 +109,15 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     ChangedTo = evt.Description,
                     UtcDateChanged = evt.UtcDateRecorded
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.DescriptionChanges = result;
         }
 
-        private Task<List<EnumChange<TicketStatuses>>> GetTicketStatusChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketStatusChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            return context
+            var result = await context
                 .TicketStatusChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
@@ -127,12 +128,15 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     ChangedTo = evt.TicketStatus,
                     UtcDateChanged = evt.UtcDateRecorded
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.StatusChanges = result;
         }
 
-        private Task<List<EnumChange<TicketTypes>>> GetTicketTypeChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketTypeChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            return context
+            var result = await context
                 .TicketTypeChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
@@ -143,12 +147,15 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     ChangedTo = evt.TicketType,
                     UtcDateChanged = evt.UtcDateRecorded
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.TypeChanges = result;
         }
 
-        private Task<List<EnumChange<TicketPriorities>>> GetTicketPriorityChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketPriorityChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            return context
+            var result = await context
                 .TicketPriorityChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
@@ -159,12 +166,15 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     ChangedTo = evt.Priority,
                     UtcDateChanged = evt.UtcDateRecorded
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.PriorityChanges = result;
         }
 
-        private Task<List<Change<string>>> GetTicketAssignmentChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketAssignmentChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            return context
+            var result = await context
                 .TicketAssignedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
@@ -175,12 +185,15 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     ChangedTo = evt.AssignedTo,
                     UtcDateChanged = evt.UtcDateRecorded
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.AssignmentChanges = result;
         }
 
-        private Task<List<Change<TicketTagChange>>> GetTicketTagChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketTagChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            return context
+            var result = await context
                 .TicketTagChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
@@ -195,12 +208,15 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     },
                     UtcDateChanged = evt.UtcDateRecorded
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.TagChanges = result;
         }
 
-        private Task<List<Change<TicketLinkChange>>> GetTicketLinkChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketLinkChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
-            return context
+            var result = await context
                 .TicketLinkChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
@@ -217,7 +233,10 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     },
                     UtcDateChanged = evt.UtcDateRecorded
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.LinkChanges = result;
         }
     }
 }
