@@ -5,7 +5,7 @@ using TicketManager.Contracts.Common;
 
 namespace TicketManager.Contracts.QueryApi.Models
 {
-    public class TicketBasicDetails
+    public class TicketBasicDetailsViewModel
     {
         public long Id { get; set; }
 
@@ -25,5 +25,7 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         [JsonConverter(typeof(StringEnumConverter))]
         public TicketPriorities Priority { get; set; }
+
+        // TODO: Add date last modified and last modified by
     }
 }

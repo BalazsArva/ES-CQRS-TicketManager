@@ -71,7 +71,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
                 var total = await totalLazy.Value.ConfigureAwait(false);
                 var mappedResults = dbResults
-                    .Select(t => new TicketBasicDetails
+                    .Select(t => new TicketBasicDetailsViewModel
                     {
                         UtcDateCreated = t.UtcDateCreated,
                         CreatedBy = t.CreatedBy,

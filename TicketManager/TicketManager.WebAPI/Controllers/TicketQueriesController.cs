@@ -34,12 +34,25 @@ namespace TicketManager.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("{id:int}", Name = RouteNames.Tickets_Queries_Get_ById)]
-        public async Task<IActionResult> GetTicketById([FromRoute]long id, CancellationToken cancellationToken, [FromHeader(Name = StandardRequestHeaders.IfNoneMatch)]string eTags = null)
+        [Route("{id:int}", Name = RouteNames.Tickets_Queries_Get_ById_Basic)]
+        public async Task<IActionResult> GetTicketBasicDetailsById([FromRoute]long id, CancellationToken cancellationToken, [FromHeader(Name = StandardRequestHeaders.IfNoneMatch)]string eTags = null)
         {
             var eTagArray = (eTags ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
 
             var request = new GetTicketBasicDetailsByIdQueryRequest(id, eTagArray);
+            var result = await mediator.Send(request, cancellationToken).ConfigureAwait(false);
+
+            return FromQueryResult(result);
+        }
+
+        [HttpGet]
+        [Route("{id:int}/extended", Name = RouteNames.Tickets_Queries_Get_ById_Extended)]
+        public async Task<IActionResult> GetTicketExtendedDetailsById([FromRoute]long id, CancellationToken cancellationToken, [FromHeader(Name = StandardRequestHeaders.IfNoneMatch)]string eTags = null)
+        {
+            // TODO: Review route
+            var eTagArray = (eTags ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            var request = new GetTicketExtendedDetailsByIdQueryRequest(id, eTagArray);
             var result = await mediator.Send(request, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(result);
