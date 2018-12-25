@@ -77,7 +77,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     result.LinkChanges = await GetTicketLinkChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
                 }
 
-                // TODO: Add support for eTags
+                // TODO: Add support for eTags. Also consider that even though a client may have a cached version, it might contain different history types from what is requested.
                 return new QueryResult<GetTicketHistoryQueryResponse>(result);
             }
         }
