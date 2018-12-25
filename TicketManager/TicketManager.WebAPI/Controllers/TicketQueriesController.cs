@@ -12,6 +12,9 @@ namespace TicketManager.WebAPI.Controllers
     [ApiController]
     public class TicketQueriesController : QueryControllerBase
     {
+        private static readonly string DefaultOrderDirection = OrderDirection.Ascending.ToString();
+        private static readonly string DefaultOrderByProperty = SearchTicketsQueryRequest.OrderByProperty.Id.ToString();
+
         private readonly IMediator mediator;
 
         public TicketQueriesController(IMediator mediator)
@@ -23,7 +26,7 @@ namespace TicketManager.WebAPI.Controllers
         [Route("page/{page:int}/pagesize/{pageSize:int}", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
         public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string orderBy, [FromQuery]string orderDirection, CancellationToken cancellationToken)
         {
-            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderBy ?? SearchTicketsQueryRequest.OrderByProperty.Id.ToString(), orderDirection ?? OrderDirection.Ascending.ToString());
+            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderBy ?? DefaultOrderByProperty, orderDirection ?? DefaultOrderDirection);
             var results = await mediator.Send(searchRequest, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(results);
