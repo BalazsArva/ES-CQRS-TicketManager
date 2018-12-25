@@ -67,6 +67,16 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     result.AssignmentChanges = await GetTicketAssignmentChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
                 }
 
+                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Tags))
+                {
+                    result.TagChanges = await GetTicketTagChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
+                }
+
+                if (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Links))
+                {
+                    result.LinkChanges = await GetTicketLinkChangesAsync(context, ticketId, cancellationToken).ConfigureAwait(false);
+                }
+
                 // TODO: Add support for eTags
                 return new QueryResult<GetTicketHistoryQueryResponse>(result);
             }
@@ -78,7 +88,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .TicketTitleChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .OrderBy(evt => evt.TicketCreatedEventId)
+                .OrderBy(evt => evt.Id)
                 .Select(evt => new Change<string>
                 {
                     ChangedBy = evt.CausedBy,
@@ -97,7 +107,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .TicketDescriptionChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .OrderBy(evt => evt.TicketCreatedEventId)
+                .OrderBy(evt => evt.Id)
                 .Select(evt => new Change<string>
                 {
                     ChangedBy = evt.CausedBy,
@@ -116,7 +126,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .TicketStatusChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .OrderBy(evt => evt.TicketCreatedEventId)
+                .OrderBy(evt => evt.Id)
                 .Select(evt => new EnumChange<TicketStatuses>
                 {
                     ChangedBy = evt.CausedBy,
@@ -135,7 +145,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .TicketTypeChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .OrderBy(evt => evt.TicketCreatedEventId)
+                .OrderBy(evt => evt.Id)
                 .Select(evt => new EnumChange<TicketTypes>
                 {
                     ChangedBy = evt.CausedBy,
@@ -154,7 +164,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .TicketPriorityChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .OrderBy(evt => evt.TicketCreatedEventId)
+                .OrderBy(evt => evt.Id)
                 .Select(evt => new EnumChange<TicketPriorities>
                 {
                     ChangedBy = evt.CausedBy,
@@ -173,11 +183,59 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .TicketAssignedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
-                .OrderBy(evt => evt.TicketCreatedEventId)
+                .OrderBy(evt => evt.Id)
                 .Select(evt => new Change<string>
                 {
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.AssignedTo,
+                    UtcDateChanged = evt.UtcDateRecorded
+                })
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            return events;
+        }
+
+        private async Task<IEnumerable<Change<TicketTagChange>>> GetTicketTagChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        {
+            var events = await context
+                .TicketTagChangedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .OrderBy(evt => evt.Id)
+                .Select(evt => new Change<TicketTagChange>
+                {
+                    ChangedBy = evt.CausedBy,
+                    ChangedTo = new TicketTagChange
+                    {
+                        Operation = evt.TagAdded ? TicketTagOperationTypes.Add : TicketTagOperationTypes.Remove,
+                        Tag = evt.Tag
+                    },
+                    UtcDateChanged = evt.UtcDateRecorded
+                })
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            return events;
+        }
+
+        private async Task<IEnumerable<Change<TicketLinkChange>>> GetTicketLinkChangesAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
+        {
+            var events = await context
+                .TicketLinkChangedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .OrderBy(evt => evt.Id)
+                .Select(evt => new Change<TicketLinkChange>
+                {
+                    ChangedBy = evt.CausedBy,
+                    ChangedTo = new TicketLinkChange
+                    {
+                        Operation = evt.ConnectionIsActive ? TicketLinkOperationTypes.Add : TicketLinkOperationTypes.Remove,
+                        LinkType = evt.LinkType,
+                        SourceTicketId = evt.SourceTicketCreatedEventId,
+                        TargetTicketId = evt.TargetTicketCreatedEventId
+                    },
                     UtcDateChanged = evt.UtcDateRecorded
                 })
                 .ToListAsync(cancellationToken)

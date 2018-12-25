@@ -14,6 +14,8 @@ namespace TicketManager.WebAPI.DTOs.Queries
         public const string Type = "type";
         public const string Priority = "priority";
         public const string Assignment = "assignment";
+        public const string Tags = "tags";
+        public const string Links = "links";
 
         public static IEnumerable<string> ValidValues { get; } = new HashSet<string>(new[]
         {
@@ -22,7 +24,9 @@ namespace TicketManager.WebAPI.DTOs.Queries
             Status,
             Type,
             Priority,
-            Assignment
+            Assignment,
+            Tags,
+            Links
         });
 
         public static IEnumerable<string> GetRequestedHistoryTypes(string requestedTypes)

@@ -32,6 +32,11 @@ namespace TicketManager.WebAPI.Extensions.Linq
             return events.Where(x => x.TicketCreatedEventId == ticketId);
         }
 
+        public static IQueryable<TicketLinkChangedEvent> OfTicket(this IQueryable<TicketLinkChangedEvent> events, long ticketId)
+        {
+            return events.Where(x => x.SourceTicketCreatedEventId == ticketId || x.TargetTicketCreatedEventId == ticketId);
+        }
+
         public static IQueryable<TicketCommentEditedEvent> OfComment(this IQueryable<TicketCommentEditedEvent> ticketCommentEditedEvents, long commentId)
         {
             return ticketCommentEditedEvents.Where(x => x.TicketCommentPostedEventId == commentId);
