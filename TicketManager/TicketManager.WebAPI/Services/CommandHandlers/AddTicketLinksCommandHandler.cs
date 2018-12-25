@@ -33,6 +33,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
             using (var context = eventsContextFactory.CreateContext())
             {
+                // TODO: If any link is a BlockedBy, set the status to blocked, don't forget to dispatch status change notification as well in this case.
                 foreach (var ticketLink in request.Links)
                 {
                     context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
