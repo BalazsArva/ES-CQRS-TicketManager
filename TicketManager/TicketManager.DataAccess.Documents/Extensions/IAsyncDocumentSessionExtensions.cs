@@ -36,7 +36,6 @@ namespace TicketManager.DataAccess.Documents.Extensions
 
         private static PatchRequest CreatePatchRequest<TDocument>(Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId, PropertyUpdateDescriptor[] propertyUpdates)
         {
-            // TODO: Ensure unique parameter names if multiple patch requests are being sent in a single session
             const string lastKnownChangeIdArgumentName = "__AUTO_LastKnownChangeId";
             const string conditionVariableName = "shouldUpdate";
 
@@ -77,7 +76,6 @@ namespace TicketManager.DataAccess.Documents.Extensions
 
         private static PatchRequest CreatePatchRequest<TDocument>(Expression<Func<TDocument, DateTime>> lastKnownChangeSelector, DateTime lastKnownChange, PropertyUpdateDescriptor[] propertyUpdates)
         {
-            // TODO: Ensure unique parameter names if multiple patch requests are being sent in a single session
             const string lastKnownChangeArgumentName = "__AUTO_LastKnownChange";
             const string conditionVariableName = "shouldUpdate";
 
