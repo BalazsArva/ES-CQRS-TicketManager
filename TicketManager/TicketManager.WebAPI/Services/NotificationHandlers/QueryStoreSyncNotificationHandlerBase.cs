@@ -62,6 +62,22 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             var tags = await GetUpdatedTagsAsync(context, ticketId, 0, Array.Empty<string>(), cancellationToken).ConfigureAwait(false);
             var links = await GetUpdatedLinksAsync(context, ticketId, 0, Array.Empty<TicketLink>(), cancellationToken).ConfigureAwait(false);
 
+            var lastUpdate = new EventBase[]
+            {
+                ticketCreatedEvent,
+                ticketTitleChangedEvent,
+                ticketDescriptionChangedEvent,
+                ticketStatusChangedEvent,
+                ticketAssignedEvent,
+                ticketTypeChangedEvent,
+                ticketPriorityChangedEvent,
+                tags.LastChange,
+                links.LastChange,
+            }
+            .Where(evt => evt != null)
+            .OrderByDescending(evt => evt.UtcDateRecorded)
+            .First();
+
             var ticket = new Ticket
             {
                 Id = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId),
@@ -122,7 +138,9 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     UtcDateLastUpdated = links.LastChange?.UtcDateRecorded ?? ticketCreatedEvent.UtcDateRecorded,
                     LinkSet = links.Links,
                     LastKnownChangeId = links.LastChange?.Id ?? 0
-                }
+                },
+                LastUpdatedBy = lastUpdate.CausedBy,
+                UtcDateLastUpdated = lastUpdate.UtcDateRecorded
             };
 
             return ticket;
