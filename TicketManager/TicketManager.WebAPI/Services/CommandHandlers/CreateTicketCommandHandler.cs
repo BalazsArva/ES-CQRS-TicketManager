@@ -25,11 +25,8 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         public async Task<long> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
+            // TODO: Add support for link and tag addition at creation time. Don't forget to overwrite the ticket's status to Blocked when a link with type 'BlockedBy' is found.
+            await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             long ticketId;
             using (var context = eventsContextFactory.CreateContext())

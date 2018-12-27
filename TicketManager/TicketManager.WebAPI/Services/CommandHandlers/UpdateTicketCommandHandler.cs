@@ -33,11 +33,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         public async Task<Unit> Handle(UpdateTicketCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
+            await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
@@ -55,6 +51,8 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 UpdateTypeIfChanged(context, ticketDocument, ticketId, request.TicketType, updatedBy);
                 UpdatePriorityIfChanged(context, ticketDocument, ticketId, request.Priority, updatedBy);
                 UpdateTagsIfChanged(context, ticketDocument, ticketId, request.Tags, updatedBy);
+
+                // This must come after UpdateStatusIfChanged because it overwrites the status to Blocked if a link with type 'BlockedBy' is found.
                 UpdateLinksIfChanged(context, ticketDocument, ticketId, request.Links, updatedBy);
 
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -202,6 +200,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 });
             }
 
+            var setToBlocked = false;
             foreach (var addedLink in addedLinks)
             {
                 context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
@@ -212,6 +211,18 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     SourceTicketCreatedEventId = ticketCreatedEventId,
                     TargetTicketCreatedEventId = int.Parse(documentStore.TrimIdPrefix<Ticket>(addedLink.TargetTicketId))
                 });
+
+                if (!setToBlocked && addedLink.LinkType == TicketLinkTypes.BlockedBy)
+                {
+                    setToBlocked = true;
+
+                    context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
+                    {
+                        CausedBy = changedBy,
+                        TicketCreatedEventId = ticketCreatedEventId,
+                        TicketStatus = TicketStatuses.Blocked
+                    });
+                }
             }
         }
     }
