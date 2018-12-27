@@ -42,6 +42,11 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     query = query.Where(t => t.CreatedBy.StartsWith(request.CreatedBy));
                 }
 
+                if (!string.IsNullOrWhiteSpace(request.LastModifiedBy))
+                {
+                    query = query.Where(t => t.LastUpdatedBy.StartsWith(request.LastModifiedBy));
+                }
+
                 if (!string.IsNullOrWhiteSpace(request.Title))
                 {
                     query = query.Where(t => t.TicketTitle.Title.StartsWith(request.Title));
@@ -52,6 +57,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     query = query.Where(t => t.Assignment.AssignedTo.StartsWith(request.AssignedTo));
                 }
 
+                // TODO: Implement UtcDateLastUpdated and UtcDateCreated queries. Pay attention to precision, e.g. don't require to provide fractional seconds.
                 var totalLazy = query.CountLazilyAsync(cancellationToken);
                 var dbResults = await SetSorting(query, request)
                     .Paginate(request.Page, request.PageSize)
@@ -64,7 +70,9 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         t.TicketStatus.Status,
                         t.TicketPriority.Priority,
                         t.TicketType.Type,
-                        t.Assignment.AssignedTo
+                        t.Assignment.AssignedTo,
+                        t.LastUpdatedBy,
+                        t.UtcDateLastUpdated
                     })
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
@@ -80,7 +88,9 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         Type = t.Type,
                         Status = t.Status,
                         Priority = t.Priority,
-                        AssignedTo = t.AssignedTo
+                        AssignedTo = t.AssignedTo,
+                        LastUpdatedBy = t.LastUpdatedBy,
+                        UtcDateLastUpdated = t.UtcDateLastUpdated
                     })
                     .ToList();
 
@@ -106,7 +116,9 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         : query.OrderByDescending(t => t.Id);
 
                 case SearchTicketsQueryRequest.OrderByProperty.LastModifiedBy:
-                    throw new NotImplementedException();
+                    return orderDirection == OrderDirection.Ascending
+                        ? query.OrderBy(t => t.LastUpdatedBy)
+                        : query.OrderByDescending(t => t.LastUpdatedBy);
 
                 case SearchTicketsQueryRequest.OrderByProperty.Priority:
                     return orderDirection == OrderDirection.Ascending
@@ -139,7 +151,9 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         : query.OrderByDescending(t => t.UtcDateCreated);
 
                 case SearchTicketsQueryRequest.OrderByProperty.UtcDateLastModified:
-                    throw new NotImplementedException();
+                    return orderDirection == OrderDirection.Ascending
+                        ? query.OrderBy(t => t.UtcDateLastUpdated)
+                        : query.OrderByDescending(t => t.UtcDateLastUpdated);
 
                 // Cannot happen as the validator prevents it and the Enum.Parse would also fail for an invalid value.
                 default:

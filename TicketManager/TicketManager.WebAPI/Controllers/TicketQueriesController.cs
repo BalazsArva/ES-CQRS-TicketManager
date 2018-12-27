@@ -25,9 +25,10 @@ namespace TicketManager.WebAPI.Controllers
 
         [HttpGet]
         [Route("page/{page:int}/pagesize/{pageSize:int}", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
-        public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string orderBy, [FromQuery]string orderDirection, CancellationToken cancellationToken)
+        public async Task<IActionResult> SearchTickets([FromRoute]int page, [FromRoute]int pageSize, [FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string lastUpdatedBy, [FromQuery]string orderBy, [FromQuery]string orderDirection, CancellationToken cancellationToken)
         {
-            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, orderBy ?? DefaultOrderByProperty, orderDirection ?? DefaultOrderDirection);
+            // TODO: Pass date of ceation/last update filter values if provided. Pay attention to precision, e.g. don't require to provide fractional seconds.
+            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, lastUpdatedBy, null, null, orderBy ?? DefaultOrderByProperty, orderDirection ?? DefaultOrderDirection);
             var results = await mediator.Send(searchRequest, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(results);

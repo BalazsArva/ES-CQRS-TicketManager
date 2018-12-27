@@ -15,7 +15,11 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         public string CreatedBy { get; set; }
 
+        public string LastUpdatedBy { get; set; }
+
         public DateTime UtcDateCreated { get; set; }
+
+        public DateTime UtcDateLastUpdated { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public TicketStatuses Status { get; set; }
@@ -25,7 +29,5 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         [JsonConverter(typeof(StringEnumConverter))]
         public TicketPriorities Priority { get; set; }
-
-        // TODO: Add date last modified and last modified by
     }
 }
