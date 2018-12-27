@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TicketManager.Domain.Common;
+using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
 
@@ -37,10 +37,15 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(new RemoveTicketTagsCommand(id, user1, new[] { "Dev" }));
             await mediator.Send(new AddTicketTagsCommand(id, user1, new[] { "QA" }));
 
+            var commentId1 = await mediator.Send(new PostCommentToTicketCommand(id, user1, $"This is a test comment posted to Ticket #{id} by {user1} at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}"));
+            var commentId2 = await mediator.Send(new PostCommentToTicketCommand(id2, user2, $"This is a test comment posted to Ticket #{id2} by {user2} at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}"));
+
+            await mediator.Send(new EditTicketCommentCommand(commentId1, user1, $"This comment was updated by {user1} at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}"));
+
             await mediator.Send(
                 new AddTicketLinksCommand(
                     id,
-                    "Balazs",
+                    user1,
                     new[]
                     {
                         new TicketLinkDTO
@@ -58,7 +63,7 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(
                 new RemoveTicketLinksCommand(
                     id,
-                    "Balazs",
+                    user1,
                     new[]
                     {
                         new TicketLinkDTO
@@ -71,7 +76,7 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(
                 new AddTicketLinksCommand(
                     id,
-                    "Balazs",
+                    user2,
                     new[]
                     {
                         new TicketLinkDTO
@@ -81,8 +86,21 @@ namespace TicketManager.WebAPI.Controllers
                         },
                         new TicketLinkDTO
                         {
-                            LinkType = TicketLinkTypes.RelatedTo,
+                            LinkType = TicketLinkTypes.BlockedBy,
                             TargetTicketId = id2
+                        }
+                    }));
+
+            await mediator.Send(
+                new AddTicketLinksCommand(
+                    id2,
+                    user2,
+                    new[]
+                    {
+                        new TicketLinkDTO
+                        {
+                            LinkType = TicketLinkTypes.RelatedTo,
+                            TargetTicketId = id
                         }
                     }));
 

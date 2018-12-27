@@ -25,7 +25,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         public async Task<Unit> Handle(AddTicketLinksCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -33,6 +33,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
             using (var context = eventsContextFactory.CreateContext())
             {
+                // TODO: If any link is a BlockedBy, set the status to blocked, don't forget to dispatch status change notification as well in this case.
                 foreach (var ticketLink in request.Links)
                 {
                     context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
@@ -45,10 +46,10 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     });
                 }
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await mediator.Publish(new TicketLinksAddedNotification(request.TicketId));
+            await mediator.Publish(new TicketLinksAddedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
 
             return Unit.Value;
         }

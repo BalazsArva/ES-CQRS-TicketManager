@@ -12,4 +12,12 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TicketManager.Contracts.Common\TicketManager.Contracts.Common.csproj" />
+  </ItemGroup>
+
 </Project>

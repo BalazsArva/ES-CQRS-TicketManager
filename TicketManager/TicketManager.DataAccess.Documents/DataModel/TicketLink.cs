@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using TicketManager.Domain.Common;
+using TicketManager.Contracts.Common;
 
 namespace TicketManager.DataAccess.Documents.DataModel
 {

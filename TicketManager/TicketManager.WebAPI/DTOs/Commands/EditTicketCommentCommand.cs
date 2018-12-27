@@ -6,8 +6,8 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class EditTicketCommentCommand : CommentCommandBase
     {
         [JsonConstructor]
-        public EditTicketCommentCommand(long ticketId, string raisedByUser, string commentText)
-            : base(ticketId, raisedByUser)
+        public EditTicketCommentCommand(long commentId, string raisedByUser, string commentText)
+            : base(commentId, raisedByUser)
         {
             CommentText = commentText;
         }

@@ -1,4 +1,4 @@
-﻿using TicketManager.Domain.Common;
+﻿using TicketManager.Contracts.Common;
 
 namespace TicketManager.WebAPI.DTOs
 {

@@ -45,11 +45,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 });
         }
 
-        public override async Task<ValidationResult> ValidateAsync(ValidationContext<AddTicketTagsCommand> context, CancellationToken cancellationToken = default)
+        public override async Task<ValidationResult> ValidateAsync(ValidationContext<AddTicketTagsCommand> context, CancellationToken cancellationToken)
         {
-            context.RootContextData[ValidationContextKeys.FoundTicketTagsContextDataKey] = await TagValidationHelper.GetAssignedTagsAsync(documentStore, context.InstanceToValidate);
+            context.RootContextData[ValidationContextKeys.FoundTicketTagsContextDataKey] = await TagValidationHelper.GetAssignedTagsAsync(documentStore, context.InstanceToValidate, cancellationToken).ConfigureAwait(false);
 
-            return await base.ValidateAsync(context, cancellationToken);
+            return await base.ValidateAsync(context, cancellationToken).ConfigureAwait(false);
         }
 
         private bool NotBeAnAssignedTag(AddTicketTagsCommand command, string tag, PropertyValidatorContext context)

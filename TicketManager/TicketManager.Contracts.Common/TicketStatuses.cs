@@ -1,4 +1,4 @@
-﻿namespace TicketManager.Domain.Common
+﻿namespace TicketManager.Contracts.Common
 {
     public enum TicketStatuses
     {

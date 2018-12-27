@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation.Validators;
 using Raven.Client.Documents;
@@ -18,13 +19,13 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers
             return command.Links.Count(otherLink => otherLink.LinkType == link.LinkType && otherLink.TargetTicketId == link.TargetTicketId) == 1;
         }
 
-        public static async Task<ISet<TicketLink>> GetAssignedLinksAsync<TCommand>(IDocumentStore documentStore, TCommand command)
+        public static async Task<ISet<TicketLink>> GetAssignedLinksAsync<TCommand>(IDocumentStore documentStore, TCommand command, CancellationToken cancellationToken)
             where TCommand : TicketCommandBase, ILinkOperationCommand
         {
             using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(command.TicketId);
-                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId, cancellationToken).ConfigureAwait(false);
 
                 return new HashSet<TicketLink>(ticketDocument?.Links?.LinkSet ?? Enumerable.Empty<TicketLink>());
             }

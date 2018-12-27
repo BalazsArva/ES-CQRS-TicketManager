@@ -30,11 +30,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("modifier"));
         }
 
-        public override async Task<ValidationResult> ValidateAsync(ValidationContext<TCommand> context, CancellationToken cancellationToken = default)
+        public override async Task<ValidationResult> ValidateAsync(ValidationContext<TCommand> context, CancellationToken cancellationToken)
         {
-            context.RootContextData[ValidationContextKeys.FoundTicketIdsContextDataKey] = await FindExistingReferencedTicketIdsAsync(context.InstanceToValidate, cancellationToken);
+            context.RootContextData[ValidationContextKeys.FoundTicketIdsContextDataKey] = await FindExistingReferencedTicketIdsAsync(context.InstanceToValidate, cancellationToken).ConfigureAwait(false);
 
-            return await base.ValidateAsync(context, cancellationToken);
+            return await base.ValidateAsync(context, cancellationToken).ConfigureAwait(false);
         }
 
         protected bool BeAnExistingTicket(TCommand command, long ticketId, PropertyValidatorContext context)
@@ -61,7 +61,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
         /// <returns>
         /// A set which contains all ticket ids which are referenced in any property of the validated object and verified to exist.
         /// </returns>
-        protected virtual async Task<ISet<long>> FindExistingReferencedTicketIdsAsync(TCommand command, CancellationToken cancellationToken = default)
+        protected virtual async Task<ISet<long>> FindExistingReferencedTicketIdsAsync(TCommand command, CancellationToken cancellationToken)
         {
             var requiredTicketIds = ExtractReferencedTicketIds(command);
 
@@ -71,7 +71,8 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
                     .TicketCreatedEvents
                     .Where(evt => requiredTicketIds.Contains(evt.Id))
                     .Select(evt => evt.Id)
-                    .ToSetAsync();
+                    .ToSetAsync(cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
 

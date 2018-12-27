@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents;
+using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
@@ -32,7 +33,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         public async Task<Unit> Handle(UpdateTicketCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
@@ -56,10 +57,10 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 UpdateTagsIfChanged(context, ticketDocument, ticketId, request.Tags, updatedBy);
                 UpdateLinksIfChanged(context, ticketDocument, ticketId, request.Links, updatedBy);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await mediator.Publish(new TicketUpdatedNotification(request.TicketId));
+            await mediator.Publish(new TicketUpdatedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
 
             return Unit.Value;
         }
@@ -103,7 +104,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketStatuses newStatus, string changedBy)
+        private void UpdateStatusIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, TicketStatuses newStatus, string changedBy)
         {
             if (ticketDocument.TicketStatus?.Status != newStatus)
             {
@@ -116,7 +117,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketTypes newTicketType, string changedBy)
+        private void UpdateTypeIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, TicketTypes newTicketType, string changedBy)
         {
             if (ticketDocument.TicketType?.Type != newTicketType)
             {
@@ -129,7 +130,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             }
         }
 
-        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, Domain.Common.TicketPriorities newPriority, string changedBy)
+        private void UpdatePriorityIfChanged(EventsContext context, Ticket ticketDocument, long ticketCreatedEventId, TicketPriorities newPriority, string changedBy)
         {
             if (ticketDocument.TicketPriority?.Priority != newPriority)
             {

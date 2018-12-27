@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TicketManager.Common\TicketManager.Common.csproj" />
+    <ProjectReference Include="..\TicketManager.Contracts.Common\TicketManager.Contracts.Common.csproj" />
     <ProjectReference Include="..\TicketManager.Domain.Common\TicketManager.Domain.Common.csproj" />
   </ItemGroup>
 

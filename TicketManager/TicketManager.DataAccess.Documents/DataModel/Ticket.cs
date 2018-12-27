@@ -25,5 +25,9 @@ namespace TicketManager.DataAccess.Documents.DataModel
         public TicketPriority TicketPriority { get; set; } = new TicketPriority();
 
         public TicketType TicketType { get; set; } = new TicketType();
+
+        public DateTime UtcDateLastUpdated { get; set; }
+
+        public string LastUpdatedBy { get; set; }
     }
 }

@@ -33,5 +33,7 @@ namespace TicketManager.WebAPI.Validation
         public static string MustBeAnAssignedTag(string propertyDisplayName) => $"The {propertyDisplayName} is not assigned to the ticket.";
 
         public static string MustNotBeAnAssignedLink() => "This ticket is already linked with this link type.";
+
+        public static string MustBeAtLeast(string propertyDisplayName, int minValue) => $"The {propertyDisplayName} must be at least {minValue}.";
     }
 }

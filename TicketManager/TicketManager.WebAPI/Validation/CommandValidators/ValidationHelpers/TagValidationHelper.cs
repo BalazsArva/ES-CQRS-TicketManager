@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation.Validators;
 using Raven.Client.Documents;
@@ -16,13 +17,13 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers
             return command.Tags.Count(t => t == tag) == 1;
         }
 
-        public static async Task<ISet<string>> GetAssignedTagsAsync<TCommand>(IDocumentStore documentStore, TCommand command)
+        public static async Task<ISet<string>> GetAssignedTagsAsync<TCommand>(IDocumentStore documentStore, TCommand command, CancellationToken cancellationToken)
             where TCommand : TicketCommandBase, ITagOperationCommand
         {
             using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(command.TicketId);
-                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId, cancellationToken).ConfigureAwait(false);
 
                 return new HashSet<string>(ticketDocument?.Tags?.TagSet ?? Enumerable.Empty<string>());
             }

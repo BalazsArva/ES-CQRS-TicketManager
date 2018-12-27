@@ -21,11 +21,13 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         public async Task Handle(TicketDescriptionChangedNotification notification, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
+            using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketDescriptionChangedEvent = await context.TicketDescriptionChangedEvents
                     .AsNoTracking()
                     .OfTicket(notification.TicketId)
-                    .LatestAsync();
+                    .LatestAsync(cancellationToken)
+                    .ConfigureAwait(false);
 
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(notification.TicketId);
 
@@ -34,11 +36,13 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     .Add(t => t.TicketDescription.UtcDateLastUpdated, ticketDescriptionChangedEvent.UtcDateRecorded)
                     .Add(t => t.TicketDescription.Description, ticketDescriptionChangedEvent.Description);
 
-                await documentStore.PatchToNewer(
-                    ticketDocumentId,
-                    updates,
-                    t => t.TicketDescription.LastKnownChangeId,
-                    ticketDescriptionChangedEvent.Id);
+                var lastModifiedUpdates = new PropertyUpdateBatch<Ticket>()
+                    .Add(t => t.LastUpdatedBy, ticketDescriptionChangedEvent.CausedBy);
+
+                session.PatchToNewer(ticketDocumentId, updates, t => t.TicketDescription.LastKnownChangeId, ticketDescriptionChangedEvent.Id);
+                session.PatchToNewer(ticketDocumentId, lastModifiedUpdates, t => t.UtcDateLastUpdated, ticketDescriptionChangedEvent.UtcDateRecorded);
+
+                await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
         }
     }
