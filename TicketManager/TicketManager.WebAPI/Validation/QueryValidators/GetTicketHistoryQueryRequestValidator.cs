@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using FluentValidation;
+using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.WebAPI.DTOs.Queries;
 
 namespace TicketManager.WebAPI.Validation.QueryValidators

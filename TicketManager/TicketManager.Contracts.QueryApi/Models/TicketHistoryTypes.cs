@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TicketManager.WebAPI.DTOs.Queries
+namespace TicketManager.Contracts.QueryApi.Models
 {
     public static class TicketHistoryTypes
     {
@@ -36,7 +36,7 @@ namespace TicketManager.WebAPI.DTOs.Queries
                 return Array.Empty<string>();
             }
 
-            return requestedTypes.Split(HistoryTypeSeparator, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToLower()).ToHashSet();
+            return new HashSet<string>(requestedTypes.Split(new[] { HistoryTypeSeparator }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToLower()));
         }
     }
 }
