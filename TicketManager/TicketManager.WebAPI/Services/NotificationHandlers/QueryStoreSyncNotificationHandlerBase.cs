@@ -146,7 +146,13 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                         .Add(t => t.Tags.UtcDateLastUpdated, lastChange.UtcDateRecorded)
                         .Add(t => t.Tags.TagSet, updatedTags.Tags);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Tags.LastKnownChangeId, lastChange.Id, cancellationToken).ConfigureAwait(false);
+                    var lastModifiedUpdates = new PropertyUpdateBatch<Ticket>()
+                        .Add(t => t.LastUpdatedBy, lastChange.CausedBy);
+
+                    session.PatchToNewer(ticketDocumentId, updates, t => t.Tags.LastKnownChangeId, lastChange.Id);
+                    session.PatchToNewer(ticketDocumentId, lastModifiedUpdates, t => t.UtcDateLastUpdated, lastChange.UtcDateRecorded);
+
+                    await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -169,7 +175,13 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                         .Add(t => t.Links.UtcDateLastUpdated, lastChange.UtcDateRecorded)
                         .Add(t => t.Links.LinkSet, updatedLinks.Links);
 
-                    await documentStore.PatchToNewer(ticketDocumentId, updates, t => t.Links.LastKnownChangeId, lastChange.Id, cancellationToken);
+                    var lastModifiedUpdates = new PropertyUpdateBatch<Ticket>()
+                        .Add(t => t.LastUpdatedBy, lastChange.CausedBy);
+
+                    session.PatchToNewer(ticketDocumentId, updates, t => t.Links.LastKnownChangeId, lastChange.Id);
+                    session.PatchToNewer(ticketDocumentId, lastModifiedUpdates, t => t.UtcDateLastUpdated, lastChange.UtcDateRecorded);
+
+                    await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
         }
