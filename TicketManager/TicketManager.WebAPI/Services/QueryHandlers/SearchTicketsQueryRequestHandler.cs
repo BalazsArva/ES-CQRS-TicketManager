@@ -6,6 +6,7 @@ using FluentValidation;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
+using TicketManager.Contracts.QueryApi;
 using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
@@ -100,57 +101,57 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
         private IRavenQueryable<Ticket> SetSorting(IRavenQueryable<Ticket> query, SearchTicketsQueryRequest request)
         {
-            var orderBy = Enum.Parse<SearchTicketsQueryRequest.OrderByProperty>(request.OrderBy);
+            var orderBy = Enum.Parse<SearchTicketsOrderByProperty>(request.OrderBy);
             var orderDirection = Enum.Parse<OrderDirection>(request.OrderDirection);
 
             switch (orderBy)
             {
-                case SearchTicketsQueryRequest.OrderByProperty.CreatedBy:
+                case SearchTicketsOrderByProperty.CreatedBy:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.CreatedBy)
                         : query.OrderByDescending(t => t.CreatedBy);
 
-                case SearchTicketsQueryRequest.OrderByProperty.Id:
+                case SearchTicketsOrderByProperty.Id:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.Id)
                         : query.OrderByDescending(t => t.Id);
 
-                case SearchTicketsQueryRequest.OrderByProperty.LastModifiedBy:
+                case SearchTicketsOrderByProperty.LastModifiedBy:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.LastUpdatedBy)
                         : query.OrderByDescending(t => t.LastUpdatedBy);
 
-                case SearchTicketsQueryRequest.OrderByProperty.Priority:
+                case SearchTicketsOrderByProperty.Priority:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.TicketPriority.Priority.ToString())
                         : query.OrderByDescending(t => t.TicketPriority.Priority.ToString());
 
-                case SearchTicketsQueryRequest.OrderByProperty.Status:
+                case SearchTicketsOrderByProperty.Status:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.TicketStatus.Status.ToString())
                         : query.OrderByDescending(t => t.TicketStatus.Status.ToString());
 
-                case SearchTicketsQueryRequest.OrderByProperty.Title:
+                case SearchTicketsOrderByProperty.Title:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.TicketTitle.Title)
                         : query.OrderByDescending(t => t.TicketTitle.Title);
 
-                case SearchTicketsQueryRequest.OrderByProperty.AssignedTo:
+                case SearchTicketsOrderByProperty.AssignedTo:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.Assignment.AssignedTo)
                         : query.OrderByDescending(t => t.Assignment.AssignedTo);
 
-                case SearchTicketsQueryRequest.OrderByProperty.Type:
+                case SearchTicketsOrderByProperty.Type:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.TicketType.Type.ToString())
                         : query.OrderByDescending(t => t.TicketType.Type.ToString());
 
-                case SearchTicketsQueryRequest.OrderByProperty.UtcDateCreated:
+                case SearchTicketsOrderByProperty.UtcDateCreated:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.UtcDateCreated)
                         : query.OrderByDescending(t => t.UtcDateCreated);
 
-                case SearchTicketsQueryRequest.OrderByProperty.UtcDateLastModified:
+                case SearchTicketsOrderByProperty.UtcDateLastModified:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.UtcDateLastUpdated)
                         : query.OrderByDescending(t => t.UtcDateLastUpdated);

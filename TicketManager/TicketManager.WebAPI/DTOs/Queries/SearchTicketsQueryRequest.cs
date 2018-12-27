@@ -5,39 +5,8 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Queries
 {
-    // TODO: Move to correct location
-    public enum OrderDirection
-    {
-        Ascending,
-
-        Descending
-    }
-
     public class SearchTicketsQueryRequest : IRequest<QueryResult<SearchTicketsResponse>>
     {
-        public enum OrderByProperty
-        {
-            Id,
-
-            UtcDateCreated,
-
-            CreatedBy,
-
-            UtcDateLastModified,
-
-            LastModifiedBy,
-
-            Title,
-
-            AssignedTo,
-
-            Status,
-
-            Priority,
-
-            Type
-        }
-
         public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy, string lastModifiedBy, DateTime? utcDateCreated, DateTime? utcDateLastModified, string orderBy, string orderDirection)
         {
             Page = page;

@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using TicketManager.Contracts.QueryApi;
+using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.WebAPI.DTOs.Queries;
 
 namespace TicketManager.WebAPI.Validation.QueryValidators
@@ -19,8 +21,8 @@ namespace TicketManager.WebAPI.Validation.QueryValidators
                 .WithMessage(ValidationMessageProvider.MustBeAtLeast("page size", MinPageSize));
 
             RuleFor(r => r.OrderBy)
-                .Must(BeValidEnumString<SearchTicketsQueryRequest.OrderByProperty>)
-                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<SearchTicketsQueryRequest.OrderByProperty>("sorting"));
+                .Must(BeValidEnumString<SearchTicketsOrderByProperty>)
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<SearchTicketsOrderByProperty>("sorting"));
 
             RuleFor(r => r.OrderDirection)
                 .Must(BeValidEnumString<OrderDirection>)

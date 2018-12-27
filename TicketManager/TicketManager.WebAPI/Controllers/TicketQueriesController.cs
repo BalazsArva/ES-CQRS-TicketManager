@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TicketManager.Common.Http;
+using TicketManager.Contracts.QueryApi;
+using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.WebAPI.Controllers.Abstractions;
 using TicketManager.WebAPI.DTOs.Queries;
 
@@ -14,7 +16,7 @@ namespace TicketManager.WebAPI.Controllers
     public class TicketQueriesController : QueryControllerBase
     {
         private static readonly string DefaultOrderDirection = OrderDirection.Ascending.ToString();
-        private static readonly string DefaultOrderByProperty = SearchTicketsQueryRequest.OrderByProperty.Id.ToString();
+        private static readonly string DefaultOrderByProperty = SearchTicketsOrderByProperty.Id.ToString();
 
         private readonly IMediator mediator;
 
