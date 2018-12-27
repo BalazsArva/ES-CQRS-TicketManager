@@ -2,9 +2,9 @@
 using Newtonsoft.Json.Converters;
 using TicketManager.Contracts.Common;
 
-namespace TicketManager.WebAPI.DTOs.Queries
+namespace TicketManager.Contracts.QueryApi.Models
 {
-    public class TicketTagChange
+    public class TicketTagChangeViewModel
     {
         public string Tag { get; set; }
 

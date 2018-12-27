@@ -15,7 +15,7 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers
 {
-    public class SearchTicketsQueryRequestHandler : IRequestHandler<SearchTicketsQueryRequest, QueryResult<SearchTicketsResponse>>
+    public class SearchTicketsQueryRequestHandler : IRequestHandler<SearchTicketsQueryRequest, QueryResult<TicketSearchResultViewModel>>
     {
         private readonly IDocumentStore documentStore;
         private readonly IValidator<SearchTicketsQueryRequest> validator;
@@ -26,7 +26,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public async Task<QueryResult<SearchTicketsResponse>> Handle(SearchTicketsQueryRequest request, CancellationToken cancellationToken)
+        public async Task<QueryResult<TicketSearchResultViewModel>> Handle(SearchTicketsQueryRequest request, CancellationToken cancellationToken)
         {
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
@@ -95,7 +95,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     })
                     .ToList();
 
-                return new QueryResult<SearchTicketsResponse>(new SearchTicketsResponse(mappedResults, total));
+                return new QueryResult<TicketSearchResultViewModel>(new TicketSearchResultViewModel { PagedResults = mappedResults, Total = total });
             }
         }
 

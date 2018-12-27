@@ -7,6 +7,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TicketManager.Contracts.Common;
+using TicketManager.Contracts.QueryApi.Models;
+using TicketManager.Contracts.QueryApi.Models.Abstractions;
 using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;
@@ -14,7 +16,7 @@ using TicketManager.WebAPI.Extensions.Linq;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers
 {
-    public class TicketHistoryQueryRequestHandler : IRequestHandler<GetTicketHistoryQueryRequest, QueryResult<GetTicketHistoryQueryResponse>>
+    public class TicketHistoryQueryRequestHandler : IRequestHandler<GetTicketHistoryQueryRequest, QueryResult<TicketHistoryViewModel>>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<GetTicketHistoryQueryRequest> validator;
@@ -25,7 +27,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public async Task<QueryResult<GetTicketHistoryQueryResponse>> Handle(GetTicketHistoryQueryRequest request, CancellationToken cancellationToken)
+        public async Task<QueryResult<TicketHistoryViewModel>> Handle(GetTicketHistoryQueryRequest request, CancellationToken cancellationToken)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -35,7 +37,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 var requestedHistoryTypes = TicketHistoryTypes.GetRequestedHistoryTypes(request.TicketHistoryTypes);
                 var requestAll = !requestedHistoryTypes.Any();
 
-                var result = new GetTicketHistoryQueryResponse();
+                var result = new TicketHistoryViewModel();
 
                 await Task.WhenAll(new List<Task>
                 {
@@ -73,18 +75,18 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 }).ConfigureAwait(false);
 
                 // TODO: Add support for eTags. Also consider that even though a client may have a cached version, it might contain different history types from what is requested.
-                return new QueryResult<GetTicketHistoryQueryResponse>(result);
+                return new QueryResult<TicketHistoryViewModel>(result);
             }
         }
 
-        private async Task PopulateTicketTitleChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketTitleChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
             var result = await context
                 .TicketTitleChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .OrderBy(evt => evt.Id)
-                .Select(evt => new Change<string>
+                .Select(evt => new ChangeViewModel<string>
                 {
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.Title,
@@ -96,14 +98,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             response.TitleChanges = result;
         }
 
-        private async Task PopulateTicketDescriptionChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketDescriptionChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
             var result = await context
                 .TicketDescriptionChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .OrderBy(evt => evt.Id)
-                .Select(evt => new Change<string>
+                .Select(evt => new ChangeViewModel<string>
                 {
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.Description,
@@ -115,14 +117,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             response.DescriptionChanges = result;
         }
 
-        private async Task PopulateTicketStatusChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketStatusChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
             var result = await context
                 .TicketStatusChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .OrderBy(evt => evt.Id)
-                .Select(evt => new EnumChange<TicketStatuses>
+                .Select(evt => new EnumChangeViewModel<TicketStatuses>
                 {
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.TicketStatus,
@@ -134,14 +136,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             response.StatusChanges = result;
         }
 
-        private async Task PopulateTicketTypeChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketTypeChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
             var result = await context
                 .TicketTypeChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .OrderBy(evt => evt.Id)
-                .Select(evt => new EnumChange<TicketTypes>
+                .Select(evt => new EnumChangeViewModel<TicketTypes>
                 {
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.TicketType,
@@ -153,14 +155,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             response.TypeChanges = result;
         }
 
-        private async Task PopulateTicketPriorityChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketPriorityChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
             var result = await context
                 .TicketPriorityChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .OrderBy(evt => evt.Id)
-                .Select(evt => new EnumChange<TicketPriorities>
+                .Select(evt => new EnumChangeViewModel<TicketPriorities>
                 {
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.Priority,
@@ -172,14 +174,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             response.PriorityChanges = result;
         }
 
-        private async Task PopulateTicketAssignmentChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketAssignmentChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
             var result = await context
                 .TicketAssignedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .OrderBy(evt => evt.Id)
-                .Select(evt => new Change<string>
+                .Select(evt => new ChangeViewModel<string>
                 {
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.AssignedTo,
@@ -191,17 +193,17 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             response.AssignmentChanges = result;
         }
 
-        private async Task PopulateTicketTagChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketTagChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
             var result = await context
                 .TicketTagChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .OrderBy(evt => evt.Id)
-                .Select(evt => new Change<TicketTagChange>
+                .Select(evt => new ChangeViewModel<TicketTagChangeViewModel>
                 {
                     ChangedBy = evt.CausedBy,
-                    ChangedTo = new TicketTagChange
+                    ChangedTo = new TicketTagChangeViewModel
                     {
                         Operation = evt.TagAdded ? TicketTagOperationTypes.Add : TicketTagOperationTypes.Remove,
                         Tag = evt.Tag
@@ -214,17 +216,17 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             response.TagChanges = result;
         }
 
-        private async Task PopulateTicketLinkChangesAsync(GetTicketHistoryQueryResponse response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        private async Task PopulateTicketLinkChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
             var result = await context
                 .TicketLinkChangedEvents
                 .AsNoTracking()
                 .OfTicket(ticketId)
                 .OrderBy(evt => evt.Id)
-                .Select(evt => new Change<TicketLinkChange>
+                .Select(evt => new ChangeViewModel<TicketLinkChangeViewModel>
                 {
                     ChangedBy = evt.CausedBy,
-                    ChangedTo = new TicketLinkChange
+                    ChangedTo = new TicketLinkChangeViewModel
                     {
                         Operation = evt.ConnectionIsActive ? TicketLinkOperationTypes.Add : TicketLinkOperationTypes.Remove,
                         LinkType = evt.LinkType,

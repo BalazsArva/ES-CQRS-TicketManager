@@ -5,7 +5,7 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Queries
 {
-    public class SearchTicketsQueryRequest : IRequest<QueryResult<SearchTicketsResponse>>
+    public class SearchTicketsQueryRequest : IRequest<QueryResult<TicketSearchResultViewModel>>
     {
         public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy, string lastModifiedBy, DateTime? utcDateCreated, DateTime? utcDateLastModified, string orderBy, string orderDirection)
         {

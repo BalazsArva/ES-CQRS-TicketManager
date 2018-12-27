@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace TicketManager.WebAPI.DTOs.Queries.Abstractions
+namespace TicketManager.Contracts.QueryApi.Models.Abstractions
 {
-    public class Change<T>
+    public class ChangeViewModel<T>
     {
         public DateTime UtcDateChanged { get; set; }
 

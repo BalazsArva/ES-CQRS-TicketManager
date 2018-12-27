@@ -2,9 +2,9 @@
 using Newtonsoft.Json.Converters;
 using TicketManager.Contracts.Common;
 
-namespace TicketManager.WebAPI.DTOs.Queries
+namespace TicketManager.Contracts.QueryApi.Models
 {
-    public class TicketLinkChange
+    public class TicketLinkChangeViewModel
     {
         public long SourceTicketId { get; set; }
 

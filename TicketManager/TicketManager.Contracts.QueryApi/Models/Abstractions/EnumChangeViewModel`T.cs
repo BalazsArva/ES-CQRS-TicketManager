@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace TicketManager.WebAPI.DTOs.Queries.Abstractions
+namespace TicketManager.Contracts.QueryApi.Models.Abstractions
 {
-    public class EnumChange<T> : Change<T> where T : Enum
+    public class EnumChangeViewModel<T> : ChangeViewModel<T> where T : Enum
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public override T ChangedTo { get; set; }

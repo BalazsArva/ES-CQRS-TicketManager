@@ -5,7 +5,6 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Queries
 {
-    // TODO: Move reponses to contract library
     public class GetTicketBasicDetailsByIdQueryRequest : IRequest<QueryResult<TicketBasicDetailsViewModel>>
     {
         public GetTicketBasicDetailsByIdQueryRequest(long ticketId, IEnumerable<string> eTags)

@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
+using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.DataAccess.Documents.Indexes;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers
 {
-    public class SearchTagsQueryRequestHandler : IRequestHandler<SearchTagsQueryRequest, QueryResult<SearchTagsQueryResponse>>
+    public class SearchTagsQueryRequestHandler : IRequestHandler<SearchTagsQueryRequest, QueryResult<TagSearchResultViewModel>>
     {
         private readonly IDocumentStore documentStore;
 
@@ -20,7 +21,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        public async Task<QueryResult<SearchTagsQueryResponse>> Handle(SearchTagsQueryRequest request, CancellationToken cancellationToken)
+        public async Task<QueryResult<TagSearchResultViewModel>> Handle(SearchTagsQueryRequest request, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {
@@ -33,7 +34,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new QueryResult<SearchTagsQueryResponse>(new SearchTagsQueryResponse(tags));
+                return new QueryResult<TagSearchResultViewModel>(new TagSearchResultViewModel { Tags = tags });
             }
         }
     }
