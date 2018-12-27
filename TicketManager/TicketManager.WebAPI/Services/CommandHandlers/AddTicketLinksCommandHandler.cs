@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
+using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Commands;
@@ -31,25 +32,45 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 throw new ValidationException(validationResult.Errors);
             }
 
+            var ticketId = request.TicketId;
+            var causedBy = request.RaisedByUser;
+
+            var statusUpdated = false;
             using (var context = eventsContextFactory.CreateContext())
             {
-                // TODO: If any link is a BlockedBy, set the status to blocked, don't forget to dispatch status change notification as well in this case.
                 foreach (var ticketLink in request.Links)
                 {
                     context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
                     {
-                        CausedBy = request.RaisedByUser,
+                        CausedBy = causedBy,
                         LinkType = ticketLink.LinkType,
-                        SourceTicketCreatedEventId = request.TicketId,
+                        SourceTicketCreatedEventId = ticketId,
                         TargetTicketCreatedEventId = ticketLink.TargetTicketId,
                         ConnectionIsActive = true
                     });
+
+                    if (!statusUpdated && ticketLink.LinkType == TicketLinkTypes.BlockedBy)
+                    {
+                        statusUpdated = true;
+
+                        context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
+                        {
+                            CausedBy = causedBy,
+                            TicketCreatedEventId = ticketId,
+                            TicketStatus = TicketStatuses.Blocked
+                        });
+                    }
                 }
 
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await mediator.Publish(new TicketLinksAddedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
+            await mediator.Publish(new TicketLinksAddedNotification(ticketId), cancellationToken).ConfigureAwait(false);
+
+            if (statusUpdated)
+            {
+                await mediator.Publish(new TicketStatusChangedNotification(ticketId), cancellationToken).ConfigureAwait(false);
+            }
 
             return Unit.Value;
         }
