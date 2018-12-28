@@ -28,11 +28,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
         public async Task<QueryResult<TicketSearchResultViewModel>> Handle(SearchTicketsQueryRequest request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
+            await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             using (var session = documentStore.OpenAsyncSession())
             {
@@ -101,8 +97,8 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
         private IRavenQueryable<Ticket> SetSorting(IRavenQueryable<Ticket> query, SearchTicketsQueryRequest request)
         {
-            var orderBy = Enum.Parse<SearchTicketsOrderByProperty>(request.OrderBy);
-            var orderDirection = Enum.Parse<OrderDirection>(request.OrderDirection);
+            var orderBy = Enum.Parse<SearchTicketsOrderByProperty>(request.OrderBy, true);
+            var orderDirection = Enum.Parse<OrderDirection>(request.OrderDirection, true);
 
             switch (orderBy)
             {

@@ -13,7 +13,7 @@ namespace TicketManager.WebAPI.Validation
         protected bool BeValidEnumString<TEnum>(string value)
             where TEnum : struct, Enum
         {
-            return Enum.TryParse<TEnum>(value, out var _);
+            return Enum.TryParse<TEnum>(value, true, out var _);
         }
     }
 }
