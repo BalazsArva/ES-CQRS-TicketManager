@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using TicketManager.Contracts.Common;
 using TicketManager.Contracts.QueryApi;
 using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.WebAPI.DTOs.Queries;
@@ -19,6 +20,21 @@ namespace TicketManager.WebAPI.Validation.QueryValidators
             RuleFor(r => r.PageSize)
                 .GreaterThanOrEqualTo(MinPageSize)
                 .WithMessage(ValidationMessageProvider.MustBeAtLeast("page size", MinPageSize));
+
+            RuleFor(r => r.Status)
+                .Must(BeValidCaseInsensitiveEnumString<TicketStatuses>)
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatuses>("status"))
+                .When(r => !string.IsNullOrEmpty(r.Status));
+
+            RuleFor(r => r.TicketType)
+                .Must(BeValidCaseInsensitiveEnumString<TicketTypes>)
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketTypes>("ticket type"))
+                .When(r => !string.IsNullOrEmpty(r.TicketType));
+
+            RuleFor(r => r.Priority)
+                .Must(BeValidCaseInsensitiveEnumString<TicketPriorities>)
+                .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketPriorities>("priority"))
+                .When(r => !string.IsNullOrEmpty(r.Priority));
 
             RuleFor(r => r.OrderBy)
                 .Must(BeValidCaseInsensitiveEnumString<SearchTicketsOrderByProperty>)

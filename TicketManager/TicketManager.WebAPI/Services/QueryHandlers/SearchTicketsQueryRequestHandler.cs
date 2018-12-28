@@ -6,6 +6,7 @@ using FluentValidation;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
+using TicketManager.Contracts.Common;
 using TicketManager.Contracts.QueryApi;
 using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.DataAccess.Documents.DataModel;
@@ -32,27 +33,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
             using (var session = documentStore.OpenAsyncSession())
             {
-                var query = session.Query<Ticket>();
-
-                if (!string.IsNullOrWhiteSpace(request.CreatedBy))
-                {
-                    query = query.Where(t => t.CreatedBy.StartsWith(request.CreatedBy));
-                }
-
-                if (!string.IsNullOrWhiteSpace(request.LastModifiedBy))
-                {
-                    query = query.Where(t => t.LastUpdatedBy.StartsWith(request.LastModifiedBy));
-                }
-
-                if (!string.IsNullOrWhiteSpace(request.Title))
-                {
-                    query = query.Where(t => t.TicketTitle.Title.StartsWith(request.Title));
-                }
-
-                if (!string.IsNullOrWhiteSpace(request.AssignedTo))
-                {
-                    query = query.Where(t => t.Assignment.AssignedTo.StartsWith(request.AssignedTo));
-                }
+                var query = SetFiltering(session.Query<Ticket>(), request);
 
                 // TODO: Implement UtcDateLastUpdated and UtcDateCreated queries. Pay attention to precision, e.g. don't require to provide fractional seconds.
                 var totalLazy = query.CountLazilyAsync(cancellationToken);
@@ -93,6 +74,49 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
                 return new QueryResult<TicketSearchResultViewModel>(new TicketSearchResultViewModel { PagedResults = mappedResults, Total = total });
             }
+        }
+
+        private IRavenQueryable<Ticket> SetFiltering(IRavenQueryable<Ticket> query, SearchTicketsQueryRequest request)
+        {
+            if (!string.IsNullOrEmpty(request.CreatedBy))
+            {
+                query = query.Where(t => t.CreatedBy.StartsWith(request.CreatedBy));
+            }
+
+            if (!string.IsNullOrEmpty(request.LastModifiedBy))
+            {
+                query = query.Where(t => t.LastUpdatedBy.StartsWith(request.LastModifiedBy));
+            }
+
+            if (!string.IsNullOrEmpty(request.Title))
+            {
+                query = query.Where(t => t.TicketTitle.Title.StartsWith(request.Title));
+            }
+
+            if (!string.IsNullOrEmpty(request.AssignedTo))
+            {
+                query = query.Where(t => t.Assignment.AssignedTo.StartsWith(request.AssignedTo));
+            }
+
+            if (!string.IsNullOrEmpty(request.TicketType))
+            {
+                var ticketType = Enum.Parse<TicketTypes>(request.TicketType, true);
+                query = query.Where(t => t.TicketType.Type == ticketType);
+            }
+
+            if (!string.IsNullOrEmpty(request.Status))
+            {
+                var ticketStatus = Enum.Parse<TicketStatuses>(request.Status, true);
+                query = query.Where(t => t.TicketStatus.Status == ticketStatus);
+            }
+
+            if (!string.IsNullOrEmpty(request.Priority))
+            {
+                var ticketPriority = Enum.Parse<TicketPriorities>(request.Priority, true);
+                query = query.Where(t => t.TicketPriority.Priority == ticketPriority);
+            }
+
+            return query;
         }
 
         private IRavenQueryable<Ticket> SetSorting(IRavenQueryable<Ticket> query, SearchTicketsQueryRequest request)
