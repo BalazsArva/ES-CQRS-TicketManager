@@ -55,6 +55,11 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
+                if (dbResults.Count == 0)
+                {
+                    return QueryResult<TicketSearchResultViewModel>.NotFound;
+                }
+
                 var total = await totalLazy.Value.ConfigureAwait(false);
                 var mappedResults = dbResults
                     .Select(t => new TicketBasicDetailsViewModel
