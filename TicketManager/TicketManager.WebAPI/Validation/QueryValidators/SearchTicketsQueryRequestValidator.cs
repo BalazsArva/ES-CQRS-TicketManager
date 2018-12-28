@@ -21,11 +21,11 @@ namespace TicketManager.WebAPI.Validation.QueryValidators
                 .WithMessage(ValidationMessageProvider.MustBeAtLeast("page size", MinPageSize));
 
             RuleFor(r => r.OrderBy)
-                .Must(BeValidEnumString<SearchTicketsOrderByProperty>)
+                .Must(BeValidCaseInsensitiveEnumString<SearchTicketsOrderByProperty>)
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<SearchTicketsOrderByProperty>("sorting"));
 
             RuleFor(r => r.OrderDirection)
-                .Must(BeValidEnumString<OrderDirection>)
+                .Must(BeValidCaseInsensitiveEnumString<OrderDirection>)
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<OrderDirection>("sorting direction"));
         }
     }

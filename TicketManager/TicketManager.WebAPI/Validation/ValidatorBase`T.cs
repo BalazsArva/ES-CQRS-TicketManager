@@ -10,10 +10,22 @@ namespace TicketManager.WebAPI.Validation
             return !string.IsNullOrWhiteSpace(value);
         }
 
-        protected bool BeValidEnumString<TEnum>(string value)
+        protected bool BeValidCaseInsensitiveEnumString<TEnum>(string value)
             where TEnum : struct, Enum
         {
-            return Enum.TryParse<TEnum>(value, true, out var _);
+            return IsValidEnumString<TEnum>(value, true);
+        }
+
+        protected bool BeValidCaseSensitiveEnumString<TEnum>(string value)
+            where TEnum : struct, Enum
+        {
+            return IsValidEnumString<TEnum>(value, false);
+        }
+
+        protected bool IsValidEnumString<TEnum>(string value, bool ignoreCase)
+            where TEnum : struct, Enum
+        {
+            return Enum.TryParse<TEnum>(value, ignoreCase, out var _);
         }
     }
 }
