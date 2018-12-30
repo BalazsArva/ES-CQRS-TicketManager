@@ -30,10 +30,9 @@ namespace TicketManager.WebAPI.Controllers
 
         [HttpGet]
         [Route("", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
-        public async Task<IActionResult> SearchTickets([FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string lastUpdatedBy, [FromQuery]string orderBy, [FromQuery]string status, [FromQuery]string priority, [FromQuery]string type, [FromQuery]string orderDirection, CancellationToken cancellationToken, [FromQuery]int page = DefaultPage, [FromQuery]int pageSize = DefaultPageSize)
+        public async Task<IActionResult> SearchTickets([FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string lastUpdatedBy, [FromQuery]string orderBy, [FromQuery]string status, [FromQuery]string priority, [FromQuery]string type, [FromQuery]string orderDirection, [FromQuery]string dateCreatedFrom, [FromQuery]string dateCreatedTo, [FromQuery] string dateLastModifiedFrom, [FromQuery]string dateLastModifiedTo, CancellationToken cancellationToken, [FromQuery]int page = DefaultPage, [FromQuery]int pageSize = DefaultPageSize)
         {
-            // TODO: Pass date of ceation/last update filter values if provided. Pay attention to precision, e.g. don't require to provide fractional seconds.
-            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, lastUpdatedBy, null, null, status, type, priority, orderBy ?? DefaultOrderByProperty, orderDirection ?? DefaultOrderDirection);
+            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, lastUpdatedBy, dateCreatedFrom, dateCreatedTo, dateLastModifiedFrom, dateLastModifiedTo, status, type, priority, orderBy ?? DefaultOrderByProperty, orderDirection ?? DefaultOrderDirection);
             var results = await mediator.Send(searchRequest, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(results);
@@ -55,7 +54,6 @@ namespace TicketManager.WebAPI.Controllers
         [Route("{id:int}/extended", Name = RouteNames.Tickets_Queries_Get_ById_Extended)]
         public async Task<IActionResult> GetTicketExtendedDetailsById([FromRoute]long id, CancellationToken cancellationToken, [FromHeader(Name = StandardRequestHeaders.IfNoneMatch)]string eTags = null)
         {
-            // TODO: Review route
             var eTagArray = (eTags ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
 
             var request = new GetTicketExtendedDetailsByIdQueryRequest(id, eTagArray);

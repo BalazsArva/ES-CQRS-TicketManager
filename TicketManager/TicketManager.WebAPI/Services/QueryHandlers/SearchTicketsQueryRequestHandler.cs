@@ -11,6 +11,7 @@ using TicketManager.Contracts.QueryApi;
 using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
+using TicketManager.WebAPI.Conventions;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
@@ -35,7 +36,6 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             {
                 var query = SetFiltering(session.Query<Ticket>(), request);
 
-                // TODO: Implement UtcDateLastUpdated and UtcDateCreated queries. Pay attention to precision, e.g. don't require to provide fractional seconds.
                 var totalLazy = query.CountLazilyAsync(cancellationToken);
                 var dbResults = await SetSorting(query, request)
                     .Paginate(request.Page, request.PageSize)
@@ -119,6 +119,30 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             {
                 var ticketPriority = Enum.Parse<TicketPriorities>(request.Priority, true);
                 query = query.Where(t => t.TicketPriority.Priority == ticketPriority);
+            }
+
+            if (!string.IsNullOrEmpty(request.DateCreatedFrom))
+            {
+                var utcDateCreatedFrom = DateTimeConventions.GetUniversalDateTime(request.DateCreatedFrom);
+                query = query.Where(t => t.UtcDateCreated >= utcDateCreatedFrom);
+            }
+
+            if (!string.IsNullOrEmpty(request.DateCreatedTo))
+            {
+                var utcDateCreatedTo = DateTimeConventions.GetUniversalDateTime(request.DateCreatedTo);
+                query = query.Where(t => t.UtcDateCreated <= utcDateCreatedTo);
+            }
+
+            if (!string.IsNullOrEmpty(request.DateLastModifiedFrom))
+            {
+                var utcDateLastModifiedFrom = DateTimeConventions.GetUniversalDateTime(request.DateLastModifiedFrom);
+                query = query.Where(t => t.UtcDateLastUpdated >= utcDateLastModifiedFrom);
+            }
+
+            if (!string.IsNullOrEmpty(request.DateLastModifiedTo))
+            {
+                var utcDateLastModifiedTo = DateTimeConventions.GetUniversalDateTime(request.DateLastModifiedTo);
+                query = query.Where(t => t.UtcDateLastUpdated <= utcDateLastModifiedTo);
             }
 
             return query;

@@ -21,6 +21,26 @@ namespace TicketManager.WebAPI.Validation.QueryValidators
                 .GreaterThanOrEqualTo(MinPageSize)
                 .WithMessage(ValidationMessageProvider.MustBeAtLeast("page size", MinPageSize));
 
+            RuleFor(r => r.DateCreatedFrom)
+                .Must(BeValidIsoDateString)
+                .WithMessage(ValidationMessageProvider.MustBeValidIsoDateString("date created from"))
+                .When(r => !string.IsNullOrEmpty(r.DateCreatedFrom));
+
+            RuleFor(r => r.DateCreatedTo)
+                .Must(BeValidIsoDateString)
+                .WithMessage(ValidationMessageProvider.MustBeValidIsoDateString("date created to"))
+                .When(r => !string.IsNullOrEmpty(r.DateCreatedTo));
+
+            RuleFor(r => r.DateLastModifiedFrom)
+                .Must(BeValidIsoDateString)
+                .WithMessage(ValidationMessageProvider.MustBeValidIsoDateString("date last modified from"))
+                .When(r => !string.IsNullOrEmpty(r.DateLastModifiedFrom));
+
+            RuleFor(r => r.DateLastModifiedTo)
+                .Must(BeValidIsoDateString)
+                .WithMessage(ValidationMessageProvider.MustBeValidIsoDateString("date last modified to"))
+                .When(r => !string.IsNullOrEmpty(r.DateLastModifiedTo));
+
             RuleFor(r => r.Status)
                 .Must(BeValidCaseInsensitiveEnumString<TicketStatuses>)
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatuses>("status"))
