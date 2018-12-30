@@ -31,16 +31,17 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(request.TicketId);
-                var ticket = await session.LoadAsync<Ticket>(ticketDocumentId, cancellationToken).ConfigureAwait(false);
+
+                var ticketLazy = session.Advanced.Lazily.LoadAsync<Ticket>(ticketDocumentId, cancellationToken);
+                var links = await GetLinksLazilyAsync(session, ticketDocumentId, cancellationToken).ConfigureAwait(false);
+                var ticket = await ticketLazy.Value.ConfigureAwait(false);
 
                 if (ticket == null)
                 {
                     return QueryResult<TicketExtendedDetailsViewModel>.NotFound;
                 }
 
-                var incomingLinks = await GetIncomingLinksAsync(session, ticketDocumentId, cancellationToken).ConfigureAwait(false);
-                var etag = GetCombinedETag(session, ticket, incomingLinks);
-
+                var etag = GetCombinedETag(session, ticket, links);
                 if (request.ETags.Contains(etag))
                 {
                     return QueryResult<TicketExtendedDetailsViewModel>.NotModified;
@@ -59,7 +60,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         UtcDateCreated = ticket.UtcDateCreated,
                         Description = ticket.TicketDescription.Description,
                         Tags = ticket.Tags.TagSet,
-                        Links = CombineLinks(ticket, incomingLinks)
+                        Links = links
                     },
                     QueryResultType.Success,
                     etag);
@@ -84,13 +85,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             }
         }
 
-        private async Task<List<TicketLinkViewModel>> GetIncomingLinksAsync(IAsyncDocumentSession session, string ticketDocumentId, CancellationToken cancellationToken)
+        private async Task<List<TicketLinkViewModel>> GetLinksLazilyAsync(IAsyncDocumentSession session, string ticketDocumentId, CancellationToken cancellationToken)
         {
             var incomingLinks = await session
                 .Query<Tickets_ByTicketIdsAndType.IndexEntry, Tickets_ByTicketIdsAndType>()
-                .Where(indexEntry => indexEntry.TargetTicketId == ticketDocumentId)
+                .Where(indexEntry => indexEntry.TargetTicketId == ticketDocumentId || indexEntry.SourceTicketId == ticketDocumentId)
                 .ProjectInto<Tickets_ByTicketIdsAndType.IndexEntry>()
-                .ToListAsync(cancellationToken)
+                .LazilyAsync()
+                .Value
                 .ConfigureAwait(false);
 
             return incomingLinks
@@ -98,27 +100,10 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 {
                     LinkType = link.LinkType,
                     SourceTicketId = long.Parse(documentStore.TrimIdPrefix<Ticket>(link.SourceTicketId)),
-                    TargetTicketId = long.Parse(documentStore.TrimIdPrefix<Ticket>(link.TargetTicketId))
+                    TargetTicketId = long.Parse(documentStore.TrimIdPrefix<Ticket>(link.TargetTicketId)),
+                    SourceTicketTitle = link.SourceTicketTitle,
+                    TargetTicketTitle = link.TargetTicketTitle
                 })
-                .ToList();
-        }
-
-        private List<TicketLinkViewModel> CombineLinks(Ticket ticket, IEnumerable<TicketLinkViewModel> incomingLinks)
-        {
-            var ticketId = long.Parse(documentStore.TrimIdPrefix<Ticket>(ticket.Id));
-
-            var outgoingLinks = ticket.Links.LinkSet.Select(link => new TicketLinkViewModel
-            {
-                LinkType = link.LinkType,
-                SourceTicketId = ticketId,
-                TargetTicketId = long.Parse(documentStore.TrimIdPrefix<Ticket>(link.TargetTicketId))
-            });
-
-            return outgoingLinks
-                .Concat(incomingLinks)
-                .OrderBy(link => link.SourceTicketId)
-                .ThenBy(link => link.TargetTicketId)
-                .ThenBy(link => link.LinkType.ToString())
                 .ToList();
         }
     }

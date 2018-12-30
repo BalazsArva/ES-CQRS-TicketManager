@@ -10,6 +10,10 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         public long TargetTicketId { get; set; }
 
+        public string SourceTicketTitle { get; set; }
+
+        public string TargetTicketTitle { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public TicketLinkTypes LinkType { get; set; }
     }

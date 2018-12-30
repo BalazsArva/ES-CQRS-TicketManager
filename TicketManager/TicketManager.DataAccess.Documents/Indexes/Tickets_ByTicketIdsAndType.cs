@@ -14,6 +14,10 @@ namespace TicketManager.DataAccess.Documents.Indexes
             public string TargetTicketId { get; set; }
 
             public string SourceTicketId { get; set; }
+
+            public string SourceTicketTitle { get; set; }
+
+            public string TargetTicketTitle { get; set; }
         }
 
         public Tickets_ByTicketIdsAndType()
@@ -22,11 +26,14 @@ namespace TicketManager.DataAccess.Documents.Indexes
 
             Map = tickets => from t in tickets
                              from link in t.Links.LinkSet
+                             let targetTicket = LoadDocument<Ticket>(link.TargetTicketId)
                              select new IndexEntry
                              {
                                  SourceTicketId = t.Id,
                                  LinkType = link.LinkType,
-                                 TargetTicketId = link.TargetTicketId
+                                 TargetTicketId = link.TargetTicketId,
+                                 SourceTicketTitle = t.TicketTitle.Title,
+                                 TargetTicketTitle = targetTicket.TicketTitle.Title
                              };
 
             StoreAllFields(FieldStorage.Yes);
