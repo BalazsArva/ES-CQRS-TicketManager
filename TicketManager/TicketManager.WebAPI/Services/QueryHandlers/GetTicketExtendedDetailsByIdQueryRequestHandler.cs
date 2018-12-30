@@ -67,13 +67,13 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             }
         }
 
-        private string GetCombinedETag(IAsyncDocumentSession session, Ticket ticket, IEnumerable<TicketLinkViewModel> incomingLinks)
+        private string GetCombinedETag(IAsyncDocumentSession session, Ticket ticket, IEnumerable<TicketLinkViewModel> links)
         {
-            // Since incoming links affect the current state of a ticket, we must consier them as well when generating the eTag.
+            // Since incoming links affect the current state of a ticket, we must consier the links as well when generating the eTag.
             var ticketETag = ETagProvider.CreateETagFromChangeVector(session.Advanced.GetChangeVectorFor(ticket));
             var incomingLinksETag = string.Join(
                 ",",
-                incomingLinks.OrderBy(link => link.SourceTicketId).ThenBy(link => link.LinkType).Select(link => $"{link.SourceTicketId}:{link.LinkType}"));
+                links.OrderBy(link => link.SourceTicketId).ThenBy(link => link.TargetTicketId).ThenBy(link => link.LinkType).Select(link => $"{link.SourceTicketId}-[{link.LinkType}]->{link.TargetTicketId}"));
 
             var combinedETag = $"{ticketETag}.{incomingLinksETag}";
 
