@@ -36,7 +36,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             {
                 var query = SetFiltering(session.Query<Ticket>(), request);
 
-                var totalLazy = query.CountLazilyAsync(cancellationToken);
+                var countLazy = query.CountLazilyAsync(cancellationToken);
                 var dbResults = await SetSorting(query, request)
                     .Paginate(request.Page, request.PageSize)
                     .Select(t => new
@@ -52,15 +52,16 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         t.LastUpdatedBy,
                         t.UtcDateLastUpdated
                     })
-                    .ToListAsync(cancellationToken)
+                    .LazilyAsync()
+                    .Value
                     .ConfigureAwait(false);
 
-                if (dbResults.Count == 0)
+                if (!dbResults.Any())
                 {
                     return QueryResult<TicketSearchResultViewModel>.NotFound;
                 }
 
-                var total = await totalLazy.Value.ConfigureAwait(false);
+                var total = await countLazy.Value.ConfigureAwait(false);
                 var mappedResults = dbResults
                     .Select(t => new TicketBasicDetailsViewModel
                     {
