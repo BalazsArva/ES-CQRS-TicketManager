@@ -6,8 +6,8 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
+using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.DTOs.Notifications;
-using TicketManager.WebAPI.Extensions.Linq;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {

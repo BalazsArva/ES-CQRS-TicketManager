@@ -5,10 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TicketManager.DataAccess.Events.DataModel;
 
-namespace TicketManager.WebAPI.Extensions.Linq
+namespace TicketManager.DataAccess.Events.Extensions
 {
     public static class EventExtensions
     {
+        public static IQueryable<EventBase> AsEventBase<TEvent>(this IQueryable<TEvent> queryable)
+            where TEvent : EventBase
+        {
+            return queryable.Select(evt => (EventBase)evt);
+        }
+
         public static Task<TEvent> LatestAsync<TEvent>(this IQueryable<TEvent> events, CancellationToken cancellationToken)
             where TEvent : EventBase
         {
