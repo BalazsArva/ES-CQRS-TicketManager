@@ -10,9 +10,9 @@ using TicketManager.Contracts.Common;
 using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.Contracts.QueryApi.Models.Abstractions;
 using TicketManager.DataAccess.Events;
+using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;
-using TicketManager.WebAPI.Extensions.Linq;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers
 {
