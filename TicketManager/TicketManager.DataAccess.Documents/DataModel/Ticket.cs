@@ -26,6 +26,8 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public TicketType TicketType { get; set; } = new TicketType();
 
+        public TicketInvolvement Involvement { get; set; } = new TicketInvolvement();
+
         public DateTime UtcDateLastUpdated { get; set; }
 
         public string LastUpdatedBy { get; set; }

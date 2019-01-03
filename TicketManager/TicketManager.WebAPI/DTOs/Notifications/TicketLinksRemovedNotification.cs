@@ -1,8 +1,8 @@
-﻿using MediatR;
+﻿using TicketManager.WebAPI.DTOs.Notifications.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Notifications
 {
-    public class TicketLinksRemovedNotification : INotification
+    public class TicketLinksRemovedNotification : ITicketNotification
     {
         public TicketLinksRemovedNotification(long ticketId)
         {

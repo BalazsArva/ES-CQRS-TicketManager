@@ -60,7 +60,10 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         UtcDateCreated = ticket.UtcDateCreated,
                         Description = ticket.TicketDescription.Description,
                         Tags = ticket.Tags.TagSet,
-                        Links = links
+                        Links = links,
+                        InvolvedUsers = ticket.Involvement.InvolvedUsersSet,
+                        LastUpdatedBy = ticket.LastUpdatedBy,
+                        UtcDateLastUpdated = ticket.UtcDateLastUpdated
                     },
                     QueryResultType.Success,
                     etag);

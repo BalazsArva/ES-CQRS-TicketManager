@@ -11,32 +11,32 @@ using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers
 {
-    public class TicketExistsQueryRequestHandler : IRequestHandler<TicketExistsQueryRequest, TicketExistsQueryResult>
+    public class GetTicketMetadataQueryRequestHandler : IRequestHandler<GetTicketMetadataQueryRequest, GetTicketMetadataQueryResult>
     {
         private readonly IDocumentStore documentStore;
 
-        public TicketExistsQueryRequestHandler(IDocumentStore documentStore)
+        public GetTicketMetadataQueryRequestHandler(IDocumentStore documentStore)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        public async Task<TicketExistsQueryResult> Handle(TicketExistsQueryRequest request, CancellationToken cancellationToken)
+        public async Task<GetTicketMetadataQueryResult> Handle(GetTicketMetadataQueryRequest request, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(request.TicketId);
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId, cancellationToken).ConfigureAwait(false);
 
-                var exists = await session.Advanced.ExistsAsync(ticketDocumentId, cancellationToken).ConfigureAwait(false);
-                if (!exists)
+                if (ticketDocument == null)
                 {
-                    return TicketExistsQueryResult.NotFound;
+                    // TODO: Consider returning null
+                    return GetTicketMetadataQueryResult.NotFound;
                 }
 
-                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId);
                 var changeVector = session.Advanced.GetChangeVectorFor(ticketDocument);
                 var etag = ETagProvider.CreateETagFromChangeVector(changeVector);
 
-                return new TicketExistsQueryResult(TicketExistsQueryResultType.Found, etag);
+                return new GetTicketMetadataQueryResult(Existences.Found, etag);
             }
         }
     }

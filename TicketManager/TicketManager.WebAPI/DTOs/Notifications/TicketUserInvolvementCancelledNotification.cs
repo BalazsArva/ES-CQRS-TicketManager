@@ -2,9 +2,9 @@
 
 namespace TicketManager.WebAPI.DTOs.Notifications
 {
-    public class TicketTagsAddedNotification : ITicketNotification
+    public class TicketUserInvolvementCancelledNotification : ITicketNotification
     {
-        public TicketTagsAddedNotification(long ticketId)
+        public TicketUserInvolvementCancelledNotification(long ticketId)
         {
             TicketId = ticketId;
         }

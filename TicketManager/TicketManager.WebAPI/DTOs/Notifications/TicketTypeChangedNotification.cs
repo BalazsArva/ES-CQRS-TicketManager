@@ -1,8 +1,8 @@
-﻿using MediatR;
+﻿using TicketManager.WebAPI.DTOs.Notifications.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Notifications
 {
-    public class TicketTypeChangedNotification : INotification
+    public class TicketTypeChangedNotification : ITicketNotification
     {
         public TicketTypeChangedNotification(long ticketId)
         {

@@ -51,7 +51,11 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         Status = ticket.TicketStatus.Status,
                         Title = ticket.TicketTitle.Title,
                         Type = ticket.TicketType.Type,
-                        UtcDateCreated = ticket.UtcDateCreated
+                        UtcDateCreated = ticket.UtcDateCreated,
+                        InvolvedUsers = ticket.Involvement.InvolvedUsersSet,
+                        LastUpdatedBy = ticket.LastUpdatedBy,
+                        UtcDateLastUpdated = ticket.UtcDateLastUpdated,
+                        Tags = ticket.Tags.TagSet
                     },
                     QueryResultType.Success,
                     etag);

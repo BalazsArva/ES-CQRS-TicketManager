@@ -10,7 +10,7 @@ using TicketManager.DataAccess.Events;
 namespace TicketManager.DataAccess.Events.Migrations
 {
     [DbContext(typeof(EventsContext))]
-    [Migration("20181210114007_InitialModel")]
+    [Migration("20190102140743_InitialModel")]
     partial class InitialModel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -324,6 +324,35 @@ namespace TicketManager.DataAccess.Events.Migrations
                     b.ToTable("TicketTypeChangedEvents");
                 });
 
+            modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketUserInvolvementCancelledEvent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AffectedUser")
+                        .IsRequired()
+                        .HasMaxLength(256);
+
+                    b.Property<string>("CausedBy")
+                        .IsRequired()
+                        .HasMaxLength(256);
+
+                    b.Property<long>("TicketCreatedEventId");
+
+                    b.Property<DateTime>("UtcDateRecorded")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TicketCreatedEventId");
+
+                    b.HasIndex("UtcDateRecorded");
+
+                    b.ToTable("TicketUserInvolvementCancelledEvents");
+                });
+
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketAssignedEvent", b =>
                 {
                     b.HasOne("TicketManager.DataAccess.Events.DataModel.TicketCreatedEvent", "TicketCreatedEvent")
@@ -402,6 +431,14 @@ namespace TicketManager.DataAccess.Events.Migrations
                 });
 
             modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketTypeChangedEvent", b =>
+                {
+                    b.HasOne("TicketManager.DataAccess.Events.DataModel.TicketCreatedEvent", "TicketCreatedEvent")
+                        .WithMany()
+                        .HasForeignKey("TicketCreatedEventId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("TicketManager.DataAccess.Events.DataModel.TicketUserInvolvementCancelledEvent", b =>
                 {
                     b.HasOne("TicketManager.DataAccess.Events.DataModel.TicketCreatedEvent", "TicketCreatedEvent")
                         .WithMany()

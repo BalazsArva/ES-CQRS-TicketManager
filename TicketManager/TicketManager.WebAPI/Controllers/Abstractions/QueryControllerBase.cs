@@ -26,9 +26,9 @@ namespace TicketManager.WebAPI.Controllers.Abstractions
             return Ok(queryResult.Result);
         }
 
-        protected IActionResult FromQueryResult(TicketExistsQueryResult existenceCheckQueryResult)
+        protected IActionResult FromQueryResult(GetTicketMetadataQueryResult existenceCheckQueryResult)
         {
-            if (existenceCheckQueryResult.ResultType == TicketExistsQueryResultType.NotFound)
+            if (existenceCheckQueryResult.ResultType == Existences.NotFound)
             {
                 return NotFound();
             }

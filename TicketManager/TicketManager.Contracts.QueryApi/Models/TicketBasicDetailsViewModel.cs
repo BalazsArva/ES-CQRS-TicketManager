@@ -21,6 +21,10 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         public DateTime UtcDateLastUpdated { get; set; }
 
+        public string[] InvolvedUsers { get; set; } = Array.Empty<string>();
+
+        public string[] Tags { get; set; } = Array.Empty<string>();
+
         [JsonConverter(typeof(StringEnumConverter))]
         public TicketStatuses Status { get; set; }
 
