@@ -54,7 +54,8 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         UtcDateCreated = ticket.UtcDateCreated,
                         InvolvedUsers = ticket.Involvement.InvolvedUsersSet,
                         LastUpdatedBy = ticket.LastUpdatedBy,
-                        UtcDateLastUpdated = ticket.UtcDateLastUpdated
+                        UtcDateLastUpdated = ticket.UtcDateLastUpdated,
+                        Tags = ticket.Tags.TagSet
                     },
                     QueryResultType.Success,
                     etag);
