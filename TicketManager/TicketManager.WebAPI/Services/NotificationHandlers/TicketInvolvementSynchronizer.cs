@@ -34,7 +34,6 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     // TODO: Consider using a dedicated type
                     var updatedInvolvements = await GetUpdatedInvolvedUsersAsync(context, ticketCreatedEventId, ticketDocument.Involvement, cancellationToken);
 
-                    // TODO: When implementing this in ticket created, pay attention that the other notification handler which creates the ticket itself must have run
                     var updates = new PropertyUpdateBatch<Ticket>()
                         .Add(t => t.Involvement.InvolvedUsersSet, updatedInvolvements.InvolvedUsersSet)
                         .Add(t => t.Involvement.LastKnownAssignmentChangeId, updatedInvolvements.LastKnownAssignmentChangeId)
