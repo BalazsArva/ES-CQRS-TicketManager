@@ -51,7 +51,8 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         t.Assignment.AssignedTo,
                         t.LastUpdatedBy,
                         t.UtcDateLastUpdated,
-                        t.Involvement.InvolvedUsersSet
+                        t.Involvement.InvolvedUsersSet,
+                        t.Tags.TagSet
                     })
                     .LazilyAsync()
                     .Value
@@ -76,7 +77,8 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         AssignedTo = t.AssignedTo,
                         LastUpdatedBy = t.LastUpdatedBy,
                         UtcDateLastUpdated = t.UtcDateLastUpdated,
-                        InvolvedUsers = t.InvolvedUsersSet
+                        InvolvedUsers = t.InvolvedUsersSet,
+                        Tags = t.TagSet
                     })
                     .ToList();
 
@@ -151,6 +153,11 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             foreach (var involvedUser in request.InvolvedUsers)
             {
                 query = query.Where(t => t.Involvement.InvolvedUsersSet.Any(user => user == involvedUser));
+            }
+
+            foreach (var tag in request.Tags)
+            {
+                query = query.Where(ticket => ticket.Tags.TagSet.Any(t => t == tag));
             }
 
             return query;

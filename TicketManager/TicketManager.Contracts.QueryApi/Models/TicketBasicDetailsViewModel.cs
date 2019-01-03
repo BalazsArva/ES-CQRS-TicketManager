@@ -23,6 +23,8 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         public string[] InvolvedUsers { get; set; } = Array.Empty<string>();
 
+        public string[] Tags { get; set; } = Array.Empty<string>();
+
         [JsonConverter(typeof(StringEnumConverter))]
         public TicketStatuses Status { get; set; }
 

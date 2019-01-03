@@ -30,11 +30,12 @@ namespace TicketManager.WebAPI.Controllers
 
         [HttpGet]
         [Route("", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
-        public async Task<IActionResult> SearchTickets([FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string lastUpdatedBy, [FromQuery]string involvedUsers, [FromQuery]string orderBy, [FromQuery]string status, [FromQuery]string priority, [FromQuery]string type, [FromQuery]string orderDirection, [FromQuery]string dateCreatedFrom, [FromQuery]string dateCreatedTo, [FromQuery] string dateLastModifiedFrom, [FromQuery]string dateLastModifiedTo, CancellationToken cancellationToken, [FromQuery]int page = DefaultPage, [FromQuery]int pageSize = DefaultPageSize)
+        public async Task<IActionResult> SearchTickets([FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string lastUpdatedBy, [FromQuery]string involvedUsers, [FromQuery]string tags, [FromQuery]string orderBy, [FromQuery]string status, [FromQuery]string priority, [FromQuery]string type, [FromQuery]string orderDirection, [FromQuery]string dateCreatedFrom, [FromQuery]string dateCreatedTo, [FromQuery] string dateLastModifiedFrom, [FromQuery]string dateLastModifiedTo, CancellationToken cancellationToken, [FromQuery]int page = DefaultPage, [FromQuery]int pageSize = DefaultPageSize)
         {
-            var involvedUsersArray = (involvedUsers ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var involvedUsersArray = involvedUsers?.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var tagsArray = tags?.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, lastUpdatedBy, involvedUsersArray, dateCreatedFrom, dateCreatedTo, dateLastModifiedFrom, dateLastModifiedTo, status, type, priority, orderBy ?? DefaultOrderByProperty, orderDirection ?? DefaultOrderDirection);
+            var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, lastUpdatedBy, involvedUsersArray, tagsArray, dateCreatedFrom, dateCreatedTo, dateLastModifiedFrom, dateLastModifiedTo, status, type, priority, orderBy ?? DefaultOrderByProperty, orderDirection ?? DefaultOrderDirection);
             var results = await mediator.Send(searchRequest, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(results);

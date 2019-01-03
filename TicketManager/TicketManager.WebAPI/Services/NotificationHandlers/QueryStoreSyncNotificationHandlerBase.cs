@@ -237,6 +237,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .Except(removedTags)
                 .Concat(addedTags)
                 .Distinct()
+                .OrderBy(tag => tag)
                 .ToArray();
 
             return (updatedTags, tagChangesSinceLastSync.Last());
