@@ -29,6 +29,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
         public async Task<QueryResult<TicketHistoryViewModel>> Handle(GetTicketHistoryQueryRequest request, CancellationToken cancellationToken)
         {
+            // TODO: Include User involvement changes
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             using (var context = eventsContextFactory.CreateContext())

@@ -66,7 +66,7 @@ namespace TicketManager.WebAPI.Controllers
         [Route("{id:int}", Name = RouteNames.Tickets_Queries_Head_ById)]
         public async Task<IActionResult> GetTicketMetaData([FromRoute]long id, CancellationToken cancellationToken)
         {
-            var request = new TicketExistsQueryRequest(id);
+            var request = new GetTicketMetadataQueryRequest(id);
             var result = await mediator.Send(request, cancellationToken).ConfigureAwait(false);
 
             return FromQueryResult(result);

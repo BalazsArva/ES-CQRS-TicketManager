@@ -27,6 +27,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
         protected async Task<Ticket> ReconstructTicketAsync(EventsContext context, long ticketId, CancellationToken cancellationToken)
         {
+            // TODO: Implement Involvement sync
             var ticketCreatedEvent = await context.TicketCreatedEvents.FindAsync(new object[] { ticketId }, cancellationToken).ConfigureAwait(false);
             var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
                 .AsNoTracking()
