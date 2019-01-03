@@ -55,6 +55,7 @@ namespace TicketManager.WebAPI.Extensions
                 .AddSingleton<IValidator<AddTicketLinksCommand>, AddTicketLinksCommandValidator>()
                 .AddSingleton<IValidator<AddTicketTagsCommand>, AddTicketTagsCommandValidator>()
                 .AddSingleton<IValidator<AssignTicketCommand>, AssignTicketCommandValidator>()
+                .AddSingleton<IValidator<CancelTicketInvolvementCommand>, CancelTicketInvolvementCommandValidator>()
                 .AddSingleton<IValidator<ChangeTicketPriorityCommand>, ChangeTicketPriorityCommandValidator>()
                 .AddSingleton<IValidator<ChangeTicketStatusCommand>, ChangeTicketStatusCommandValidator>()
                 .AddSingleton<IValidator<ChangeTicketTypeCommand>, ChangeTicketTypeCommandValidator>()

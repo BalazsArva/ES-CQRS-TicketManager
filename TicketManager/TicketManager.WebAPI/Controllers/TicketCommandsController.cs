@@ -36,6 +36,8 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(new AssignTicketCommand(id, user1, user4));
             await mediator.Send(new AssignTicketCommand(id, user5, user3));
 
+            await mediator.Send(new CancelTicketInvolvementCommand(id, user5, user5));
+
             await mediator.Send(new EditTicketTitleCommand(id, user1, "Test ticket - edited"));
             await mediator.Send(new EditTicketDescriptionCommand(id, user1, "Test ticket description - edited"));
             await mediator.Send(new ChangeTicketStatusCommand(id, user1, TicketStatuses.InProgress));

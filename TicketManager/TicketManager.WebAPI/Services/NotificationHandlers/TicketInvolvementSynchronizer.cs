@@ -16,8 +16,6 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
     public class TicketInvolvementSynchronizer : QueryStoreSyncNotificationHandlerBase, INotificationHandler<ITicketNotification>
     {
-        private const int NonexistentEventId = -1;
-
         public TicketInvolvementSynchronizer(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
             : base(eventsContextFactory, documentStore)
         {
@@ -134,15 +132,15 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             return new TicketInvolvement
             {
                 InvoledUsersSet = involvedUsersSet.OrderBy(user => user).ToArray(),
-                LastKnownAssignmentChangeId = assignmentChangeEvents.LastOrDefault()?.Id ?? NonexistentEventId,
-                LastKnownCancelInvolvementId = ticketUserInvolvementCancelledEvents.LastOrDefault()?.Id ?? NonexistentEventId,
-                LastKnownDescriptionChangeId = descriptionChangeEvents.LastOrDefault()?.Id ?? NonexistentEventId,
-                LastKnownLinkChangeId = linkChangeEvents.LastOrDefault()?.Id ?? NonexistentEventId,
-                LastKnownPriorityChangeId = priorityChangeEvents.LastOrDefault()?.Id ?? NonexistentEventId,
-                LastKnownStatusChangeId = statusChangeEvents.LastOrDefault()?.Id ?? NonexistentEventId,
-                LastKnownTagChangeId = tagChangeEvents.LastOrDefault()?.Id ?? NonexistentEventId,
-                LastKnownTitleChangeId = titleChangeEvents.LastOrDefault()?.Id ?? NonexistentEventId,
-                LastKnownTypeChangeId = typeChangeEvents.LastOrDefault()?.Id ?? NonexistentEventId
+                LastKnownAssignmentChangeId = assignmentChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownAssignmentChangeId,
+                LastKnownCancelInvolvementId = ticketUserInvolvementCancelledEvents.LastOrDefault()?.Id ?? involvement.LastKnownCancelInvolvementId,
+                LastKnownDescriptionChangeId = descriptionChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownDescriptionChangeId,
+                LastKnownLinkChangeId = linkChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownLinkChangeId,
+                LastKnownPriorityChangeId = priorityChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownPriorityChangeId,
+                LastKnownStatusChangeId = statusChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownStatusChangeId,
+                LastKnownTagChangeId = tagChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownTagChangeId,
+                LastKnownTitleChangeId = titleChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownTitleChangeId,
+                LastKnownTypeChangeId = typeChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownTypeChangeId
             };
         }
     }
