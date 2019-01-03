@@ -23,5 +23,7 @@ namespace TicketManager.DataAccess.Documents.DataModel
         public long LastKnownTypeChangeId { get; set; }
 
         public long LastKnownCancelInvolvementId { get; set; }
+
+        public string ConcurrencyStamp { get; set; }
     }
 }

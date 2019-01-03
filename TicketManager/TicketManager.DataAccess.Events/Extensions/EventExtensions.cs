@@ -9,8 +9,8 @@ namespace TicketManager.DataAccess.Events.Extensions
 {
     public static class EventExtensions
     {
-        public static IQueryable<EventBase> AsEventBase<TEvent>(this IQueryable<TEvent> queryable)
-            where TEvent : EventBase
+        public static IEnumerable<EventBase> AsEventBase<TEvent>(this IEnumerable<TEvent> queryable)
+           where TEvent : EventBase
         {
             return queryable.Select(evt => (EventBase)evt);
         }

@@ -12,6 +12,16 @@ namespace TicketManager.DataAccess.Documents.Extensions
 {
     public static class IAsyncDocumentSessionExtensions
     {
+        public static void PatchIfEquals<TDocument>(this IAsyncDocumentSession session, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, string>> comparisonPropertySelector, string comparisonPropertyValue)
+        {
+            var batch = propertyUpdates.CreateBatch();
+
+            var patchRequest = CreatePatchRequest(comparisonPropertySelector, comparisonPropertyValue, batch);
+            var patchCommandData = new PatchCommandData(id, null, patchRequest, null);
+
+            session.Advanced.Defer(new ICommandData[] { patchCommandData });
+        }
+
         public static void PatchToNewer<TDocument>(this IAsyncDocumentSession session, string id, PropertyUpdateBatch<TDocument> propertyUpdates, Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId)
         {
             var lastKnownChangeUpdateDescriptor = new PropertyUpdateDescriptor<TDocument, long>(lastKnownChangeIdSelector, lastKnownChangeId);
@@ -34,13 +44,53 @@ namespace TicketManager.DataAccess.Documents.Extensions
             session.Advanced.Defer(new ICommandData[] { patchCommandData });
         }
 
+        private static PatchRequest CreatePatchRequest<TDocument>(Expression<Func<TDocument, string>> comparisonPropertySelector, string comparisonPropertyValue, PropertyUpdateDescriptor[] propertyUpdates)
+        {
+            const string comparisonPropertyValueArgumentName = "__AUTO_LastKnownChangeId";
+            const string conditionVariableName = "shouldUpdate";
+
+            var comparisonPropertyPath = GetPropertyPathFromExpression(comparisonPropertySelector);
+            var conditionVariableScript = CreateEqualsConditionVariableScript(comparisonPropertyValueArgumentName, conditionVariableName, comparisonPropertyPath);
+
+            var assignmentScripts = new List<string>(propertyUpdates.Length);
+            var scriptParameters = new Dictionary<string, object>
+            {
+                [comparisonPropertyValueArgumentName] = comparisonPropertyValue
+            };
+
+            for (var i = 0; i < propertyUpdates.Length; ++i)
+            {
+                var propertyUpdate = propertyUpdates[i];
+                var parameterName = $"__AUTO_Parameter{i}";
+
+                assignmentScripts.Add(CreateUpdateScript(propertyUpdate, parameterName));
+                scriptParameters.Add(parameterName, propertyUpdate.NewValue);
+            }
+
+            var script = string.Join(
+                Environment.NewLine,
+                conditionVariableScript,
+                $"if ({conditionVariableName})",
+                "{",
+                string.Join(Environment.NewLine, assignmentScripts),
+                "}");
+
+            var patchRequest = new PatchRequest
+            {
+                Script = script,
+                Values = scriptParameters
+            };
+
+            return patchRequest;
+        }
+
         private static PatchRequest CreatePatchRequest<TDocument>(Expression<Func<TDocument, long>> lastKnownChangeIdSelector, long lastKnownChangeId, PropertyUpdateDescriptor[] propertyUpdates)
         {
             const string lastKnownChangeIdArgumentName = "__AUTO_LastKnownChangeId";
             const string conditionVariableName = "shouldUpdate";
 
             var lastKnownChangeIdPropertyPath = GetPropertyPathFromExpression(lastKnownChangeIdSelector);
-            var conditionVariableScript = CreateConditionVariableScript(lastKnownChangeIdArgumentName, conditionVariableName, lastKnownChangeIdPropertyPath);
+            var conditionVariableScript = CreateLessThanConditionVariableScript(lastKnownChangeIdArgumentName, conditionVariableName, lastKnownChangeIdPropertyPath);
 
             var assignmentScripts = new List<string>(propertyUpdates.Length);
             var scriptParameters = new Dictionary<string, object>
@@ -80,7 +130,7 @@ namespace TicketManager.DataAccess.Documents.Extensions
             const string conditionVariableName = "shouldUpdate";
 
             var timestampPropertyPath = GetPropertyPathFromExpression(lastKnownChangeSelector);
-            var conditionVariableScript = CreateConditionVariableScript(lastKnownChangeArgumentName, conditionVariableName, timestampPropertyPath);
+            var conditionVariableScript = CreateLessThanConditionVariableScript(lastKnownChangeArgumentName, conditionVariableName, timestampPropertyPath);
 
             var assignmentScripts = new List<string>(propertyUpdates.Length);
             var scriptParameters = new Dictionary<string, object>
@@ -121,9 +171,14 @@ namespace TicketManager.DataAccess.Documents.Extensions
             return $"\t{propertyToUpdate} = args.{parameterName};";
         }
 
-        private static string CreateConditionVariableScript(string argumentName, string variableName, string conditionPropertyPath)
+        private static string CreateLessThanConditionVariableScript(string argumentName, string variableName, string conditionPropertyPath)
         {
             return $"var {variableName} = {conditionPropertyPath} < args.{argumentName};";
+        }
+
+        private static string CreateEqualsConditionVariableScript(string argumentName, string variableName, string conditionPropertyPath)
+        {
+            return $"var {variableName} = {conditionPropertyPath} === args.{argumentName};";
         }
 
         private static string GetPropertyPathFromExpression(LambdaExpression lambdaExpression)

@@ -229,6 +229,28 @@ namespace TicketManager.DataAccess.Events.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TicketUserInvolvementCancelledEvents",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    UtcDateRecorded = table.Column<DateTime>(nullable: false, defaultValueSql: "SYSUTCDATETIME()"),
+                    CausedBy = table.Column<string>(maxLength: 256, nullable: false),
+                    TicketCreatedEventId = table.Column<long>(nullable: false),
+                    AffectedUser = table.Column<string>(maxLength: 256, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TicketUserInvolvementCancelledEvents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TicketUserInvolvementCancelledEvents_TicketCreatedEvents_TicketCreatedEventId",
+                        column: x => x.TicketCreatedEventId,
+                        principalTable: "TicketCreatedEvents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TicketCommentEditedEvents",
                 columns: table => new
                 {
@@ -359,6 +381,16 @@ namespace TicketManager.DataAccess.Events.Migrations
                 name: "IX_TicketTypeChangedEvents_UtcDateRecorded",
                 table: "TicketTypeChangedEvents",
                 column: "UtcDateRecorded");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TicketUserInvolvementCancelledEvents_TicketCreatedEventId",
+                table: "TicketUserInvolvementCancelledEvents",
+                column: "TicketCreatedEventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TicketUserInvolvementCancelledEvents_UtcDateRecorded",
+                table: "TicketUserInvolvementCancelledEvents",
+                column: "UtcDateRecorded");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -389,6 +421,9 @@ namespace TicketManager.DataAccess.Events.Migrations
 
             migrationBuilder.DropTable(
                 name: "TicketTypeChangedEvents");
+
+            migrationBuilder.DropTable(
+                name: "TicketUserInvolvementCancelledEvents");
 
             migrationBuilder.DropTable(
                 name: "TicketCommentPostedEvents");
