@@ -4,7 +4,7 @@ namespace TicketManager.DataAccess.Documents.DataModel
 {
     public class TicketInvolvement
     {
-        public string[] InvoledUsersSet { get; set; } = Array.Empty<string>();
+        public string[] InvolvedUsersSet { get; set; } = Array.Empty<string>();
 
         public long LastKnownAssignmentChangeId { get; set; }
 

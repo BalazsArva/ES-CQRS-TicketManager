@@ -40,7 +40,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
                     // TODO: When implementing this in ticket created, pay attention that the other notification handler which creates the ticket itself must have run
                     var updates = new PropertyUpdateBatch<Ticket>()
-                        .Add(t => t.Involvement.InvoledUsersSet, updatedInvolvements.InvoledUsersSet)
+                        .Add(t => t.Involvement.InvolvedUsersSet, updatedInvolvements.InvolvedUsersSet)
                         .Add(t => t.Involvement.LastKnownAssignmentChangeId, updatedInvolvements.LastKnownAssignmentChangeId)
                         .Add(t => t.Involvement.LastKnownCancelInvolvementId, updatedInvolvements.LastKnownCancelInvolvementId)
                         .Add(t => t.Involvement.LastKnownDescriptionChangeId, updatedInvolvements.LastKnownDescriptionChangeId)
@@ -115,7 +115,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 .Concat(removeInvolvements)
                 .OrderBy(evt => evt.UtcDateRecorded);
 
-            var involvedUsersSet = new HashSet<string>(involvement.InvoledUsersSet);
+            var involvedUsersSet = new HashSet<string>(involvement.InvolvedUsersSet);
 
             foreach (var involvementChange in involvementChanges)
             {
@@ -131,7 +131,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
             return new TicketInvolvement
             {
-                InvoledUsersSet = involvedUsersSet.OrderBy(user => user).ToArray(),
+                InvolvedUsersSet = involvedUsersSet.OrderBy(user => user).ToArray(),
                 LastKnownAssignmentChangeId = assignmentChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownAssignmentChangeId,
                 LastKnownCancelInvolvementId = ticketUserInvolvementCancelledEvents.LastOrDefault()?.Id ?? involvement.LastKnownCancelInvolvementId,
                 LastKnownDescriptionChangeId = descriptionChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownDescriptionChangeId,

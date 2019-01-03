@@ -50,7 +50,8 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         t.TicketType.Type,
                         t.Assignment.AssignedTo,
                         t.LastUpdatedBy,
-                        t.UtcDateLastUpdated
+                        t.UtcDateLastUpdated,
+                        t.Involvement.InvolvedUsersSet
                     })
                     .LazilyAsync()
                     .Value
@@ -74,7 +75,8 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         Priority = t.Priority,
                         AssignedTo = t.AssignedTo,
                         LastUpdatedBy = t.LastUpdatedBy,
-                        UtcDateLastUpdated = t.UtcDateLastUpdated
+                        UtcDateLastUpdated = t.UtcDateLastUpdated,
+                        InvolvedUsers = t.InvolvedUsersSet
                     })
                     .ToList();
 
@@ -144,6 +146,11 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             {
                 var utcDateLastModifiedTo = DateTimeConventions.GetUniversalDateTime(request.DateLastModifiedTo);
                 query = query.Where(t => t.UtcDateLastUpdated <= utcDateLastModifiedTo);
+            }
+
+            foreach (var involvedUser in request.InvolvedUsers)
+            {
+                query = query.Where(t => t.Involvement.InvolvedUsersSet.Any(user => user == involvedUser));
             }
 
             return query;

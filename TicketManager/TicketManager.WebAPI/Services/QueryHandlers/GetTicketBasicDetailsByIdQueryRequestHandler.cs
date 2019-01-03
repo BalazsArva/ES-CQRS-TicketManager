@@ -52,7 +52,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         Title = ticket.TicketTitle.Title,
                         Type = ticket.TicketType.Type,
                         UtcDateCreated = ticket.UtcDateCreated,
-                        InvolvedUsers = ticket.Involvement.InvoledUsersSet,
+                        InvolvedUsers = ticket.Involvement.InvolvedUsersSet,
                         LastUpdatedBy = ticket.LastUpdatedBy,
                         UtcDateLastUpdated = ticket.UtcDateLastUpdated
                     },

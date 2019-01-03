@@ -61,7 +61,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         Description = ticket.TicketDescription.Description,
                         Tags = ticket.Tags.TagSet,
                         Links = links,
-                        InvolvedUsers = ticket.Involvement.InvoledUsersSet,
+                        InvolvedUsers = ticket.Involvement.InvolvedUsersSet,
                         LastUpdatedBy = ticket.LastUpdatedBy,
                         UtcDateLastUpdated = ticket.UtcDateLastUpdated
                     },
