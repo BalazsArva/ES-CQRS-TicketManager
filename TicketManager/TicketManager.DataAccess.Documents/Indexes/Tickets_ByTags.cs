@@ -23,6 +23,9 @@ namespace TicketManager.DataAccess.Documents.Indexes
                              };
 
             Stores.Add(entry => entry.Tag, FieldStorage.Yes);
+            
+            // TODO: Review this in other indices as well
+            Index(entry => entry.Tag, FieldIndexing.Search);
         }
     }
 }

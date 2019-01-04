@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
+using TicketManager.Common.Utils;
 using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.DataAccess.Documents.Indexes;
 using TicketManager.WebAPI.DTOs.Queries;
@@ -23,11 +24,30 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
         public async Task<QueryResult<TagSearchResultViewModel>> Handle(SearchTagsQueryRequest request, CancellationToken cancellationToken)
         {
+            var (kind, transformedValue) = StringSearchHelper.ParseSearchSyntax(request.Query);
+
             using (var session = documentStore.OpenAsyncSession())
             {
-                var tags = await session
-                    .Query<Tickets_ByTags.IndexEntry, Tickets_ByTags>()
-                    .Where(e => e.Tag.StartsWith(request.Query))
+                var query = session.Query<Tickets_ByTags.IndexEntry, Tickets_ByTags>();
+
+                if (kind == StringSearchKind.EndsWith)
+                {
+                    query = query.Where(e => e.Tag.EndsWith(transformedValue));
+                }
+                else if (kind == StringSearchKind.StartsWith)
+                {
+                    query = query.Where(e => e.Tag.StartsWith(transformedValue));
+                }
+                else if (kind == StringSearchKind.Equals)
+                {
+                    query = query.Where(e => e.Tag == transformedValue);
+                }
+                else
+                {
+                    query = query.Search(t => t.Tag, transformedValue);
+                }
+
+                var tags = await query
                     .OrderBy(e => e.Tag)
                     .Select(e => e.Tag)
                     .Distinct()
