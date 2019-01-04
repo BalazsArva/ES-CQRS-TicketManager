@@ -78,7 +78,14 @@ namespace TicketManager.WebAPI.Services.QueryHandlers.SearchTickets
                     })
                     .ToList();
 
-                return new QueryResult<TicketSearchResultViewModel>(new TicketSearchResultViewModel { PagedResults = mappedResults, Total = stats.TotalResults });
+                return new QueryResult<TicketSearchResultViewModel>(
+                    new TicketSearchResultViewModel
+                    {
+                        PagedResults = mappedResults,
+                        Total = stats.TotalResults,
+                        IsStale = stats.IsStale,
+                        IndexTimestamp = stats.IndexTimestamp
+                    });
             }
         }
     }

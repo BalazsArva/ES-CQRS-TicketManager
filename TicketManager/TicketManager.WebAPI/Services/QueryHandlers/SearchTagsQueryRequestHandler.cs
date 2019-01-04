@@ -24,27 +24,30 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
         public async Task<QueryResult<TagSearchResultViewModel>> Handle(SearchTagsQueryRequest request, CancellationToken cancellationToken)
         {
-            var (kind, transformedValue) = StringSearchHelper.ParseSearchSyntax(request.Query);
-
             using (var session = documentStore.OpenAsyncSession())
             {
-                var query = session.Query<Tickets_ByTags.IndexEntry, Tickets_ByTags>();
+                var query = session.Query<Tickets_ByTags.IndexEntry, Tickets_ByTags>().Statistics(out var stats);
 
-                if (kind == StringSearchKind.EndsWith)
+                if (!string.IsNullOrEmpty(request.Query))
                 {
-                    query = query.Where(e => e.Tag.EndsWith(transformedValue));
-                }
-                else if (kind == StringSearchKind.StartsWith)
-                {
-                    query = query.Where(e => e.Tag.StartsWith(transformedValue));
-                }
-                else if (kind == StringSearchKind.Equals)
-                {
-                    query = query.Where(e => e.Tag == transformedValue);
-                }
-                else
-                {
-                    query = query.Search(t => t.Tag, transformedValue);
+                    var (kind, transformedValue) = StringSearchHelper.ParseSearchSyntax(request.Query);
+
+                    if (kind == StringSearchKind.EndsWith)
+                    {
+                        query = query.Where(e => e.Tag.EndsWith(transformedValue));
+                    }
+                    else if (kind == StringSearchKind.StartsWith)
+                    {
+                        query = query.Where(e => e.Tag.StartsWith(transformedValue));
+                    }
+                    else if (kind == StringSearchKind.Equals)
+                    {
+                        query = query.Where(e => e.Tag == transformedValue);
+                    }
+                    else
+                    {
+                        query = query.Search(t => t.Tag, transformedValue);
+                    }
                 }
 
                 var tags = await query
@@ -54,7 +57,13 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new QueryResult<TagSearchResultViewModel>(new TagSearchResultViewModel { Tags = tags });
+                return new QueryResult<TagSearchResultViewModel>(
+                    new TagSearchResultViewModel
+                    {
+                        Tags = tags,
+                        IsStale = stats.IsStale,
+                        IndexTimestamp = stats.IndexTimestamp
+                    });
             }
         }
     }
