@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,17 +28,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers
 
                 return new HashSet<TicketLink>(ticketDocument?.Links?.LinkSet ?? Enumerable.Empty<TicketLink>());
             }
-        }
-
-        public static bool ReferenceAnExistingTicket(ILinkOperationCommand command, TicketLinkDTO link, PropertyValidatorContext context)
-        {
-            if (context.ParentContext.RootContextData[ValidationContextKeys.FoundTicketIdsContextDataKey] is ISet<long> foundTicketIds)
-            {
-                return foundTicketIds.Contains(link.TargetTicketId);
-            }
-
-            throw new InvalidOperationException(
-                "The validation could not be performed because the collection of existing ticket identifiers was not found in the context data of the validation context.");
         }
     }
 }

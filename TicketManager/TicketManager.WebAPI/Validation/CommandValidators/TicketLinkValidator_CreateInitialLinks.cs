@@ -2,20 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
+using Raven.Client.Documents;
 using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs;
-using TicketManager.WebAPI.DTOs.Commands.Abstractions;
+using TicketManager.WebAPI.DTOs.Commands;
 
-namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
+namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public abstract class TicketLinkDTOValidatorBase : AbstractValidator<TicketLinkDTO>
+    public class TicketLinkValidator_CreateInitialLinks : AbstractValidator<TicketLinkDTO>
     {
-        protected TicketLinkDTOValidatorBase()
+        protected readonly IDocumentStore documentStore;
+
+        public TicketLinkValidator_CreateInitialLinks(IDocumentStore documentStore)
         {
+            this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+
             RuleFor(link => link)
                 .Must((link, _, context) =>
                 {
-                    var parent = (ILinkOperationCommand)context.ParentContext.RootContextData[ValidationContextKeys.TicketLinkOperationCommandContextDataKey];
+                    var parent = (CreateTicketCommand)context.ParentContext.RootContextData[ValidationContextKeys.CreateTicketCommandContextDataKey];
                     var numberOfLinksWithSameProperties = parent.Links.Count(x => x.TargetTicketId == link.TargetTicketId && x.LinkType == link.LinkType);
 
                     return numberOfLinksWithSameProperties == 1;
@@ -26,16 +31,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
             RuleFor(link => link.LinkType)
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketLinkTypes>("link type"));
-
-            RuleFor(link => link.TargetTicketId)
-                .Must((link, targetTicketId, context) =>
-                {
-                    var parent = (ILinkOperationCommand)context.ParentContext.RootContextData[ValidationContextKeys.TicketLinkOperationCommandContextDataKey];
-
-                    return targetTicketId != parent.TicketId;
-                })
-                .WithMessage("A ticket cannot be linked to itself.")
-                .WithErrorCode(ValidationErrorCodes.BadRequest);
 
             RuleFor(link => link.TargetTicketId)
                 .Must((link, targetTicketId, context) =>

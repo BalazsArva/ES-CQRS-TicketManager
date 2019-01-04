@@ -68,6 +68,7 @@ namespace TicketManager.WebAPI.Extensions
                 .AddSingleton<IValidator<RemoveTicketTagsCommand>, RemoveTicketTagsCommandValidator>()
                 .AddSingleton<IValidator<UpdateTicketCommand>, UpdateTicketCommandValidator>()
                 .AddSingleton<TicketLinkValidator_AddLinks>()
+                .AddSingleton<TicketLinkValidator_CreateInitialLinks>()
                 .AddSingleton<TicketLinkValidator_UpdateLinks>();
 
             services

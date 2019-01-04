@@ -25,7 +25,6 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         public async Task<long> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
         {
-            // TODO: Add support for link and tag addition at creation time. Don't forget to overwrite the ticket's status to Blocked when a link with type 'BlockedBy' is found.
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             long ticketId;
@@ -70,6 +69,40 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     CausedBy = request.RaisedByUser,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
+
+                foreach (var tag in request.Tags)
+                {
+                    context.TicketTagChangedEvents.Add(new TicketTagChangedEvent
+                    {
+                        CausedBy = request.RaisedByUser,
+                        Tag = tag,
+                        TagAdded = true,
+                        TicketCreatedEvent = ticketCreatedEvent
+                    });
+                }
+
+                foreach (var link in request.Links)
+                {
+                    context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
+                    {
+                        CausedBy = request.RaisedByUser,
+                        LinkType = link.LinkType,
+                        ConnectionIsActive = true,
+                        SourceTicketCreatedEvent = ticketCreatedEvent,
+                        TargetTicketCreatedEventId = link.TargetTicketId
+                    });
+
+                    // Pay attention that this must always come after the addition of the status event for the user-set status as this one must overwrite that.
+                    if (link.LinkType == Contracts.Common.TicketLinkTypes.BlockedBy)
+                    {
+                        context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
+                        {
+                            CausedBy = request.RaisedByUser,
+                            TicketCreatedEvent = ticketCreatedEvent,
+                            TicketStatus = Contracts.Common.TicketStatuses.Blocked
+                        });
+                    }
+                }
 
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 

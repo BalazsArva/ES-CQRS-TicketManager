@@ -28,8 +28,8 @@ namespace TicketManager.WebAPI.Controllers
             const string user4 = "User 4";
             const string user5 = "User 5";
 
-            var id = await mediator.Send(new CreateTicketCommand(user1, null, "Test ticket", "Test ticket description", TicketPriorities.Lowest, TicketTypes.Task, TicketStatuses.NotStarted));
-            var id2 = await mediator.Send(new CreateTicketCommand(user2, null, "Other test ticket", "Other test ticket description", TicketPriorities.Medium, TicketTypes.Bug, TicketStatuses.NotStarted));
+            var id = await mediator.Send(new CreateTicketCommand(user1, null, "Test ticket", "Test ticket description", new[] { "Infrastructure" }, null, TicketPriorities.Lowest, TicketTypes.Task, TicketStatuses.NotStarted));
+            var id2 = await mediator.Send(new CreateTicketCommand(user2, null, "Other test ticket", "Other test ticket description", null, null, TicketPriorities.Medium, TicketTypes.Bug, TicketStatuses.NotStarted));
 
             await mediator.Send(new AssignTicketCommand(id, user1, user2));
             await mediator.Send(new AssignTicketCommand(id, user1, user3));

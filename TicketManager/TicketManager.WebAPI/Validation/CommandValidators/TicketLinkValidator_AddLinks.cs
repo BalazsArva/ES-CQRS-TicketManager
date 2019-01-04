@@ -10,9 +10,12 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 {
     public class TicketLinkValidator_AddLinks : TicketLinkDTOValidatorBase
     {
+        private readonly IDocumentStore documentStore;
+
         public TicketLinkValidator_AddLinks(IDocumentStore documentStore)
-            : base(documentStore)
         {
+            this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+
             RuleFor(link => link)
                 .Must((link, _, context) =>
                 {
