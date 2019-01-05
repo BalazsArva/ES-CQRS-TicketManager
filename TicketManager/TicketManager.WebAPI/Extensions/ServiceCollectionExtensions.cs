@@ -4,9 +4,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using TicketManager.DataAccess.Documents;
+using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Events;
+using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Queries;
+using TicketManager.WebAPI.Services.EventAggregators;
+using TicketManager.WebAPI.Services.NotificationHandlers.Abstractions;
 using TicketManager.WebAPI.Validation.CommandValidators;
 using TicketManager.WebAPI.Validation.QueryValidators;
 
@@ -74,6 +78,14 @@ namespace TicketManager.WebAPI.Extensions
             services
                 .AddSingleton<IValidator<SearchTicketsQueryRequest>, SearchTicketsQueryRequestValidator>()
                 .AddSingleton<IValidator<GetTicketHistoryQueryRequest>, GetTicketHistoryQueryRequestValidator>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddEventAggregators(this IServiceCollection services)
+        {
+            services
+                .AddTransient<IEventAggregator<TicketAssignedEvent, Assignment>, TicketAssignedEventAggregator>();
 
             return services;
         }
