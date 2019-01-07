@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,18 +19,7 @@ namespace TicketManager.DataAccess.Events.Extensions
         public static Task<TEvent> LatestAsync<TEvent>(this IQueryable<TEvent> events, CancellationToken cancellationToken)
             where TEvent : EventBase
         {
-            return events.OrderByDescending(x => x.UtcDateRecorded).FirstAsync(cancellationToken);
-        }
-
-        public static EventBase Latest(this IEnumerable<EventBase> events)
-        {
-            return events.OrderByDescending(x => x.UtcDateRecorded).First();
-        }
-
-        public static Task<TEvent> LatestOrDefaultAsync<TEvent>(this IQueryable<TEvent> events, CancellationToken cancellationToken)
-            where TEvent : EventBase
-        {
-            return events.OrderByDescending(x => x.UtcDateRecorded).FirstOrDefaultAsync(cancellationToken);
+            return events.OrderByDescending(x => x.Id).FirstAsync(cancellationToken);
         }
 
         public static IQueryable<TEvent> OfTicket<TEvent>(this IQueryable<TEvent> events, long ticketId)
@@ -52,6 +42,12 @@ namespace TicketManager.DataAccess.Events.Extensions
              where TEvent : EventBase
         {
             return events.Where(x => x.Id > lastKnownEventId);
+        }
+
+        public static IQueryable<TEvent> NotLaterThan<TEvent>(this IQueryable<TEvent> events, DateTime eventTimeUpperLimit)
+             where TEvent : EventBase
+        {
+            return events.Where(x => x.UtcDateRecorded <= eventTimeUpperLimit);
         }
 
         public static Task<List<TEvent>> ToOrderedEventListAsync<TEvent>(this IQueryable<TEvent> events, CancellationToken cancellationToken)

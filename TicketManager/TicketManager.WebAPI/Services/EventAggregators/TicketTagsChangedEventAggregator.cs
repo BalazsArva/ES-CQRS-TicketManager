@@ -23,29 +23,35 @@ namespace TicketManager.WebAPI.Services.EventAggregators
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
         }
 
-        public async Task<Tags> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Tags currentAggregateState, CancellationToken cancellationToken)
+        public Task<Tags> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Tags currentAggregateState, CancellationToken cancellationToken)
+        {
+            return AggregateSubsequentEventsAsync(ticketCreatedEventId, currentAggregateState, DateTime.MaxValue, cancellationToken);
+        }
+
+        public async Task<Tags> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Tags currentAggregateState, DateTime eventTimeUpperLimit, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             {
                 var currentTags = currentAggregateState?.TagSet ?? Array.Empty<string>();
                 var lastKnownChangeId = currentAggregateState?.LastKnownChangeId ?? NonexistentEventId;
 
-                var tagChangesSinceLastSync = await context
+                var eventsAfterLastKnownChange = await context
                     .TicketTagChangedEvents
                     .AsNoTracking()
                     .OfTicket(ticketCreatedEventId)
                     .After(lastKnownChangeId)
+                    .NotLaterThan(eventTimeUpperLimit)
                     .ToOrderedEventListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                var lastChange = tagChangesSinceLastSync.LastOrDefault();
+                var lastChange = eventsAfterLastKnownChange.LastOrDefault();
                 if (lastChange == null && currentAggregateState != null)
                 {
                     return currentAggregateState;
                 }
 
                 var resultSet = new HashSet<string>(currentTags);
-                foreach (var change in tagChangesSinceLastSync)
+                foreach (var change in eventsAfterLastKnownChange)
                 {
                     if (change.TagAdded)
                     {

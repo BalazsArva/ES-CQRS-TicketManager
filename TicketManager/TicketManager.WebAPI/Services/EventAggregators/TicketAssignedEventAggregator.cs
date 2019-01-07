@@ -17,7 +17,12 @@ namespace TicketManager.WebAPI.Services.EventAggregators
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
         }
 
-        public async Task<Assignment> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Assignment currentAggregateState, CancellationToken cancellationToken)
+        public Task<Assignment> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Assignment currentAggregateState, CancellationToken cancellationToken)
+        {
+            return AggregateSubsequentEventsAsync(ticketCreatedEventId, currentAggregateState, DateTime.MaxValue, cancellationToken);
+        }
+
+        public async Task<Assignment> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Assignment currentAggregateState, DateTime eventTimeUpperLimit, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             {
@@ -25,6 +30,7 @@ namespace TicketManager.WebAPI.Services.EventAggregators
                     .TicketAssignedEvents
                     .AsNoTracking()
                     .OfTicket(ticketCreatedEventId)
+                    .NotLaterThan(eventTimeUpperLimit)
                     .LatestAsync(cancellationToken)
                     .ConfigureAwait(false);
 

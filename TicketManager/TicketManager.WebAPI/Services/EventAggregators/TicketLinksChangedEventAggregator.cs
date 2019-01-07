@@ -27,29 +27,35 @@ namespace TicketManager.WebAPI.Services.EventAggregators
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
-        public async Task<Links> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Links currentAggregateState, CancellationToken cancellationToken)
+        public Task<Links> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Links currentAggregateState, CancellationToken cancellationToken)
+        {
+            return AggregateSubsequentEventsAsync(ticketCreatedEventId, currentAggregateState, DateTime.MaxValue, cancellationToken);
+        }
+
+        public async Task<Links> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Links currentAggregateState, DateTime eventTimeUpperLimit, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             {
                 var currentLinks = currentAggregateState?.LinkSet ?? Array.Empty<TicketLink>();
                 var lastKnownChangeId = currentAggregateState?.LastKnownChangeId ?? NonexistentEventId;
 
-                var linkChangesSinceLastSync = await context
+                var eventsAfterLastKnownChange = await context
                     .TicketLinkChangedEvents
                     .AsNoTracking()
                     .Where(evt => evt.SourceTicketCreatedEventId == ticketCreatedEventId)
                     .After(lastKnownChangeId)
+                    .NotLaterThan(eventTimeUpperLimit)
                     .ToOrderedEventListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                var lastChange = linkChangesSinceLastSync.LastOrDefault();
+                var lastChange = eventsAfterLastKnownChange.LastOrDefault();
                 if (lastChange == null && currentAggregateState != null)
                 {
                     return currentAggregateState;
                 }
 
                 var resultSet = new HashSet<TicketLink>(currentLinks);
-                foreach (var change in linkChangesSinceLastSync)
+                foreach (var change in eventsAfterLastKnownChange)
                 {
                     var link = new TicketLink
                     {

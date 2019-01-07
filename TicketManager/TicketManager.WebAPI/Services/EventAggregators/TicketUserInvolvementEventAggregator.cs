@@ -36,22 +36,26 @@ namespace TicketManager.WebAPI.Services.EventAggregators
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
         }
 
-        public async Task<TicketInvolvement> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketInvolvement currentAggregateState, CancellationToken cancellationToken)
+        public Task<TicketInvolvement> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketInvolvement currentAggregateState, CancellationToken cancellationToken)
+        {
+            return AggregateSubsequentEventsAsync(ticketCreatedEventId, currentAggregateState, DateTime.MaxValue, cancellationToken);
+        }
+
+        public async Task<TicketInvolvement> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketInvolvement currentAggregateState, DateTime eventTimeUpperLimit, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             {
                 var involvement = currentAggregateState ?? DefaultInvolvement;
 
-                var assignmentChangeEvents = await context.TicketAssignedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownAssignmentChangeId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
-                var descriptionChangeEvents = await context.TicketDescriptionChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownDescriptionChangeId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
-                var linkChangeEvents = await context.TicketLinkChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownLinkChangeId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
-                var priorityChangeEvents = await context.TicketPriorityChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownPriorityChangeId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
-                var statusChangeEvents = await context.TicketStatusChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownStatusChangeId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
-                var tagChangeEvents = await context.TicketTagChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTagChangeId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
-                var titleChangeEvents = await context.TicketTitleChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTitleChangeId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
-                var typeChangeEvents = await context.TicketTypeChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTypeChangeId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
-
-                var ticketUserInvolvementCancelledEvents = await context.TicketUserInvolvementCancelledEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownCancelInvolvementId).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var assignmentChangeEvents = await context.TicketAssignedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownAssignmentChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var descriptionChangeEvents = await context.TicketDescriptionChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownDescriptionChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var linkChangeEvents = await context.TicketLinkChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownLinkChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var priorityChangeEvents = await context.TicketPriorityChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownPriorityChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var statusChangeEvents = await context.TicketStatusChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownStatusChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var tagChangeEvents = await context.TicketTagChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTagChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var titleChangeEvents = await context.TicketTitleChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTitleChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var typeChangeEvents = await context.TicketTypeChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTypeChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var ticketUserInvolvementCancelledEvents = await context.TicketUserInvolvementCancelledEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownCancelInvolvementId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
 
                 // TODO: Consider comment events
                 var addInvolvements1 = assignmentChangeEvents.AsEventBase()
@@ -92,7 +96,6 @@ namespace TicketManager.WebAPI.Services.EventAggregators
                     .OrderBy(evt => evt.UtcDateRecorded);
 
                 var involvedUsersSet = new HashSet<string>(involvement.InvolvedUsersSet);
-
                 foreach (var involvementChange in involvementChanges)
                 {
                     if (involvementChange.AddInvolvement)
