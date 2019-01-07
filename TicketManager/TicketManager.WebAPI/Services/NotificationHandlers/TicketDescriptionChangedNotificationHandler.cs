@@ -1,46 +1,47 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Raven.Client.Documents;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
-using TicketManager.DataAccess.Events;
-using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.DTOs.Notifications;
+using TicketManager.WebAPI.Services.EventAggregators;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
-    public class TicketDescriptionChangedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketDescriptionChangedNotification>
+    public class TicketDescriptionChangedNotificationHandler : INotificationHandler<TicketDescriptionChangedNotification>
     {
-        public TicketDescriptionChangedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
-            : base(eventsContextFactory, documentStore)
+        private readonly IDocumentStore documentStore;
+        private readonly IEventAggregator<TicketDescription> eventAggregator;
+
+        public TicketDescriptionChangedNotificationHandler(IDocumentStore documentStore, IEventAggregator<TicketDescription> eventAggregator)
         {
+            this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+            this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
         }
 
         public async Task Handle(TicketDescriptionChangedNotification notification, CancellationToken cancellationToken)
         {
-            using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
-                var ticketDescriptionChangedEvent = await context.TicketDescriptionChangedEvents
-                    .AsNoTracking()
-                    .OfTicket(notification.TicketId)
-                    .LatestAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                var ticketId = notification.TicketId;
+                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId);
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId, cancellationToken).ConfigureAwait(false);
 
-                var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(notification.TicketId);
+                var eventAggregate = await eventAggregator.AggregateSubsequentEventsAsync(ticketId, ticketDocument.TicketDescription, cancellationToken).ConfigureAwait(false);
 
                 var updates = new PropertyUpdateBatch<Ticket>()
-                    .Add(t => t.TicketDescription.LastChangedBy, ticketDescriptionChangedEvent.CausedBy)
-                    .Add(t => t.TicketDescription.UtcDateLastUpdated, ticketDescriptionChangedEvent.UtcDateRecorded)
-                    .Add(t => t.TicketDescription.Description, ticketDescriptionChangedEvent.Description);
+                    .Add(t => t.TicketDescription.LastChangedBy, eventAggregate.LastChangedBy)
+                    .Add(t => t.TicketDescription.UtcDateLastUpdated, eventAggregate.UtcDateLastUpdated)
+                    .Add(t => t.TicketDescription.Description, eventAggregate.Description);
 
                 var lastModifiedUpdates = new PropertyUpdateBatch<Ticket>()
-                    .Add(t => t.LastUpdatedBy, ticketDescriptionChangedEvent.CausedBy);
+                    .Add(t => t.LastUpdatedBy, eventAggregate.LastChangedBy);
 
-                session.PatchToNewer(ticketDocumentId, updates, t => t.TicketDescription.LastKnownChangeId, ticketDescriptionChangedEvent.Id);
-                session.PatchToNewer(ticketDocumentId, lastModifiedUpdates, t => t.UtcDateLastUpdated, ticketDescriptionChangedEvent.UtcDateRecorded);
+                session.PatchToNewer(ticketDocumentId, updates, t => t.TicketDescription.LastKnownChangeId, eventAggregate.LastKnownChangeId);
+                session.PatchToNewer(ticketDocumentId, lastModifiedUpdates, t => t.UtcDateLastUpdated, eventAggregate.UtcDateLastUpdated);
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }

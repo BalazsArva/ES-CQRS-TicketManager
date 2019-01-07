@@ -1,48 +1,47 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Raven.Client.Documents;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
-using TicketManager.DataAccess.Events;
-using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.DTOs.Notifications;
+using TicketManager.WebAPI.Services.EventAggregators;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
-    public class TicketAssignedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketAssignedNotification>
+    public class TicketAssignedNotificationHandler : INotificationHandler<TicketAssignedNotification>
     {
-        public TicketAssignedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
-            : base(eventsContextFactory, documentStore)
+        private readonly IDocumentStore documentStore;
+        private readonly IEventAggregator<Assignment> eventAggregator;
+
+        public TicketAssignedNotificationHandler(IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
         {
+            this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+            this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
         }
 
         public async Task Handle(TicketAssignedNotification notification, CancellationToken cancellationToken)
         {
-            using (var context = eventsContextFactory.CreateContext())
             using (var session = documentStore.OpenAsyncSession())
             {
                 var ticketId = notification.TicketId;
-                var ticketAssignedEvent = await context
-                    .TicketAssignedEvents
-                    .AsNoTracking()
-                    .OfTicket(ticketId)
-                    .LatestAsync(cancellationToken)
-                    .ConfigureAwait(false);
-
                 var ticketDocumentId = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId);
+                var ticketDocument = await session.LoadAsync<Ticket>(ticketDocumentId, cancellationToken).ConfigureAwait(false);
+
+                var eventAggregate = await eventAggregator.AggregateSubsequentEventsAsync(ticketId, ticketDocument.Assignment, cancellationToken).ConfigureAwait(false);
 
                 var updates = new PropertyUpdateBatch<Ticket>()
-                    .Add(t => t.Assignment.LastChangedBy, ticketAssignedEvent.CausedBy)
-                    .Add(t => t.Assignment.UtcDateLastUpdated, ticketAssignedEvent.UtcDateRecorded)
-                    .Add(t => t.Assignment.AssignedTo, ticketAssignedEvent.AssignedTo);
+                    .Add(t => t.Assignment.LastChangedBy, eventAggregate.LastChangedBy)
+                    .Add(t => t.Assignment.UtcDateLastUpdated, eventAggregate.UtcDateLastUpdated)
+                    .Add(t => t.Assignment.AssignedTo, eventAggregate.AssignedTo);
 
                 var lastModifiedUpdates = new PropertyUpdateBatch<Ticket>()
-                    .Add(t => t.LastUpdatedBy, ticketAssignedEvent.CausedBy);
+                    .Add(t => t.LastUpdatedBy, eventAggregate.LastChangedBy);
 
-                session.PatchToNewer(ticketDocumentId, updates, t => t.Assignment.LastKnownChangeId, ticketAssignedEvent.Id);
-                session.PatchToNewer(ticketDocumentId, lastModifiedUpdates, t => t.UtcDateLastUpdated, ticketAssignedEvent.UtcDateRecorded);
+                session.PatchToNewer(ticketDocumentId, updates, t => t.Assignment.LastKnownChangeId, eventAggregate.LastKnownChangeId);
+                session.PatchToNewer(ticketDocumentId, lastModifiedUpdates, t => t.UtcDateLastUpdated, eventAggregate.UtcDateLastUpdated);
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }

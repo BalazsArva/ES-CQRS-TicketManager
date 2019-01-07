@@ -25,10 +25,11 @@ namespace TicketManager.WebAPI
             services.AddEventsContext(Configuration);
 
             services.AddValidators();
+            services.AddEventAggregators();
             services.AddMediatR(typeof(Startup).Assembly);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "TicketManager", Version = "v1" });
