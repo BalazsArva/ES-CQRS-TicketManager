@@ -8,32 +8,31 @@ using TicketManager.DataAccess.Events.Extensions;
 
 namespace TicketManager.WebAPI.Services.EventAggregators
 {
-    public class TicketAssignedEventAggregator : IEventAggregator<Assignment>
+    public class TicketDescriptionChangedEventAggregator : IEventAggregator<TicketDescription>
     {
         private readonly IEventsContextFactory eventsContextFactory;
 
-        public TicketAssignedEventAggregator(IEventsContextFactory eventsContextFactory)
+        public TicketDescriptionChangedEventAggregator(IEventsContextFactory eventsContextFactory)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
         }
 
-        public async Task<Assignment> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Assignment currentAggregateState, CancellationToken cancellationToken)
+        public async Task<TicketDescription> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketDescription currentAggregateState, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             {
-                var ticketAssignedEvent = await context
-                    .TicketAssignedEvents
+                var ticketDescriptionChangedEvent = await context.TicketDescriptionChangedEvents
                     .AsNoTracking()
                     .OfTicket(ticketCreatedEventId)
                     .LatestAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new Assignment
+                return new TicketDescription
                 {
-                    AssignedTo = ticketAssignedEvent.AssignedTo,
-                    LastChangedBy = ticketAssignedEvent.CausedBy,
-                    LastKnownChangeId = ticketAssignedEvent.Id,
-                    UtcDateLastUpdated = ticketAssignedEvent.UtcDateRecorded
+                    LastChangedBy = ticketDescriptionChangedEvent.CausedBy,
+                    Description = ticketDescriptionChangedEvent.Description,
+                    UtcDateLastUpdated = ticketDescriptionChangedEvent.UtcDateRecorded,
+                    LastKnownChangeId = ticketDescriptionChangedEvent.Id
                 };
             }
         }

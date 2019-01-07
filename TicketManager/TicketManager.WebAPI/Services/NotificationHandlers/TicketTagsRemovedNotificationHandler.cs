@@ -2,15 +2,16 @@
 using System.Threading.Tasks;
 using MediatR;
 using Raven.Client.Documents;
-using TicketManager.DataAccess.Events;
+using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.WebAPI.DTOs.Notifications;
+using TicketManager.WebAPI.Services.EventAggregators;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
-    public class TicketTagsRemovedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketTagsRemovedNotification>
+    public class TicketTagsRemovedNotificationHandler : TicketTagsChangedNotificationHandlerBase, INotificationHandler<TicketTagsRemovedNotification>
     {
-        public TicketTagsRemovedNotificationHandler(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
-            : base(eventsContextFactory, documentStore)
+        public TicketTagsRemovedNotificationHandler(IDocumentStore documentStore, IEventAggregator<Tags> eventAggregator)
+            : base(documentStore, eventAggregator)
         {
         }
 

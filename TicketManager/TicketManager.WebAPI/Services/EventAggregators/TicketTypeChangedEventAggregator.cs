@@ -8,32 +8,32 @@ using TicketManager.DataAccess.Events.Extensions;
 
 namespace TicketManager.WebAPI.Services.EventAggregators
 {
-    public class TicketAssignedEventAggregator : IEventAggregator<Assignment>
+    public class TicketTypeChangedEventAggregator : IEventAggregator<TicketType>
     {
         private readonly IEventsContextFactory eventsContextFactory;
 
-        public TicketAssignedEventAggregator(IEventsContextFactory eventsContextFactory)
+        public TicketTypeChangedEventAggregator(IEventsContextFactory eventsContextFactory)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
         }
 
-        public async Task<Assignment> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Assignment currentAggregateState, CancellationToken cancellationToken)
+        public async Task<TicketType> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketType currentAggregateState, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             {
-                var ticketAssignedEvent = await context
-                    .TicketAssignedEvents
+                var ticketTypeChangedEvent = await context
+                    .TicketTypeChangedEvents
                     .AsNoTracking()
                     .OfTicket(ticketCreatedEventId)
                     .LatestAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new Assignment
+                return new TicketType
                 {
-                    AssignedTo = ticketAssignedEvent.AssignedTo,
-                    LastChangedBy = ticketAssignedEvent.CausedBy,
-                    LastKnownChangeId = ticketAssignedEvent.Id,
-                    UtcDateLastUpdated = ticketAssignedEvent.UtcDateRecorded
+                    LastChangedBy = ticketTypeChangedEvent.CausedBy,
+                    UtcDateLastUpdated = ticketTypeChangedEvent.UtcDateRecorded,
+                    Type = ticketTypeChangedEvent.TicketType,
+                    LastKnownChangeId = ticketTypeChangedEvent.Id
                 };
             }
         }

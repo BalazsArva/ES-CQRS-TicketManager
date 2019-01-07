@@ -8,14 +8,20 @@ using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.DTOs.Notifications;
+using IDocumentStore = Raven.Client.Documents.IDocumentStore;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
-    public class TicketCommentEditedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketCommentEditedNotification>
+    // TODO: Create event aggregator
+    public class TicketCommentEditedNotificationHandler : INotificationHandler<TicketCommentEditedNotification>
     {
-        public TicketCommentEditedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore)
-            : base(eventsContextFactory, documentStore)
+        private readonly IEventsContextFactory eventsContextFactory;
+        private readonly IDocumentStore documentStore;
+
+        public TicketCommentEditedNotificationHandler(IEventsContextFactory eventsContextFactory, IDocumentStore documentStore)
         {
+            this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
+            this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
         public async Task Handle(TicketCommentEditedNotification notification, CancellationToken cancellationToken)

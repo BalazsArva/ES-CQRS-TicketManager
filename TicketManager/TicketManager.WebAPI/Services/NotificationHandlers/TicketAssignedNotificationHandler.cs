@@ -1,24 +1,25 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Raven.Client.Documents;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
-using TicketManager.DataAccess.Events;
-using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Services.EventAggregators;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
-    public class TicketAssignedNotificationHandler : QueryStoreSyncNotificationHandlerBase, INotificationHandler<TicketAssignedNotification>
+    public class TicketAssignedNotificationHandler : INotificationHandler<TicketAssignedNotification>
     {
-        private readonly IEventAggregator<TicketAssignedEvent, Assignment> eventAggregator;
+        private readonly IDocumentStore documentStore;
+        private readonly IEventAggregator<Assignment> eventAggregator;
 
-        public TicketAssignedNotificationHandler(IEventsContextFactory eventsContextFactory, Raven.Client.Documents.IDocumentStore documentStore, IEventAggregator<TicketAssignedEvent, Assignment> eventAggregator)
-            : base(eventsContextFactory, documentStore)
+        public TicketAssignedNotificationHandler(IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
         {
-            this.eventAggregator = eventAggregator ?? throw new System.ArgumentNullException(nameof(eventAggregator));
+            this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+            this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
         }
 
         public async Task Handle(TicketAssignedNotification notification, CancellationToken cancellationToken)

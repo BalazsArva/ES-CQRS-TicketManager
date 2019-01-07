@@ -8,32 +8,32 @@ using TicketManager.DataAccess.Events.Extensions;
 
 namespace TicketManager.WebAPI.Services.EventAggregators
 {
-    public class TicketAssignedEventAggregator : IEventAggregator<Assignment>
+    public class TicketPriorityChangedEventAggregator : IEventAggregator<TicketPriority>
     {
         private readonly IEventsContextFactory eventsContextFactory;
 
-        public TicketAssignedEventAggregator(IEventsContextFactory eventsContextFactory)
+        public TicketPriorityChangedEventAggregator(IEventsContextFactory eventsContextFactory)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
         }
 
-        public async Task<Assignment> AggregateSubsequentEventsAsync(long ticketCreatedEventId, Assignment currentAggregateState, CancellationToken cancellationToken)
+        public async Task<TicketPriority> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketPriority currentAggregateState, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             {
-                var ticketAssignedEvent = await context
-                    .TicketAssignedEvents
+                var ticketPriorityChangedEvent = await context
+                    .TicketPriorityChangedEvents
                     .AsNoTracking()
                     .OfTicket(ticketCreatedEventId)
                     .LatestAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new Assignment
+                return new TicketPriority
                 {
-                    AssignedTo = ticketAssignedEvent.AssignedTo,
-                    LastChangedBy = ticketAssignedEvent.CausedBy,
-                    LastKnownChangeId = ticketAssignedEvent.Id,
-                    UtcDateLastUpdated = ticketAssignedEvent.UtcDateRecorded
+                    LastChangedBy = ticketPriorityChangedEvent.CausedBy,
+                    UtcDateLastUpdated = ticketPriorityChangedEvent.UtcDateRecorded,
+                    Priority = ticketPriorityChangedEvent.Priority,
+                    LastKnownChangeId = ticketPriorityChangedEvent.Id
                 };
             }
         }
