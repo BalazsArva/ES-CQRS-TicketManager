@@ -56,6 +56,8 @@ namespace TicketManager.WebAPI
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            
+            app.MigrateDatabase();
         }
     }
 }
