@@ -4,13 +4,17 @@ if (Test-Path -Path ".\dist") {
     Remove-Item .\dist -Force -Recurse
 }
 
-$composeArgs = @()
-$composeArgs += "publish"
-$composeArgs += "--framework"
-$composeArgs += "netcoreapp2.2"
-$composeArgs += "--configuration"
-$composeArgs += $BuildConfiguration
-$composeArgs += "--output"
-$composeArgs += "dist"
+$dotnetPublishArgs = @()
+$dotnetPublishArgs += "publish"
+$dotnetPublishArgs += "--framework"
+$dotnetPublishArgs += "netcoreapp2.2"
+$dotnetPublishArgs += "--configuration"
+$dotnetPublishArgs += $BuildConfiguration
+$dotnetPublishArgs += "--output"
+$dotnetPublishArgs += "dist"
 
-Invoke-Expression -Command "dotnet $composeArgs"
+$dotnetRestoreArgs = @()
+$dotnetRestoreArgs += "restore"
+
+Invoke-Expression -Command "dotnet $dotnetRestoreArgs"
+Invoke-Expression -Command "dotnet $dotnetPublishArgs"
