@@ -1,0 +1,111 @@
+version: "3"
+
+volumes:
+  ravendbdata1:
+  ravendbconfig1:
+  ravendbdata2:
+  ravendbconfig2:
+  ravendbdata3:
+  ravendbconfig3:
+  mssqldata:
+
+networks:
+  databases:
+
+services:
+
+  ticketmanager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - databases
+    ports:
+      - "3000:80"
+    environment:
+      - MSSQL_DBHOST=mssql
+      - MSSQL_DBUSERID=sa
+      - MSSQL_DBPORT=1433
+      - MSSQL_DBNAME=CQRSTicketManager
+      - MSSQL_DBMIGRATE=${MSSQL_DBMIGRATE}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:?err}
+    depends_on:
+      - mssql
+      - ravendb1
+      - ravendb2
+      - ravendb3
+
+  # TODO: Create initial database if it does not exist
+  # Expose inner 1433 on 1434 so it won't collide with MS SQL if there is a non-containerized one running on the host
+  mssql:
+    image: "mcr.microsoft.com/mssql/server:2017-CU8-ubuntu"
+    container_name: mssql
+    volumes:
+      - mssqldata:/var/opt/mssql
+    networks:
+      - databases
+    ports:
+      - "1434:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${MSSQL_SA_PASSWORD:?err}
+
+  # Set ravendb instances explicity because they should NOT be dynamically scaled, they should be preconfigured how many instances to have 
+  # because of licensing, they all have to be immediately available not just under heavy load, etc.
+  # Reference: https://github.com/ravendb/ravendb/tree/v4.0/docker/compose/linux-cluster
+  ravendb1:
+    image: "ravendb/ravendb:4.1-ubuntu-latest"
+    container_name: ravendb1
+    volumes:
+      - ravendbdata1:/opt/RavenDB/Server/RavenData
+      - ravendbconfig1:/opt/RavenDB/config
+    networks:
+      - databases
+    ports:
+      - "8081:8080"
+      - "38881:38888"
+    environment:
+      - RAVEN_ARGS=--Setup.Mode=None
+      - RAVEN_Logs_Mode=Information
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
+      - RAVEN_PublicServerUrl=http://ravendb1:8080
+      - RAVEN_PublicServerUrl_Tcp=tcp://ravendb1:38888
+    env_file: ./raven-license.env
+
+  ravendb2:
+    image: "ravendb/ravendb:4.1-ubuntu-latest"
+    container_name: ravendb2
+    volumes:
+      - ravendbdata2:/opt/RavenDB/Server/RavenData
+      - ravendbconfig2:/opt/RavenDB/config
+    networks:
+      - databases
+    ports:
+      - "8082:8080"
+      - "38882:38888"
+    environment:
+      - RAVEN_ARGS=--Setup.Mode=None
+      - RAVEN_Logs_Mode=Information
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
+      - RAVEN_PublicServerUrl=http://ravendb2:8080
+      - RAVEN_PublicServerUrl_Tcp=tcp://ravendb2:38888
+    env_file: ./raven-license.env
+
+  ravendb3:
+    image: "ravendb/ravendb:4.1-ubuntu-latest"
+    container_name: ravendb3
+    volumes:
+      - ravendbdata3:/opt/RavenDB/Server/RavenData
+      - ravendbconfig3:/opt/RavenDB/config
+    networks:
+      - databases
+    ports:
+      - "8083:8080"
+      - "38883:38888"
+    environment:
+      - RAVEN_ARGS=--Setup.Mode=None
+      - RAVEN_Logs_Mode=Information
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
+      - RAVEN_PublicServerUrl=http://ravendb3:8080
+      - RAVEN_PublicServerUrl_Tcp=tcp://ravendb3:38888
+    env_file: ./raven-license.env
