@@ -333,3 +333,4 @@ ASALocalRun/
 #                     CUSTOM VALUES                     #
 #########################################################
 TicketManager/TicketManager.WebAPI/dist
+TicketManager/TicketManager.WebAPI/raven-license.env
