@@ -20,9 +20,9 @@ if ($BuildRavenDbImage) {
     Write-Host -ForegroundColor Magenta "Building customized RavenDB image..."
     Write-Host -ForegroundColor White
 
-    cd ..\..\Docker\RavenDb-4.1.Ubuntu.Customize
+    cd .\RavenDb-4.1.Ubuntu.Customize
     .\build.ps1
-    cd ..\..\TicketManager\TicketManager.WebAPI
+    cd ..
 
     Write-Host -ForegroundColor Magenta "Finished building customized RavenDB image."
     Write-Host -ForegroundColor White
