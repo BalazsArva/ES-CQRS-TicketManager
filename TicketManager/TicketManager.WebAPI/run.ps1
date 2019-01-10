@@ -31,28 +31,31 @@ if ([string]::IsNullOrEmpty($MSSQL_SA_PASSWORD)) {
     $MSSQL_SA_PASSWORD = read-host "Password for the SA MSSQL user"
 }
 
-$env:MSSQL_DBHOST="$MSSQL_DBHOST"
-$env:MSSQL_DBUSERID="$MSSQL_DBUSERID"
-$env:MSSQL_DBPORT="$MSSQL_DBPORT"
-$env:MSSQL_DBNAME="$MSSQL_DBNAME"
-$env:MSSQL_SA_PASSWORD="$MSSQL_SA_PASSWORD"
+$env:MSSQL_DBHOST = "$MSSQL_DBHOST"
+$env:MSSQL_DBUSERID = "$MSSQL_DBUSERID"
+$env:MSSQL_DBPORT = "$MSSQL_DBPORT"
+$env:MSSQL_DBNAME = "$MSSQL_DBNAME"
+$env:MSSQL_SA_PASSWORD = "$MSSQL_SA_PASSWORD"
 
 $composeCommand = "docker-compose"
 $composeArgs = @()
 
 if ($BuildOnly) {
     $composeArgs += "build";
+    $composeArgs += "--force-recreate"
+    $composeArgs += "-d"
+
+    Invoke-Expression -Command "$composeCommand $composeArgs"
 } else {
     $composeArgs += "up";
+    $composeArgs += "--force-recreate"
+    $composeArgs += "-d"
 
     if ($MigrateDatabase) {
         $env:MSSQL_DBMIGRATE = "true";
     }
+
+    Invoke-Expression -Command "$composeCommand $composeArgs"
+
+    & .\run-ravendb.ps1 -CoresPerNode $RavenDbCoresPerNode
 }
-
-$composeArgs += "--force-recreate"
-$composeArgs += "-d"
-
-Invoke-Expression -Command "$composeCommand $composeArgs"
-
-& .\run-ravendb.ps1 -CoresPerNode $RavenDbCoresPerNode
