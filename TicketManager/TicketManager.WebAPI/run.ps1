@@ -8,6 +8,7 @@ param(
     $MSSQL_SA_PASSWORD,
     [switch]$BuildRavenDbImage,
     [switch]$MigrateDatabase,
+    [switch]$SetupRavenDbCluster,
     [switch]$BuildOnly)
 
 $ErrorActionPreference = 'Stop'
@@ -57,5 +58,7 @@ if ($BuildOnly) {
 
     Invoke-Expression -Command "$composeCommand $composeArgs"
 
-    & .\run-ravendb.ps1 -CoresPerNode $RavenDbCoresPerNode
+    if ($SetupRavenDbCluster) {
+        & .\setup-ravendb-cluster.ps1 -CoresPerNode $RavenDbCoresPerNode
+    }
 }
