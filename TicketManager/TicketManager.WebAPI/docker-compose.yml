@@ -35,8 +35,8 @@ services:
       - ravendb2
       - ravendb3
 
-  # TODO: Create initial database if it does not exist
   # Expose inner 1433 on 1434 so it won't collide with MS SQL if there is a non-containerized one running on the host
+  # The database is created by the EF migration if performed.
   mssql:
     image: "mcr.microsoft.com/mssql/server:2017-CU8-ubuntu"
     container_name: mssql

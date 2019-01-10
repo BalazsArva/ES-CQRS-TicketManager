@@ -1,4 +1,5 @@
 param(
+    $RavenDbCoresPerNode = 3,
     $BuildConfiguration = "Release",
     $MSSQL_DBHOST = "mssql",
     $MSSQL_DBUSERID = "sa",
@@ -15,7 +16,7 @@ $ErrorActionPreference = 'Stop'
 & .\build-app.ps1 -BuildConfiguration $BuildConfiguration
 
 if ([string]::IsNullOrEmpty($MSSQL_SA_PASSWORD)) {
-    $MSSQL_SA_PASSWORD = read-host "Password for the SA MSSQL user:"
+    $MSSQL_SA_PASSWORD = read-host "Password for the SA MSSQL user"
 }
 
 $env:MSSQL_DBHOST="$MSSQL_DBHOST"
@@ -42,4 +43,4 @@ $composeArgs += "-d"
 
 Invoke-Expression -Command "$composeCommand $composeArgs"
 
-& .\run-ravendb.ps1
+& .\run-ravendb.ps1 -CoresPerNode $RavenDbCoresPerNode
