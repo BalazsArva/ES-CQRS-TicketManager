@@ -13,7 +13,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# Delete dist folder and rebuild app
+& .\Utilities\restore-packages.ps1
 & .\build-app.ps1 -BuildConfiguration $BuildConfiguration
 
 if ($BuildRavenDbImage) {
