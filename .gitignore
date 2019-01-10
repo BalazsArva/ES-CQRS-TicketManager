@@ -334,3 +334,4 @@ ASALocalRun/
 #########################################################
 Docker/dist
 Docker/raven-license.env
+Docker/Utilities/node_modules

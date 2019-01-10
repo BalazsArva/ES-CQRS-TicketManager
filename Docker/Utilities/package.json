@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "wait-for-it.sh": "^1.0.0"
+  }
+}
