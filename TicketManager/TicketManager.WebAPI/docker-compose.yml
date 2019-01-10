@@ -52,9 +52,9 @@ services:
 
   # Set ravendb instances explicity because they should NOT be dynamically scaled, they should be preconfigured how many instances to have 
   # because of licensing, they all have to be immediately available not just under heavy load, etc.
-  # Reference: https://github.com/ravendb/ravendb/tree/v4.0/docker/compose/linux-cluster
+  # Reference: https://github.com/ravendb/ravendb/tree/v4.1/docker/compose/linux-cluster
   ravendb1:
-    image: "ravendb/ravendb:4.1-ubuntu-latest"
+    image: "balazsarva/ravendb:4.1-ubuntu-latest"
     container_name: ravendb1
     volumes:
       - ravendbdata1:/opt/RavenDB/Server/RavenData
@@ -74,7 +74,7 @@ services:
     env_file: ./raven-license.env
 
   ravendb2:
-    image: "ravendb/ravendb:4.1-ubuntu-latest"
+    image: "balazsarva/ravendb:4.1-ubuntu-latest"
     container_name: ravendb2
     volumes:
       - ravendbdata2:/opt/RavenDB/Server/RavenData
@@ -94,7 +94,7 @@ services:
     env_file: ./raven-license.env
 
   ravendb3:
-    image: "ravendb/ravendb:4.1-ubuntu-latest"
+    image: "balazsarva/ravendb:4.1-ubuntu-latest"
     container_name: ravendb3
     volumes:
       - ravendbdata3:/opt/RavenDB/Server/RavenData

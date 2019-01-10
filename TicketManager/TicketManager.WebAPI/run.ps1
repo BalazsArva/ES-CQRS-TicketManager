@@ -6,14 +6,26 @@ param(
     $MSSQL_DBPORT = 1433,
     $MSSQL_DBNAME = "CQRSTicketManager",
     $MSSQL_SA_PASSWORD,
+    [switch]$BuildRavenDbImage,
     [switch]$MigrateDatabase,
-    [switch]$BuildOnly,
-    [switch]$DontSetupCluster)
+    [switch]$BuildOnly)
 
 $ErrorActionPreference = 'Stop'
 
 # Delete dist folder and rebuild app
 & .\build-app.ps1 -BuildConfiguration $BuildConfiguration
+
+if ($BuildRavenDbImage) {
+    Write-Host -ForegroundColor Magenta "Building customized RavenDB image..."
+    Write-Host -ForegroundColor White
+
+    cd ..\..\Docker\RavenDb-4.1.Ubuntu.Customize
+    .\build.ps1
+    cd ..\..\TicketManager\TicketManager.WebAPI
+
+    Write-Host -ForegroundColor Magenta "Finished building customized RavenDB image."
+    Write-Host -ForegroundColor White
+}
 
 if ([string]::IsNullOrEmpty($MSSQL_SA_PASSWORD)) {
     $MSSQL_SA_PASSWORD = read-host "Password for the SA MSSQL user"

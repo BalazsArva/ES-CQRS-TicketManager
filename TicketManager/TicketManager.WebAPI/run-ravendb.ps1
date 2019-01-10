@@ -1,25 +1,11 @@
 # Based on https://github.com/ravendb/ravendb/blob/v4.0/docker/compose/linux-cluster/run.ps1
-param(
-    $CoresPerNode = 3,
-    [switch]$DontSetupCluster)
-
-if ($DontSetupCluster) {
-    exit 0
-}
+param($CoresPerNode = 3)
 
 $nodes = @(
     @{ Tag = "A"; Url = "http://ravendb1:8080" },
     @{ Tag = "B"; Url = "http://ravendb2:8080" },
     @{ Tag = "C"; Url = "http://ravendb3:8080" }
 );
-
-function EnsureCurlInstalledOnNodeA() {
-    Write-Host -ForegroundColor Yellow "Installing CURL tool on Node A for cluster setup..."
-
-    docker exec -it ravendb1 bash -c "apt-get update && apt-get install -y && apt-get install -y --no-install-recommends curl"
-
-    Write-Host
-}
 
 function AddNodeToCluster() {
     param($FirstNodeUrl, $OtherNodeUrl, $AssignedCores = 1)
@@ -60,8 +46,6 @@ $nodeAcoresReassigned = $false
 
 Write-Host
 Write-Host -ForegroundColor Magenta "Setting up RavenDb..."
-
-EnsureCurlInstalledOnNodeA
 
 foreach ($node in $nodes | Select-Object -Skip 1) {
     AddNodeToCluster -FirstNodeUrl $firstNodeIp -OtherNodeUrl $node.Url
