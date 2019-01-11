@@ -328,3 +328,10 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+#########################################################
+#                     CUSTOM VALUES                     #
+#########################################################
+Docker/dist
+Docker/raven-license.env
+Docker/Utilities/node_modules

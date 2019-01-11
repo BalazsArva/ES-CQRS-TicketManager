@@ -1,0 +1,1 @@
+docker build . -t balazsarva/ravendb:4.1-ubuntu-latest -f Dockerfile

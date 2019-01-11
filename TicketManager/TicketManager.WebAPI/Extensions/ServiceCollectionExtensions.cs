@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Raven.Client.Documents;
-using TicketManager.DataAccess.Documents;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Commands;
@@ -16,26 +14,16 @@ namespace TicketManager.WebAPI.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddRavenDb(this IServiceCollection services, IConfiguration configuration)
-        {
-            var ravenDbUrls = configuration.GetSection("DataAccess:RavenDb:Urls").Get<string[]>();
-            var ravenDbDatabase = configuration["DataAccess:RavenDb:Database"];
-
-            var store = new DocumentStore
-            {
-                Urls = ravenDbUrls,
-                Database = ravenDbDatabase
-            }.Initialize();
-
-            IndexCreator.CreateIndexes(store);
-            services.AddSingleton(store);
-
-            return services;
-        }
-
         public static IServiceCollection AddEventsContext(this IServiceCollection services, IConfiguration Configuration)
         {
-            var sqlConnectionString = Configuration["DataAccess:SQL"];
+            // TODO: Maybe should default to localhost and local settings (integrated security, etc.)
+            var dbHost = Configuration["DBHOST"] ?? "mssql";
+            var userId = Configuration["DBUSERID"] ?? "sa";
+            var password = Configuration["SA_PASSWORD"];
+            var dbPort = Configuration["DBPORT"] ?? "1433";
+            var database = Configuration["DBNAME"] ?? "CQRSTicketManager";
+
+            var sqlConnectionString = $"Data Source={dbHost},{dbPort};Initial Catalog={database};User Id={userId};Password={password}";
 
             var options = new DbContextOptionsBuilder<EventsContext>()
                 .UseSqlServer(sqlConnectionString)

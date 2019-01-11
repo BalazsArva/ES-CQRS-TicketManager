@@ -56,6 +56,11 @@ namespace TicketManager.WebAPI
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            if (bool.TryParse(Configuration["DBMIGRATE"], out var migrate) && migrate)
+            {
+                app.MigrateDatabase();
+            }
         }
     }
 }
