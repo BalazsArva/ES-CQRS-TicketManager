@@ -10,6 +10,7 @@ $nodes = @(
 function AddNodeToCluster() {
     param($FirstNodeUrl, $OtherNodeUrl, $AssignedCores = 1)
 
+    $WaitSeconds = 5
     $otherNodeUrlEncoded = $OtherNodeUrl
 
     Write-Host -ForegroundColor Yellow "Add node $otherNodeUrlEncoded to cluster"
@@ -18,10 +19,10 @@ function AddNodeToCluster() {
     $curlCmd = "curl -L -X PUT '$uri' -d ''"
     docker exec -it ravendb1 bash -c "$curlCmd"
 
-    Write-Host -ForegroundColor DarkGray "Waiting 10 seconds for cluster to stabilize..."
+    Write-Host -ForegroundColor DarkGray "Waiting $WaitSeconds seconds for cluster to stabilize..."
     Write-Host
 
-    Start-Sleep -Seconds 10
+    Start-Sleep -Seconds $WaitSeconds
 }
 
 function SetNodeCores() {
@@ -33,10 +34,10 @@ function SetNodeCores() {
     $curlCmd = "curl -L -X POST '$uri' -d ''"
     docker exec -it ravendb1 bash -c "$curlCmd"
 
-    Write-Host -ForegroundColor DarkGray "Waiting 10 seconds for cluster to stabilize..."
+    # Write-Host -ForegroundColor DarkGray "Waiting 10 seconds for cluster to stabilize..."
     Write-Host
 
-    Start-Sleep -Seconds 10
+    # Start-Sleep -Seconds 10
 }
 
 Start-Sleep -Seconds 10

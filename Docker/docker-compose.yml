@@ -11,6 +11,7 @@ volumes:
 
 networks:
   databases:
+  frontend:
 
 services:
 
@@ -21,8 +22,7 @@ services:
     image: balazsarva/cqrs-ticketmanager
     networks:
       - databases
-    ports:
-      - "3000:80"
+      - frontend
     environment:
       - MSSQL_DBHOST=mssql
       - MSSQL_DBUSERID=sa
@@ -35,6 +35,17 @@ services:
       - ravendb1
       - ravendb2
       - ravendb3
+
+  loadbalancer:
+    image: dockercloud/haproxy:1.6.7
+    ports:
+      - 3000:80
+    links:
+      - ticketmanager
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - frontend
 
   # Expose inner 1433 on 1434 so it won't collide with MS SQL if there is a non-containerized one running on the host
   # The database is created by the EF migration if performed.
