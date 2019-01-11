@@ -20,9 +20,12 @@ if ($BuildRavenDbImage) {
     Write-Host -ForegroundColor Magenta "Building customized RavenDB image..."
     Write-Host -ForegroundColor White
 
-    cd .\RavenDb-4.1.Ubuntu.Customize
+    $OriginalLocation = (Get-Location).Path
+    Set-Location -Path "$OriginalLocation\RavenDb-4.1.Ubuntu.Customize"
+    
     .\build.ps1
-    cd ..
+
+    Set-Location -Path $OriginalLocation
 
     Write-Host -ForegroundColor Magenta "Finished building customized RavenDB image."
     Write-Host -ForegroundColor White
