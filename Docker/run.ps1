@@ -58,8 +58,8 @@ function Compose() {
         $composeArgs += "up"
         $composeArgs += "--force-recreate"
         $composeArgs += "-d"
-        $composeArgs += "--scale"
-        $composeArgs += "ticketmanager=$Scale"
+        # $composeArgs += "--scale"
+        # $composeArgs += "ticketmanager=$Scale"
     
         if ($MigrateDatabase) {
             $env:MSSQL_DBMIGRATE = "true";
