@@ -1,0 +1,73 @@
+version: "3"
+
+volumes:
+  ravendbdata1:
+  ravendbconfig1:
+  mssqldata:
+
+networks:
+  databases:
+  frontend:
+
+services:
+
+  ticketmanager:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev.dockerfile
+    image: balazsarva/cqrs-ticketmanager:dev
+    ports:
+      - "3000:80"
+      - "3001:54067"
+    volumes:
+      - ../TicketManager:/app
+      - /app/bin
+      - /app/obj
+      - ~/.nuget:/root/.nuget
+      - /root/.nuget/packages/.tools
+    networks:
+      - databases
+      - frontend
+    environment:
+      - MSSQL_DBHOST=mssql
+      - MSSQL_DBUSERID=sa
+      - MSSQL_DBPORT=1433
+      - MSSQL_DBNAME=CQRSTicketManager
+      - MSSQL_DBMIGRATE=true
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:?err}
+    depends_on:
+      - mssql
+      - ravendb1
+
+  mssql:
+    image: "mcr.microsoft.com/mssql/server:2017-CU8-ubuntu"
+    container_name: mssql
+    volumes:
+      - mssqldata:/var/opt/mssql
+    networks:
+      - databases
+    ports:
+      - "1434:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${MSSQL_SA_PASSWORD:?err}
+
+  ravendb1:
+    image: "balazsarva/ravendb:4.1-ubuntu-latest"
+    container_name: ravendb1
+    volumes:
+      - ravendbdata1:/opt/RavenDB/Server/RavenData
+      - ravendbconfig1:/opt/RavenDB/config
+    networks:
+      - databases
+    ports:
+      - "8081:8080"
+      - "38881:38888"
+    environment:
+      - RAVEN_License_Eula_Accepted=true
+      - RAVEN_ARGS=--Setup.Mode=None
+      - RAVEN_Logs_Mode=Information
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
+      - RAVEN_PublicServerUrl=http://ravendb1:8080
+      - RAVEN_PublicServerUrl_Tcp=tcp://ravendb1:38888
+    env_file: ./raven-license.dev.env
