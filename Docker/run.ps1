@@ -56,10 +56,9 @@ function Compose() {
         Invoke-Expression -Command "$composeCommand $composeArgs"
     } else {
         $composeArgs += "up"
+        $composeArgs += "--build"
         $composeArgs += "--force-recreate"
         $composeArgs += "-d"
-        # $composeArgs += "--scale"
-        # $composeArgs += "ticketmanager=$Scale"
     
         if ($MigrateDatabase) {
             $env:MSSQL_DBMIGRATE = "true";
