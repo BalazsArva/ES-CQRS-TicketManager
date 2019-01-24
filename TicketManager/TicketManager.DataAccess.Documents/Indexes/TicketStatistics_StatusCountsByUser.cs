@@ -5,7 +5,7 @@ using TicketManager.DataAccess.Documents.DataModel;
 
 namespace TicketManager.DataAccess.Documents.Indexes
 {
-    public class TicketStatistics_StatusesByUser : AbstractIndexCreationTask<Ticket, TicketStatistics_StatusesByUser.IndexEntry>
+    public class TicketStatistics_StatusCountsByUser : AbstractIndexCreationTask<Ticket, TicketStatistics_StatusCountsByUser.IndexEntry>
     {
         public class IndexEntry
         {
@@ -16,7 +16,7 @@ namespace TicketManager.DataAccess.Documents.Indexes
             public int Count { get; set; }
         }
 
-        public TicketStatistics_StatusesByUser()
+        public TicketStatistics_StatusCountsByUser()
         {
             Priority = IndexPriority.High;
 
