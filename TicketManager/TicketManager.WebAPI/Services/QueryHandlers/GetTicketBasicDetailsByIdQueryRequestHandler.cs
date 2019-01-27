@@ -49,6 +49,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         Id = request.TicketId,
                         Priority = ticket.TicketPriority.Priority,
                         Status = ticket.TicketStatus.Status,
+                        StoryPoints = ticket.StoryPoints.AssignedStoryPoints,
                         Title = ticket.TicketTitle.Title,
                         Type = ticket.TicketType.Type,
                         UtcDateCreated = ticket.UtcDateCreated,
