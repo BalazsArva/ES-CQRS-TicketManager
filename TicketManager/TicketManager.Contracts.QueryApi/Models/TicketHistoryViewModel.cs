@@ -12,6 +12,8 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         public IEnumerable<ChangeViewModel<string>> AssignmentChanges { get; set; }
 
+        public IEnumerable<ChangeViewModel<int>> StoryPointChanges { get; set; }
+
         public IEnumerable<ChangeViewModel<TicketTagChangeViewModel>> TagChanges { get; set; }
 
         public IEnumerable<ChangeViewModel<TicketLinkChangeViewModel>> LinkChanges { get; set; }

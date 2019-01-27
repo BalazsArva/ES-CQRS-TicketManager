@@ -57,6 +57,10 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                         ? PopulateTicketStatusChangesAsync(result, context, ticketId, cancellationToken)
                         : Task.CompletedTask,
 
+                    (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.StoryPoints))
+                        ? PopulateTicketStoryPointChangesAsync(result, context, ticketId, cancellationToken)
+                        : Task.CompletedTask,
+
                     (requestAll || requestedHistoryTypes.Contains(TicketHistoryTypes.Priority))
                         ? PopulateTicketPriorityChangesAsync(result, context, ticketId, cancellationToken)
                         : Task.CompletedTask,
@@ -134,6 +138,25 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .ConfigureAwait(false);
 
             response.StatusChanges = result;
+        }
+
+        private async Task PopulateTicketStoryPointChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
+        {
+            var result = await context
+                .TicketStoryPointsChangedEvents
+                .AsNoTracking()
+                .OfTicket(ticketId)
+                .OrderBy(evt => evt.Id)
+                .Select(evt => new ChangeViewModel<int>
+                {
+                    ChangedBy = evt.CausedBy,
+                    ChangedTo = evt.StoryPoints,
+                    UtcDateChanged = evt.UtcDateRecorded
+                })
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            response.StoryPointChanges = result;
         }
 
         private async Task PopulateTicketTypeChangesAsync(TicketHistoryViewModel response, EventsContext context, long ticketId, CancellationToken cancellationToken)
