@@ -32,6 +32,8 @@ namespace TicketManager.DataAccess.Events
 
         public DbSet<TicketTagChangedEvent> TicketTagChangedEvents { get; set; }
 
+        public DbSet<TicketStoryPointsChangedEvent> TicketStoryPointsChangedEvents { get; set; }
+
         public DbSet<TicketUserInvolvementCancelledEvent> TicketUserInvolvementCancelledEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -62,6 +64,7 @@ namespace TicketManager.DataAccess.Events
             SetupDateIndex<TicketTitleChangedEvent>(modelBuilder);
             SetupDateIndex<TicketTypeChangedEvent>(modelBuilder);
             SetupDateIndex<TicketUserInvolvementCancelledEvent>(modelBuilder);
+            SetupDateIndex<TicketStoryPointsChangedEvent>(modelBuilder);
 
             SetupUtcDateRecordedDefault<TicketAssignedEvent>(modelBuilder);
             SetupUtcDateRecordedDefault<TicketCommentEditedEvent>(modelBuilder);
@@ -75,6 +78,7 @@ namespace TicketManager.DataAccess.Events
             SetupUtcDateRecordedDefault<TicketTitleChangedEvent>(modelBuilder);
             SetupUtcDateRecordedDefault<TicketTypeChangedEvent>(modelBuilder);
             SetupUtcDateRecordedDefault<TicketUserInvolvementCancelledEvent>(modelBuilder);
+            SetupUtcDateRecordedDefault<TicketStoryPointsChangedEvent>(modelBuilder);
         }
 
         private void SetupDateIndex<TEvent>(ModelBuilder modelBuilder)
