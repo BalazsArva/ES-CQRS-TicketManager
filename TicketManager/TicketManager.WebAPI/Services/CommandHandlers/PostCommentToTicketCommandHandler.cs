@@ -25,11 +25,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         public async Task<long> Handle(PostCommentToTicketCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
+            await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             long commentId;
             using (var context = eventsContextFactory.CreateContext())
