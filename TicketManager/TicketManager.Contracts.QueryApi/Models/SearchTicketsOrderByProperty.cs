@@ -18,6 +18,8 @@
 
         Status,
 
+        StoryPoints,
+
         Priority,
 
         Type

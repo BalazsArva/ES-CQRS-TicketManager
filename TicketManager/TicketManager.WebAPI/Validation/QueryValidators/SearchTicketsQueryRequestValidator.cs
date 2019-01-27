@@ -8,7 +8,9 @@ namespace TicketManager.WebAPI.Validation.QueryValidators
 {
     public class SearchTicketsQueryRequestValidator : ValidatorBase<SearchTicketsQueryRequest>
     {
+        // TODO: Move to ValidationConstants
         private const int MinPage = 1;
+
         private const int MinPageSize = 1;
 
         public SearchTicketsQueryRequestValidator()
@@ -45,6 +47,13 @@ namespace TicketManager.WebAPI.Validation.QueryValidators
                 .Must(BeValidCaseInsensitiveEnumString<TicketStatuses>)
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatuses>("status"))
                 .When(r => !string.IsNullOrEmpty(r.Status));
+
+            // TODO: Consider receiving the value as a string and check whether it can be converted to int. Without this, an invalid value would just be ignored as the parameter binding will silently fail.
+            RuleFor(r => r.StoryPoints)
+                .Transform(p => p.Value)
+                .GreaterThanOrEqualTo(ValidationConstants.MinStoryPoints)
+                .WithMessage(ValidationMessageProvider.CannotBeNegative("story points"))
+                .When(r => r.StoryPoints.HasValue);
 
             RuleFor(r => r.TicketType)
                 .Must(BeValidCaseInsensitiveEnumString<TicketTypes>)

@@ -7,13 +7,14 @@ namespace TicketManager.WebAPI.DTOs.Queries
 {
     public class SearchTicketsQueryRequest : IRequest<QueryResult<TicketSearchResultViewModel>>
     {
-        public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy, string lastModifiedBy, string[] involvedUsers, string[] tags, string dateCreatedFrom, string dateCreatedTo, string dateLastModifiedFrom, string dateLastModifiedTo, string status, string ticketType, string priority, string orderBy, string orderDirection)
+        public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy, string lastModifiedBy, int? storyPoints, string[] involvedUsers, string[] tags, string dateCreatedFrom, string dateCreatedTo, string dateLastModifiedFrom, string dateLastModifiedTo, string status, string ticketType, string priority, string orderBy, string orderDirection)
         {
             Page = page;
             PageSize = pageSize;
             Title = title;
             CreatedBy = createdBy;
             LastModifiedBy = lastModifiedBy;
+            StoryPoints = storyPoints;
             InvolvedUsers = involvedUsers ?? Array.Empty<string>();
             Tags = tags ?? Array.Empty<string>();
             DateCreatedFrom = dateCreatedFrom;
@@ -42,6 +43,8 @@ namespace TicketManager.WebAPI.DTOs.Queries
         public string[] Tags { get; }
 
         public string LastModifiedBy { get; }
+
+        public int? StoryPoints { get; }
 
         public string DateCreatedFrom { get; }
 
