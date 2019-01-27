@@ -18,6 +18,8 @@ namespace TicketManager.DataAccess.Documents.DataModel
 
         public TicketTitle TicketTitle { get; set; } = new TicketTitle();
 
+        public StoryPoints StoryPoints { get; set; } = new StoryPoints();
+
         public TicketDescription TicketDescription { get; set; } = new TicketDescription();
 
         public TicketStatus TicketStatus { get; set; } = new TicketStatus();

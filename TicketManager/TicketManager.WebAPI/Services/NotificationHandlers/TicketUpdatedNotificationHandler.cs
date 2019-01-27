@@ -22,8 +22,9 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             IEventAggregator<TicketPriority> priorityEventAggregator,
             IEventAggregator<Tags> tagsEventAggregator,
             IEventAggregator<Links> linksEventAggregator,
+            IEventAggregator<StoryPoints> storyPointsEventAggregator,
             IEventAggregator<TicketInvolvement> involvementEventAggregator)
-            : base(eventsContextFactory, documentStore, assignmentEventAggregator, titleEventAggregator, descriptionEventAggregator, statusEventAggregator, typeEventAggregator, priorityEventAggregator, tagsEventAggregator, linksEventAggregator, involvementEventAggregator)
+            : base(eventsContextFactory, documentStore, assignmentEventAggregator, titleEventAggregator, descriptionEventAggregator, statusEventAggregator, typeEventAggregator, priorityEventAggregator, tagsEventAggregator, linksEventAggregator, storyPointsEventAggregator, involvementEventAggregator)
         {
         }
 
@@ -31,6 +32,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         {
             using (var session = documentStore.OpenAsyncSession())
             {
+                // TODO: Implement not full reconstruction (=don't reaggreaggregate all events, but only subsequent ones). Will have to implement integrity check (=no event is lost due to concurrent updates)
                 var ticket = await ReconstructTicketAsync(notification.TicketId, cancellationToken).ConfigureAwait(false);
 
                 await session.StoreAsync(ticket, cancellationToken).ConfigureAwait(false);

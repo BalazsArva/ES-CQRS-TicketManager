@@ -48,6 +48,7 @@ namespace TicketManager.WebAPI.Extensions
                 .AddSingleton<IValidator<CancelTicketInvolvementCommand>, CancelTicketInvolvementCommandValidator>()
                 .AddSingleton<IValidator<ChangeTicketPriorityCommand>, ChangeTicketPriorityCommandValidator>()
                 .AddSingleton<IValidator<ChangeTicketStatusCommand>, ChangeTicketStatusCommandValidator>()
+                .AddSingleton<IValidator<ChangeTicketStoryPointsCommand>, ChangeTicketStoryPointsCommandValidator>()
                 .AddSingleton<IValidator<ChangeTicketTypeCommand>, ChangeTicketTypeCommandValidator>()
                 .AddSingleton<IValidator<CreateTicketCommand>, CreateTicketCommandValidator>()
                 .AddSingleton<IValidator<EditTicketCommentCommand>, EditTicketCommentCommandValidator>()
@@ -80,6 +81,7 @@ namespace TicketManager.WebAPI.Extensions
                 .AddTransient<IEventAggregator<Tags>, TicketTagsChangedEventAggregator>()
                 .AddTransient<IEventAggregator<TicketTitle>, TicketTitleChangedEventAggregator>()
                 .AddTransient<IEventAggregator<TicketType>, TicketTypeChangedEventAggregator>()
+                .AddTransient<IEventAggregator<StoryPoints>, TicketStoryPointsChangedEventAggregator>()
                 .AddTransient<IEventAggregator<TicketInvolvement>, TicketUserInvolvementEventAggregator>();
 
             return services;

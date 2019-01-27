@@ -69,6 +69,12 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     CausedBy = request.RaisedByUser,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
+                context.TicketStoryPointsChangedEvents.Add(new TicketStoryPointsChangedEvent
+                {
+                    CausedBy = request.RaisedByUser,
+                    StoryPoints = request.StoryPoints,
+                    TicketCreatedEvent = ticketCreatedEvent
+                });
 
                 foreach (var tag in request.Tags)
                 {

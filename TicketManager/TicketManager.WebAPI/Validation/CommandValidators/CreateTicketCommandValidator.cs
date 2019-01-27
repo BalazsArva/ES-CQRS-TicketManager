@@ -38,6 +38,10 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketTypes>("ticket status"));
 
+            RuleFor(cmd => cmd.StoryPoints)
+                .GreaterThanOrEqualTo(ValidationConstants.MinStoryPoints)
+                .WithMessage(ValidationMessageProvider.CannotBeNegative("story points"));
+
             // TODO: Review WithErrorCode everywhere
             RuleForEach(cmd => cmd.Tags)
                 .Must(NotBeWhitespaceOnly)
