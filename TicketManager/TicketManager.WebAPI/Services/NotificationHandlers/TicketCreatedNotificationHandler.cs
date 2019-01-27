@@ -18,12 +18,25 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             IEventAggregator<TicketTitle> titleEventAggregator,
             IEventAggregator<TicketDescription> descriptionEventAggregator,
             IEventAggregator<TicketStatus> statusEventAggregator,
+            IEventAggregator<StoryPoints> storyPointsEventAggregator,
             IEventAggregator<TicketType> typeEventAggregator,
             IEventAggregator<TicketPriority> priorityEventAggregator,
             IEventAggregator<Tags> tagsEventAggregator,
             IEventAggregator<Links> linksEventAggregator,
             IEventAggregator<TicketInvolvement> involvementEventAggregator)
-            : base(eventsContextFactory, documentStore, assignmentEventAggregator, titleEventAggregator, descriptionEventAggregator, statusEventAggregator, typeEventAggregator, priorityEventAggregator, tagsEventAggregator, linksEventAggregator, involvementEventAggregator)
+            : base(
+                  eventsContextFactory,
+                  documentStore,
+                  assignmentEventAggregator,
+                  titleEventAggregator,
+                  descriptionEventAggregator,
+                  statusEventAggregator,
+                  typeEventAggregator,
+                  priorityEventAggregator,
+                  tagsEventAggregator,
+                  linksEventAggregator,
+                  storyPointsEventAggregator,
+                  involvementEventAggregator)
         {
         }
 

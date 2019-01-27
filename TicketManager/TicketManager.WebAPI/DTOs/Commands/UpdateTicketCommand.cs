@@ -8,13 +8,14 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class UpdateTicketCommand : TicketCommandBase, ITagOperationCommand, ILinkOperationCommand
     {
         [JsonConstructor]
-        public UpdateTicketCommand(long ticketId, string raisedByUser, string title, string description, string assignedTo, TicketPriorities priority, TicketTypes ticketType, TicketStatuses ticketStatus, string[] tags, TicketLinkDTO[] links)
+        public UpdateTicketCommand(long ticketId, string raisedByUser, string title, string description, string assignedTo, int storyPoints, TicketPriorities priority, TicketTypes ticketType, TicketStatuses ticketStatus, string[] tags, TicketLinkDTO[] links)
             : base(ticketId, raisedByUser)
 
         {
             Title = title;
             Description = description;
             AssignedTo = assignedTo;
+            StoryPoints = storyPoints;
             Priority = priority;
             TicketType = ticketType;
             TicketStatus = ticketStatus;
@@ -27,6 +28,8 @@ namespace TicketManager.WebAPI.DTOs.Commands
         public string Description { get; }
 
         public string AssignedTo { get; }
+
+        public int StoryPoints { get; }
 
         public TicketPriorities Priority { get; }
 

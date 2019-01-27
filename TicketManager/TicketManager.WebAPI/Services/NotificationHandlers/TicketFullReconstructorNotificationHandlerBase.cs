@@ -24,6 +24,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         private readonly IEventAggregator<TicketPriority> priorityEventAggregator;
         private readonly IEventAggregator<Tags> tagsEventAggregator;
         private readonly IEventAggregator<Links> linksEventAggregator;
+        private readonly IEventAggregator<StoryPoints> storyPointsEventAggregator;
         private readonly IEventAggregator<TicketInvolvement> involvementEventAggregator;
 
         protected TicketFullReconstructorNotificationHandlerBase(
@@ -37,6 +38,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             IEventAggregator<TicketPriority> priorityEventAggregator,
             IEventAggregator<Tags> tagsEventAggregator,
             IEventAggregator<Links> linksEventAggregator,
+            IEventAggregator<StoryPoints> storyPointsEventAggregator,
             IEventAggregator<TicketInvolvement> involvementEventAggregator)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
@@ -49,6 +51,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
             this.priorityEventAggregator = priorityEventAggregator ?? throw new ArgumentNullException(nameof(priorityEventAggregator));
             this.tagsEventAggregator = tagsEventAggregator ?? throw new ArgumentNullException(nameof(tagsEventAggregator));
             this.linksEventAggregator = linksEventAggregator ?? throw new ArgumentNullException(nameof(linksEventAggregator));
+            this.storyPointsEventAggregator = storyPointsEventAggregator ?? throw new ArgumentNullException(nameof(storyPointsEventAggregator));
             this.involvementEventAggregator = involvementEventAggregator ?? throw new ArgumentNullException(nameof(involvementEventAggregator));
         }
 
@@ -67,8 +70,9 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                 var tags = await tagsEventAggregator.AggregateSubsequentEventsAsync(ticketId, null, cancellationToken).ConfigureAwait(false);
                 var links = await linksEventAggregator.AggregateSubsequentEventsAsync(ticketId, null, cancellationToken).ConfigureAwait(false);
                 var involvement = await involvementEventAggregator.AggregateSubsequentEventsAsync(ticketId, null, cancellationToken).ConfigureAwait(false);
+                var storyPoints = await storyPointsEventAggregator.AggregateSubsequentEventsAsync(ticketId, null, cancellationToken).ConfigureAwait(false);
 
-                var lastUpdate = GetLastUpdate(ticketCreatedEvent, ticketTitle, ticketDescription, ticketStatus, ticketAssigned, ticketType, ticketPriority, tags, links);
+                var lastUpdate = GetLastUpdate(ticketCreatedEvent, ticketTitle, ticketDescription, ticketStatus, storyPoints, ticketAssigned, ticketType, ticketPriority, tags, links);
                 return new Ticket
                 {
                     Id = documentStore.GeneratePrefixedDocumentId<Ticket>(ticketId),
@@ -83,6 +87,7 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     Tags = tags,
                     Links = links,
                     Involvement = involvement,
+                    StoryPoints = storyPoints,
                     LastUpdatedBy = lastUpdate.LastChangedBy,
                     UtcDateLastUpdated = lastUpdate.UtcDateLastUpdated
                 };

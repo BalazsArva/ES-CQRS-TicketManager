@@ -17,6 +17,8 @@ namespace TicketManager.Contracts.QueryApi.Models
 
         public string LastUpdatedBy { get; set; }
 
+        public int StoryPoints { get; set; }
+
         public DateTime UtcDateCreated { get; set; }
 
         public DateTime UtcDateLastUpdated { get; set; }

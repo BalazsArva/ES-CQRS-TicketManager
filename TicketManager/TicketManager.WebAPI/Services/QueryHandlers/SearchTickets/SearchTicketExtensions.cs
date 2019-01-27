@@ -32,6 +32,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers.SearchTickets
                 .SearchForCreatedBy(request.CreatedBy)
                 .SearchForLastUpdatedBy(request.LastModifiedBy)
                 .SearchForTitle(request.Title)
+                .SearchForStoryPoints(request.StoryPoints)
                 .SearchForAssignedTo(request.AssignedTo)
                 .SearchForDateCreatedFrom(request.DateCreatedFrom)
                 .SearchForDateCreatedTo(request.DateCreatedTo)
@@ -82,6 +83,11 @@ namespace TicketManager.WebAPI.Services.QueryHandlers.SearchTickets
                         ? query.OrderBy(t => t.TicketStatus.Status.ToString())
                         : query.OrderByDescending(t => t.TicketStatus.Status.ToString());
 
+                case SearchTicketsOrderByProperty.StoryPoints:
+                    return orderDirection == OrderDirection.Ascending
+                        ? query.OrderBy(t => t.StoryPoints.AssignedStoryPoints)
+                        : query.OrderByDescending(t => t.StoryPoints.AssignedStoryPoints);
+
                 case SearchTicketsOrderByProperty.Title:
                     return orderDirection == OrderDirection.Ascending
                         ? query.OrderBy(t => t.TicketTitle.Title)
@@ -116,6 +122,17 @@ namespace TicketManager.WebAPI.Services.QueryHandlers.SearchTickets
         public static IRavenQueryable<Ticket> SearchForCreatedBy(this IRavenQueryable<Ticket> query, string createdBy)
         {
             return query.SearchForStringFieldValue(t => t.CreatedBy, createdBy);
+        }
+
+        public static IRavenQueryable<Ticket> SearchForStoryPoints(this IRavenQueryable<Ticket> query, int? storyPoints)
+        {
+            if (storyPoints.HasValue)
+            {
+                // TODO: Add support for operators
+                return query.Where(t => t.StoryPoints.AssignedStoryPoints == storyPoints.Value);
+            }
+
+            return query;
         }
 
         public static IRavenQueryable<Ticket> SearchForLastUpdatedBy(this IRavenQueryable<Ticket> query, string lastUpdatedBy)

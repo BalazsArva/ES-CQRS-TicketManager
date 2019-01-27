@@ -11,6 +11,7 @@ namespace TicketManager.Contracts.QueryApi.Models
         public const string Title = "title";
         public const string Description = "description";
         public const string Status = "status";
+        public const string StoryPoints = "storypoints";
         public const string Type = "type";
         public const string Priority = "priority";
         public const string Assignment = "assignment";
@@ -22,6 +23,7 @@ namespace TicketManager.Contracts.QueryApi.Models
             Title,
             Description,
             Status,
+            StoryPoints,
             Type,
             Priority,
             Assignment,

@@ -39,6 +39,10 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketStatuses>("ticket status"));
 
+            RuleFor(cmd => cmd.StoryPoints)
+                .GreaterThanOrEqualTo(ValidationConstants.MinStoryPoints)
+                .WithMessage(ValidationMessageProvider.CannotBeNegative("story points"));
+
             RuleForEach(cmd => cmd.Links)
                 .Must((command, link) => link.TargetTicketId != command.TicketId)
                 .WithMessage("A ticket cannot be linked to itself.");

@@ -26,7 +26,8 @@ namespace TicketManager.WebAPI.Services.EventAggregators
             LastKnownTagChangeId = NonexistentEventId,
             LastKnownTitleChangeId = NonexistentEventId,
             LastKnownTypeChangeId = NonexistentEventId,
-            LastKnownCancelInvolvementId = NonexistentEventId
+            LastKnownCancelInvolvementId = NonexistentEventId,
+            LastKnownStoryPointsChangeId = NonexistentEventId
         };
 
         private readonly IEventsContextFactory eventsContextFactory;
@@ -55,6 +56,7 @@ namespace TicketManager.WebAPI.Services.EventAggregators
                 var tagChangeEvents = await context.TicketTagChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTagChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
                 var titleChangeEvents = await context.TicketTitleChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTitleChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
                 var typeChangeEvents = await context.TicketTypeChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownTypeChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
+                var storyPointsChangeEvents = await context.TicketStoryPointsChangedEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownStoryPointsChangeId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
                 var ticketUserInvolvementCancelledEvents = await context.TicketUserInvolvementCancelledEvents.OfTicket(ticketCreatedEventId).After(involvement.LastKnownCancelInvolvementId).NotLaterThan(eventTimeUpperLimit).ToOrderedEventListAsync(cancellationToken).ConfigureAwait(false);
 
                 // TODO: Consider comment events
@@ -66,6 +68,7 @@ namespace TicketManager.WebAPI.Services.EventAggregators
                     .Concat(tagChangeEvents.AsEventBase())
                     .Concat(titleChangeEvents.AsEventBase())
                     .Concat(typeChangeEvents.AsEventBase())
+                    .Concat(storyPointsChangeEvents.AsEventBase())
                     .Select(evt => new
                     {
                         User = evt.CausedBy,
@@ -119,7 +122,8 @@ namespace TicketManager.WebAPI.Services.EventAggregators
                     LastKnownStatusChangeId = statusChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownStatusChangeId,
                     LastKnownTagChangeId = tagChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownTagChangeId,
                     LastKnownTitleChangeId = titleChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownTitleChangeId,
-                    LastKnownTypeChangeId = typeChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownTypeChangeId
+                    LastKnownTypeChangeId = typeChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownTypeChangeId,
+                    LastKnownStoryPointsChangeId = storyPointsChangeEvents.LastOrDefault()?.Id ?? involvement.LastKnownStoryPointsChangeId
                 };
             }
         }

@@ -28,8 +28,8 @@ namespace TicketManager.WebAPI.Controllers
             const string user4 = "User 4";
             const string user5 = "User 5";
 
-            var id = await mediator.Send(new CreateTicketCommand(user1, null, "Test ticket", "Test ticket description", new[] { "Infrastructure" }, null, TicketPriorities.Lowest, TicketTypes.Task, TicketStatuses.NotStarted));
-            var id2 = await mediator.Send(new CreateTicketCommand(user2, null, "Other test ticket", "Other test ticket description", null, null, TicketPriorities.Medium, TicketTypes.Bug, TicketStatuses.NotStarted));
+            var id = await mediator.Send(new CreateTicketCommand(user1, null, "Test ticket", "Test ticket description", new[] { "Infrastructure" }, 5, null, TicketPriorities.Lowest, TicketTypes.Task, TicketStatuses.NotStarted));
+            var id2 = await mediator.Send(new CreateTicketCommand(user2, null, "Other test ticket", "Other test ticket description", null, 2, null, TicketPriorities.Medium, TicketTypes.Bug, TicketStatuses.NotStarted));
 
             await mediator.Send(new AssignTicketCommand(id, user1, user2));
             await mediator.Send(new AssignTicketCommand(id, user1, user3));
@@ -45,6 +45,9 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(new AddTicketTagsCommand(id, user1, new[] { "PoC", "Backend" }));
             await mediator.Send(new RemoveTicketTagsCommand(id, user1, new[] { "Dev" }));
             await mediator.Send(new AddTicketTagsCommand(id, user1, new[] { "QA" }));
+            await mediator.Send(new ChangeTicketStoryPointsCommand(id, user2, 10));
+            await mediator.Send(new ChangeTicketStoryPointsCommand(id, user2, 3));
+            await mediator.Send(new ChangeTicketStoryPointsCommand(id2, user1, 4));
 
             var commentId1 = await mediator.Send(new PostCommentToTicketCommand(id, user1, $"This is a test comment posted to Ticket #{id} by {user1} at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}"));
             var commentId2 = await mediator.Send(new PostCommentToTicketCommand(id2, user2, $"This is a test comment posted to Ticket #{id2} by {user2} at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}"));

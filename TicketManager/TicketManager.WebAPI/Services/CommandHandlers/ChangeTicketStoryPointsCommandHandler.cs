@@ -10,28 +10,28 @@ using TicketManager.WebAPI.DTOs.Notifications;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
-    public class AssignTicketCommandHandler : IRequestHandler<AssignTicketCommand>
+    public class ChangeTicketStoryPointsCommandHandler : IRequestHandler<ChangeTicketStoryPointsCommand>
     {
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
-        private readonly IValidator<AssignTicketCommand> validator;
+        private readonly IValidator<ChangeTicketStoryPointsCommand> validator;
 
-        public AssignTicketCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<AssignTicketCommand> validator)
+        public ChangeTicketStoryPointsCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<ChangeTicketStoryPointsCommand> validator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public async Task<Unit> Handle(AssignTicketCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ChangeTicketStoryPointsCommand request, CancellationToken cancellationToken)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             using (var context = eventsContextFactory.CreateContext())
             {
-                context.TicketAssignedEvents.Add(new TicketAssignedEvent
+                context.TicketStoryPointsChangedEvents.Add(new TicketStoryPointsChangedEvent
                 {
-                    AssignedTo = request.AssignTo,
+                    StoryPoints = request.StoryPoints,
                     CausedBy = request.RaisedByUser,
                     TicketCreatedEventId = request.TicketId
                 });
@@ -39,7 +39,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await mediator.Publish(new TicketAssignedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
+            await mediator.Publish(new TicketStoryPointsChangedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
 
             return Unit.Value;
         }

@@ -37,5 +37,7 @@ namespace TicketManager.WebAPI.Validation
         public static string MustBeAtLeast(string propertyDisplayName, int minValue) => $"The {propertyDisplayName} must be at least {minValue}.";
 
         public static string MustBeValidIsoDateString(string propertyDisplayName) => $"The {propertyDisplayName} must be a valid ISO date and time.";
+
+        public static string CannotBeNegative(string propertyDisplayName) => $"The {propertyDisplayName} cannot be negative.";
     }
 }
