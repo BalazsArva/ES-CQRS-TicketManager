@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using TicketManager.WebAPI.Extensions;
+using TicketManager.WebAPI.Filters;
 
 namespace TicketManager.WebAPI
 {
@@ -18,7 +19,6 @@ namespace TicketManager.WebAPI
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRavenDb(Configuration);
@@ -29,7 +29,12 @@ namespace TicketManager.WebAPI
             services.AddApplicationUtilities();
             services.AddMediatR(typeof(Startup).Assembly);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services
+                .AddMvc(opts =>
+                {
+                    opts.Filters.Add<ValidationExceptionFilterAttribute>();
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSwaggerGen(c =>
             {
@@ -37,7 +42,6 @@ namespace TicketManager.WebAPI
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
