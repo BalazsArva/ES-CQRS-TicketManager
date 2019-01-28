@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,15 +74,19 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
         private string GetCombinedETag(IAsyncDocumentSession session, Ticket ticket, IEnumerable<TicketLinkViewModel> links)
         {
+            var linkStrings = links
+                .OrderBy(link => link.SourceTicketId)
+                .ThenBy(link => link.TargetTicketId)
+                .ThenBy(link => link.LinkType)
+                .Select(link => $"{link.SourceTicketId}-[{link.LinkType}]->{link.TargetTicketId}");
+
             // Since incoming links affect the current state of a ticket, we must consier the links as well when generating the eTag.
             var ticketETag = ETagProvider.CreateETagFromChangeVector(session.Advanced.GetChangeVectorFor(ticket));
-            var incomingLinksETag = string.Join(
-                ",",
-                links.OrderBy(link => link.SourceTicketId).ThenBy(link => link.TargetTicketId).ThenBy(link => link.LinkType).Select(link => $"{link.SourceTicketId}-[{link.LinkType}]->{link.TargetTicketId}"));
+            var incomingLinksETag = string.Join(",", linkStrings);
 
             var combinedETag = $"{ticketETag}.{incomingLinksETag}";
 
-            using (var sha = System.Security.Cryptography.SHA256.Create())
+            using (var sha = SHA256.Create())
             {
                 var hashBytes = sha.ComputeHash(Encoding.Default.GetBytes(combinedETag));
 
