@@ -16,10 +16,12 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
     public class GetTicketBasicDetailsByIdQueryRequestHandler : IRequestHandler<GetTicketBasicDetailsByIdQueryRequest, QueryResult<TicketBasicDetailsViewModel>>
     {
         private readonly IDocumentStore documentStore;
+        private readonly IETagProvider etagProvider;
 
-        public GetTicketBasicDetailsByIdQueryRequestHandler(IDocumentStore documentStore)
+        public GetTicketBasicDetailsByIdQueryRequestHandler(IDocumentStore documentStore, IETagProvider etagProvider)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+            this.etagProvider = etagProvider ?? throw new ArgumentNullException(nameof(etagProvider));
         }
 
         public async Task<QueryResult<TicketBasicDetailsViewModel>> Handle(GetTicketBasicDetailsByIdQueryRequest request, CancellationToken cancellationToken)
@@ -34,7 +36,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     return QueryResult<TicketBasicDetailsViewModel>.NotFound;
                 }
 
-                var etag = ETagProvider.CreateETagFromChangeVector(session.Advanced.GetChangeVectorFor(ticket));
+                var etag = etagProvider.CreateCombinedETagFromDocumentETags(session.Advanced.GetChangeVectorFor(ticket));
 
                 if (request.ETags.Contains(etag))
                 {

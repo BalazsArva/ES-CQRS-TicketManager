@@ -1,26 +1,30 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace TicketManager.DataAccess.Documents.Utilities
 {
-    public static class ETagProvider
+    public class ETagProvider : IETagProvider
     {
-        public static string CreateETagFromChangeVector(string changeVector)
+        public string CreateCombinedETagFromDocumentETags(params string[] eTags)
         {
-            if (changeVector == null)
+            if (eTags == null)
             {
-                throw new ArgumentNullException(nameof(changeVector));
+                throw new ArgumentNullException(nameof(eTags));
             }
 
-            if (changeVector == string.Empty)
+            if (eTags.Length == 0)
             {
-                throw new ArgumentException($"The parameter {nameof(changeVector)} cannot be an empty string.", nameof(changeVector));
+                throw new ArgumentException("At least 1 e-tag must be provided.", nameof(eTags));
             }
 
-            // Change vectors in RavenDb are similar to A:1234...
-            // The only purpose of this method is to hide the underlying technical stuff and expose
-            // etags in a more convenient base64-format.
-            return Convert.ToBase64String(Encoding.Default.GetBytes(changeVector));
+            var joinedEtags = string.Join(".", eTags);
+            using (var sha = SHA256.Create())
+            {
+                var hashBytes = sha.ComputeHash(Encoding.Default.GetBytes(joinedEtags));
+
+                return Convert.ToBase64String(hashBytes);
+            }
         }
     }
 }

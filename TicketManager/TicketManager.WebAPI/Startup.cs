@@ -26,6 +26,7 @@ namespace TicketManager.WebAPI
 
             services.AddValidators();
             services.AddEventAggregators();
+            services.AddApplicationUtilities();
             services.AddMediatR(typeof(Startup).Assembly);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -21,10 +19,12 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
     public class GetTicketExtendedDetailsByIdQueryRequestHandler : IRequestHandler<GetTicketExtendedDetailsByIdQueryRequest, QueryResult<TicketExtendedDetailsViewModel>>
     {
         private readonly IDocumentStore documentStore;
+        private readonly IETagProvider etagProvider;
 
-        public GetTicketExtendedDetailsByIdQueryRequestHandler(IDocumentStore documentStore)
+        public GetTicketExtendedDetailsByIdQueryRequestHandler(IDocumentStore documentStore, IETagProvider etagProvider)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+            this.etagProvider = etagProvider ?? throw new ArgumentNullException(nameof(etagProvider));
         }
 
         public async Task<QueryResult<TicketExtendedDetailsViewModel>> Handle(GetTicketExtendedDetailsByIdQueryRequest request, CancellationToken cancellationToken)
@@ -81,17 +81,10 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .Select(link => $"{link.SourceTicketId}-[{link.LinkType}]->{link.TargetTicketId}");
 
             // Since incoming links affect the current state of a ticket, we must consier the links as well when generating the eTag.
-            var ticketETag = ETagProvider.CreateETagFromChangeVector(session.Advanced.GetChangeVectorFor(ticket));
+            var ticketETag = session.Advanced.GetChangeVectorFor(ticket);
             var incomingLinksETag = string.Join(",", linkStrings);
 
-            var combinedETag = $"{ticketETag}.{incomingLinksETag}";
-
-            using (var sha = SHA256.Create())
-            {
-                var hashBytes = sha.ComputeHash(Encoding.Default.GetBytes(combinedETag));
-
-                return Convert.ToBase64String(hashBytes);
-            }
+            return etagProvider.CreateCombinedETagFromDocumentETags(ticketETag, incomingLinksETag);
         }
 
         private async Task<List<TicketLinkViewModel>> GetLinksLazilyAsync(IAsyncDocumentSession session, string ticketDocumentId, CancellationToken cancellationToken)

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TicketManager.DataAccess.Documents.DataModel;
+using TicketManager.DataAccess.Documents.Utilities;
 using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Queries;
@@ -85,6 +86,11 @@ namespace TicketManager.WebAPI.Extensions
                 .AddTransient<IEventAggregator<TicketInvolvement>, TicketUserInvolvementEventAggregator>();
 
             return services;
+        }
+
+        public static IServiceCollection AddApplicationUtilities(this IServiceCollection services)
+        {
+            return services.AddSingleton<IETagProvider, ETagProvider>();
         }
     }
 }

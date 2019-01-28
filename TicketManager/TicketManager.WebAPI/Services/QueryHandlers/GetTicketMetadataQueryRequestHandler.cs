@@ -14,10 +14,12 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
     public class GetTicketMetadataQueryRequestHandler : IRequestHandler<GetTicketMetadataQueryRequest, GetTicketMetadataQueryResult>
     {
         private readonly IDocumentStore documentStore;
+        private readonly IETagProvider etagProvider;
 
-        public GetTicketMetadataQueryRequestHandler(IDocumentStore documentStore)
+        public GetTicketMetadataQueryRequestHandler(IDocumentStore documentStore, IETagProvider etagProvider)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+            this.etagProvider = etagProvider ?? throw new ArgumentNullException(nameof(etagProvider));
         }
 
         public async Task<GetTicketMetadataQueryResult> Handle(GetTicketMetadataQueryRequest request, CancellationToken cancellationToken)
@@ -33,8 +35,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     return GetTicketMetadataQueryResult.NotFound;
                 }
 
-                var changeVector = session.Advanced.GetChangeVectorFor(ticketDocument);
-                var etag = ETagProvider.CreateETagFromChangeVector(changeVector);
+                var etag = etagProvider.CreateCombinedETagFromDocumentETags(session.Advanced.GetChangeVectorFor(ticketDocument));
 
                 return new GetTicketMetadataQueryResult(Existences.Found, etag);
             }
