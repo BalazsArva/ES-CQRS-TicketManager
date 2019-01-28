@@ -305,7 +305,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "347a12c8-6a8e-42a3-955b-3cf99d8604a2",
+						"id": "f7418b93-e4ba-4bd0-a3b5-dcb651dc7152",
 						"type": "text/javascript",
 						"exec": [
 							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
@@ -322,7 +322,7 @@
 							"    return array[index];",
 							"}",
 							"",
-							"pm.globals.set(\"creator\", getRandomArrayItem(users));",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
 							"pm.globals.set(\"assignTo\", getRandomArrayItem(usersAndNull));",
 							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));"
 						]
@@ -339,7 +339,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"raisedByUser\": \"{{creator}}\",\r\n    \"assignTo\": \"{{assignTo}}\"\r\n}"
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"assignTo\": \"{{assignTo}}\"\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:54067/api/ticketcommands/{{ticketId}}/assignment",
@@ -353,6 +353,65 @@
 						"ticketcommands",
 						"{{ticketId}}",
 						"assignment"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Change ticket story points",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d5a3d3ff-5a3c-495c-8fdd-4ce2805a2b05",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"",
+							"var users = ['Amelia', 'Margaret', 'Emma', 'Mary', 'Olivia', 'Samantha', 'Olivia', 'Patricia', 'Isla', 'Bethany', 'Sophia', 'Jennifer', 'Emily', 'Elizabeth', 'Isabella', 'Elizabeth', 'Poppy', 'Joanne', 'Ava', 'Linda', 'Ava', 'Megan', 'Mia', 'Barbara', 'Isabella', 'Victoria', 'Emily', 'Susan', 'Jessica', 'Lauren', 'Abigail', 'Margaret', 'Lily', 'Michelle', 'Madison', 'Jessica', 'Sophie', 'Tracy', 'Charlotte', 'Sarah', 'Oliver', 'Jake', 'Noah', 'James', 'Jack', 'Connor', 'Liam', 'John', 'Harry', 'Callum', 'Mason', 'Robert', 'Jacob', 'Jacob', 'Jacob', 'Michael', 'Charlie', 'Kyle', 'William', 'William', 'Thomas', 'Joe', 'Ethan', 'David', 'George', 'Reece', 'Michael', 'Richard', 'Oscar', 'Rhys', 'Alexander', 'Joseph', 'James', 'Charlie', 'James', 'Charles', 'William', 'Damian', 'Daniel', 'Thomas'];",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"storyPoints\", Math.round(Math.random() * 10));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"storyPoints\": {{storyPoints}}\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:54067/api/ticketcommands/{{ticketId}}/storyPoints",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "54067",
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"storyPoints"
 					]
 				},
 				"description": ""

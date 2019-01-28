@@ -158,5 +158,18 @@ namespace TicketManager.WebAPI.Controllers
 
             return Accepted();
         }
+
+        [HttpPatch]
+        [Route("{id:int}/storyPoints")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketStoryPoints([FromRoute]long id, [FromBody]ChangeTicketStoryPointsCommandModel commandModel)
+        {
+            var command = new ChangeTicketStoryPointsCommand(id, commandModel.RaisedByUser, commandModel.StoryPoints);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
     }
 }
