@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TicketManager.Common.Http;
+using TicketManager.Contracts.CommandApi;
 using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
@@ -143,6 +144,19 @@ namespace TicketManager.WebAPI.Controllers
             }
 
             return CreatedAtRoute(RouteNames.Tickets_Queries_Get_ById_Extended, new { id }, ticket);
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/assignment")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> AssignTicket([FromRoute]long id, [FromBody]AssignTicketCommandModel commandModel)
+        {
+            var command = new AssignTicketCommand(id, commandModel.RaisedByUser, commandModel.RaisedByUser);
+
+            await mediator.Send(command);
+
+            return Accepted();
         }
     }
 }
