@@ -2,9 +2,9 @@
 using Raven.Client.Documents.Indexes;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
+namespace TicketManager.DataAccess.Documents.Indexes.Statistics
 {
-    public class TicketStatistics_InvolvementCounts : AbstractIndexCreationTask<Ticket, TicketStatistics_InvolvementCounts.IndexEntry>
+    public class TicketStatistics_InvolvementCountByUser : AbstractIndexCreationTask<Ticket, TicketStatistics_InvolvementCountByUser.IndexEntry>
     {
         public class IndexEntry
         {
@@ -13,7 +13,7 @@ namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
             public int Count { get; set; }
         }
 
-        public TicketStatistics_InvolvementCounts()
+        public TicketStatistics_InvolvementCountByUser()
         {
             Priority = IndexPriority.High;
 

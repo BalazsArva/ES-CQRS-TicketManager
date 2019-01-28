@@ -2,7 +2,7 @@
 using Raven.Client.Documents.Indexes;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
+namespace TicketManager.DataAccess.Documents.Indexes.Statistics
 {
     public class TicketStatistics_StoryPointsByTag : AbstractIndexCreationTask<Ticket, TicketStatistics_StoryPointsByTag.IndexEntry>
     {
