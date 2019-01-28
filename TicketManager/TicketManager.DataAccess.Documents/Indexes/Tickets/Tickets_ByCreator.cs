@@ -2,7 +2,7 @@
 using Raven.Client.Documents.Indexes;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes
+namespace TicketManager.DataAccess.Documents.Indexes.Tickets
 {
     public class Tickets_ByCreator : AbstractIndexCreationTask<Ticket>
     {
@@ -15,11 +15,12 @@ namespace TicketManager.DataAccess.Documents.Indexes
         {
             Priority = IndexPriority.Low;
 
-            Map = tickets => from t in tickets
-                             select new IndexEntry
-                             {
-                                 CreatedBy = t.CreatedBy
-                             };
+            Map = tickets =>
+                from t in tickets
+                select new IndexEntry
+                {
+                    CreatedBy = t.CreatedBy
+                };
         }
     }
 }

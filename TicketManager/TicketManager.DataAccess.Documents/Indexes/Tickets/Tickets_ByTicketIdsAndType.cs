@@ -3,7 +3,7 @@ using Raven.Client.Documents.Indexes;
 using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes
+namespace TicketManager.DataAccess.Documents.Indexes.Tickets
 {
     public class Tickets_ByTicketIdsAndType : AbstractIndexCreationTask<Ticket, Tickets_ByTicketIdsAndType.IndexEntry>
     {
@@ -24,17 +24,18 @@ namespace TicketManager.DataAccess.Documents.Indexes
         {
             Priority = IndexPriority.High;
 
-            Map = tickets => from t in tickets
-                             from link in t.Links.LinkSet
-                             let targetTicket = LoadDocument<Ticket>(link.TargetTicketId)
-                             select new IndexEntry
-                             {
-                                 SourceTicketId = t.Id,
-                                 LinkType = link.LinkType,
-                                 TargetTicketId = link.TargetTicketId,
-                                 SourceTicketTitle = t.TicketTitle.Title,
-                                 TargetTicketTitle = targetTicket.TicketTitle.Title
-                             };
+            Map = tickets =>
+                from t in tickets
+                from link in t.Links.LinkSet
+                let targetTicket = LoadDocument<Ticket>(link.TargetTicketId)
+                select new IndexEntry
+                {
+                    LinkType = link.LinkType,
+                    SourceTicketId = t.Id,
+                    SourceTicketTitle = t.TicketTitle.Title,
+                    TargetTicketId = link.TargetTicketId,
+                    TargetTicketTitle = targetTicket.TicketTitle.Title
+                };
 
             StoreAllFields(FieldStorage.Yes);
         }

@@ -3,18 +3,18 @@ using Raven.Client.Documents.Indexes;
 using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes
+namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
 {
-    public class TicketStatistics_StoryPointsByType : AbstractIndexCreationTask<Ticket, TicketStatistics_StoryPointsByType.IndexEntry>
+    public class TicketStatistics_PriorityCounts : AbstractIndexCreationTask<Ticket, TicketStatistics_PriorityCounts.IndexEntry>
     {
         public class IndexEntry
         {
-            public TicketTypes Type { get; set; }
+            public TicketPriorities Priority { get; set; }
 
-            public int StoryPoints { get; set; }
+            public int Count { get; set; }
         }
 
-        public TicketStatistics_StoryPointsByType()
+        public TicketStatistics_PriorityCounts()
         {
             Priority = IndexPriority.High;
 
@@ -23,17 +23,17 @@ namespace TicketManager.DataAccess.Documents.Indexes
                 from t in tickets
                 select new IndexEntry
                 {
-                    Type = t.TicketType.Type,
-                    StoryPoints = t.StoryPoints.AssignedStoryPoints
+                    Priority = t.TicketPriority.Priority,
+                    Count = 1
                 };
 
             Reduce = results =>
                 from result in results
-                group result by result.Type into g
+                group result by result.Priority into g
                 select new IndexEntry
                 {
-                    Type = g.Key,
-                    StoryPoints = g.Sum(x => x.StoryPoints)
+                    Priority = g.Key,
+                    Count = g.Sum(x => x.Count)
                 };
 
             StoreAllFields(FieldStorage.Yes);

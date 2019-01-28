@@ -10,7 +10,7 @@ using Raven.Client.Documents.Session;
 using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
-using TicketManager.DataAccess.Documents.Indexes;
+using TicketManager.DataAccess.Documents.Indexes.Tickets;
 using TicketManager.DataAccess.Documents.Utilities;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.DTOs.Queries.Abstractions;

@@ -3,7 +3,7 @@ using Raven.Client.Documents.Indexes;
 using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes
+namespace TicketManager.DataAccess.Documents.Indexes.Tickets
 {
     public class Tickets_ByStatus : AbstractIndexCreationTask<Ticket>
     {
@@ -16,11 +16,12 @@ namespace TicketManager.DataAccess.Documents.Indexes
         {
             Priority = IndexPriority.High;
 
-            Map = tickets => from t in tickets
-                             select new IndexEntry
-                             {
-                                 Status = t.TicketStatus.Status
-                             };
+            Map = tickets => 
+                from t in tickets
+                select new IndexEntry
+                {
+                    Status = t.TicketStatus.Status
+                };
         }
     }
 }
