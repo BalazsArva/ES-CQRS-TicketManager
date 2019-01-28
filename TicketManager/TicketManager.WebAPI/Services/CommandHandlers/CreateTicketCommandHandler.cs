@@ -7,17 +7,20 @@ using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
+using TicketManager.WebAPI.Services.Providers;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
     public class CreateTicketCommandHandler : IRequestHandler<CreateTicketCommand, long>
     {
+        private readonly ICorrelationIdProvider correlationIdProvider;
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<CreateTicketCommand> validator;
 
-        public CreateTicketCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<CreateTicketCommand> validator)
+        public CreateTicketCommandHandler(ICorrelationIdProvider correlationIdProvider, IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<CreateTicketCommand> validator)
         {
+            this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));

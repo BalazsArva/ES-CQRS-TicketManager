@@ -8,6 +8,7 @@ using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.Services.EventAggregators;
+using TicketManager.WebAPI.Services.Providers;
 using TicketManager.WebAPI.Validation.CommandValidators;
 using TicketManager.WebAPI.Validation.QueryValidators;
 
@@ -88,9 +89,12 @@ namespace TicketManager.WebAPI.Extensions
             return services;
         }
 
-        public static IServiceCollection AddApplicationUtilities(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            return services.AddSingleton<IETagProvider, ETagProvider>();
+            return services
+                .AddHttpContextAccessor()
+                .AddSingleton<IETagProvider, ETagProvider>()
+                .AddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
         }
     }
 }

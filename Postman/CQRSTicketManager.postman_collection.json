@@ -40,12 +40,10 @@
 						"header": [],
 						"body": {},
 						"url": {
-							"raw": "http://localhost:54067/api/ticketqueries?orderBy=Id&pageSize=1000",
-							"protocol": "http",
+							"raw": "{{apiBaseUrl}}/api/ticketqueries?orderBy=Id&pageSize=1000",
 							"host": [
-								"localhost"
+								"{{apiBaseUrl}}"
 							],
-							"port": "54067",
 							"path": [
 								"api",
 								"ticketqueries"
