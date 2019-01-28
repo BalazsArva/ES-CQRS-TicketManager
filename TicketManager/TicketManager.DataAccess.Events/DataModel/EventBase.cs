@@ -13,5 +13,11 @@ namespace TicketManager.DataAccess.Events.DataModel
 
         [Required, MaxLength(256)]
         public string CausedBy { get; set; }
+
+        [Required, MaxLength(256)]
+        public string CorrelationId { get; set; }
+
+        [MaxLength(1024)]
+        public string Reason { get; set; }
     }
 }

@@ -31,49 +31,58 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             long ticketId;
+            var correlationId = correlationIdProvider.GetCorrelationId();
+
             using (var context = eventsContextFactory.CreateContext())
             {
-                var ticketCreatedEvent = new TicketCreatedEvent { CausedBy = request.RaisedByUser };
+                var ticketCreatedEvent = new TicketCreatedEvent { CausedBy = request.RaisedByUser, CorrelationId = correlationId, };
 
                 context.TicketCreatedEvents.Add(ticketCreatedEvent);
                 context.TicketTitleChangedEvents.Add(new TicketTitleChangedEvent
                 {
+                    CorrelationId = correlationId,
                     CausedBy = request.RaisedByUser,
                     TicketCreatedEvent = ticketCreatedEvent,
                     Title = request.Title
                 });
                 context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
+                    CorrelationId = correlationId,
                     CausedBy = request.RaisedByUser,
                     Description = request.Description,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketPriorityChangedEvents.Add(new TicketPriorityChangedEvent
                 {
+                    CorrelationId = correlationId,
                     CausedBy = request.RaisedByUser,
                     Priority = request.Priority,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketTypeChangedEvents.Add(new TicketTypeChangedEvent
                 {
+                    CorrelationId = correlationId,
                     CausedBy = request.RaisedByUser,
                     TicketType = request.TicketType,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
                 {
+                    CorrelationId = correlationId,
                     TicketCreatedEvent = ticketCreatedEvent,
                     CausedBy = request.RaisedByUser,
                     TicketStatus = request.TicketStatus
                 });
                 context.TicketAssignedEvents.Add(new TicketAssignedEvent
                 {
+                    CorrelationId = correlationId,
                     AssignedTo = request.AssignTo,
                     CausedBy = request.RaisedByUser,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketStoryPointsChangedEvents.Add(new TicketStoryPointsChangedEvent
                 {
+                    CorrelationId = correlationId,
                     CausedBy = request.RaisedByUser,
                     StoryPoints = request.StoryPoints,
                     TicketCreatedEvent = ticketCreatedEvent
@@ -83,6 +92,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     context.TicketTagChangedEvents.Add(new TicketTagChangedEvent
                     {
+                        CorrelationId = correlationId,
                         CausedBy = request.RaisedByUser,
                         Tag = tag,
                         TagAdded = true,
@@ -94,6 +104,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     context.TicketLinkChangedEvents.Add(new TicketLinkChangedEvent
                     {
+                        CorrelationId = correlationId,
                         CausedBy = request.RaisedByUser,
                         LinkType = link.LinkType,
                         ConnectionIsActive = true,
@@ -106,6 +117,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     {
                         context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
                         {
+                            CorrelationId = correlationId,
                             CausedBy = request.RaisedByUser,
                             TicketCreatedEvent = ticketCreatedEvent,
                             TicketStatus = Contracts.Common.TicketStatuses.Blocked

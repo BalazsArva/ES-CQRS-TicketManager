@@ -7,6 +7,7 @@ using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Notifications;
+using TicketManager.WebAPI.Services.Providers;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
@@ -15,12 +16,14 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<EditTicketDescriptionCommand> validator;
+        private readonly ICorrelationIdProvider correlationIdProvider;
 
-        public EditTicketDescriptionCommandHandler(IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<EditTicketDescriptionCommand> validator)
+        public EditTicketDescriptionCommandHandler(ICorrelationIdProvider correlationIdProvider, IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<EditTicketDescriptionCommand> validator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
+            this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
         }
 
         public async Task<Unit> Handle(EditTicketDescriptionCommand request, CancellationToken cancellationToken)
@@ -31,6 +34,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             {
                 context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
+                    CorrelationId = correlationIdProvider.GetCorrelationId(),
                     CausedBy = request.RaisedByUser,
                     Description = request.Description,
                     TicketCreatedEventId = request.TicketId
