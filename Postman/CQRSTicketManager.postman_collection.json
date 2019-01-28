@@ -176,6 +176,34 @@
 						"description": "Get title placeholder sentences from BaconIpsum"
 					},
 					"response": []
+				},
+				{
+					"name": "Configure environment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8c0106c7-fd88-4956-92a5-964c9ab7c40f",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"apiBaseUrl\", \"http://localhost:54067\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{apiBaseUrl}}",
+							"host": [
+								"{{apiBaseUrl}}"
+							]
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -284,12 +312,10 @@
 					"raw": "{\r\n    \"raisedByUser\": \"{{creator}}\",\r\n    \"assignTo\": \"{{assignTo}}\",\r\n    \"title\": \"{{title}}\",\r\n    \"description\": \"{{description}}\",\r\n    \"tags\": {{tags}},\r\n    \"storyPoints\": {{storyPoints}},\r\n    \"priority\": \"{{priority}}\",\r\n    \"ticketType\": \"{{ticketType}}\",\r\n    \"ticketStatus\": \"{{status}}\",\r\n    \"links\": {{links}}\r\n}"
 				},
 				"url": {
-					"raw": "http://localhost:54067/api/ticketcommands",
-					"protocol": "http",
+					"raw": "{{apiBaseUrl}}/api/ticketcommands",
 					"host": [
-						"localhost"
+						"{{apiBaseUrl}}"
 					],
-					"port": "54067",
 					"path": [
 						"api",
 						"ticketcommands"
@@ -342,12 +368,10 @@
 					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"assignTo\": \"{{assignTo}}\"\r\n}"
 				},
 				"url": {
-					"raw": "http://localhost:54067/api/ticketcommands/{{ticketId}}/assignment",
-					"protocol": "http",
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/assignment",
 					"host": [
-						"localhost"
+						"{{apiBaseUrl}}"
 					],
-					"port": "54067",
 					"path": [
 						"api",
 						"ticketcommands",
@@ -401,12 +425,10 @@
 					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"storyPoints\": {{storyPoints}}\r\n}"
 				},
 				"url": {
-					"raw": "http://localhost:54067/api/ticketcommands/{{ticketId}}/storyPoints",
-					"protocol": "http",
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/storyPoints",
 					"host": [
-						"localhost"
+						"{{apiBaseUrl}}"
 					],
-					"port": "54067",
 					"path": [
 						"api",
 						"ticketcommands",
