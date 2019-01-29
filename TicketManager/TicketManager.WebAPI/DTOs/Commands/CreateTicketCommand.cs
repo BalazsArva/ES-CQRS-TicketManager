@@ -8,7 +8,7 @@ namespace TicketManager.WebAPI.DTOs.Commands
     public class CreateTicketCommand : CommandBase<long>, ITagOperationCommand
     {
         [JsonConstructor]
-        public CreateTicketCommand(string raisedByUser, string assignTo, string title, string description, string[] tags, int storyPoints, TicketLinkDTO[] links, TicketPriorities priority, TicketTypes ticketType, TicketStatuses ticketStatus)
+        public CreateTicketCommand(string raisedByUser, string assignTo, string title, string description, string[] tags, int storyPoints, TicketLinkDTO[] links, TicketPriorities priority, TicketTypes type, TicketStatuses status)
             : base(raisedByUser)
         {
             AssignTo = assignTo;
@@ -18,8 +18,8 @@ namespace TicketManager.WebAPI.DTOs.Commands
             StoryPoints = storyPoints;
             Links = links ?? Array.Empty<TicketLinkDTO>();
             Priority = priority;
-            TicketType = ticketType;
-            TicketStatus = ticketStatus;
+            Type = type;
+            Status = status;
         }
 
         public string AssignTo { get; }
@@ -36,8 +36,8 @@ namespace TicketManager.WebAPI.DTOs.Commands
 
         public TicketPriorities Priority { get; }
 
-        public TicketTypes TicketType { get; }
+        public TicketTypes Type { get; }
 
-        public TicketStatuses TicketStatus { get; }
+        public TicketStatuses Status { get; }
     }
 }

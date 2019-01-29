@@ -234,7 +234,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "aea39e38-3331-4a1d-af8d-195fa360273a",
+						"id": "9355bb10-556f-4cee-aa20-2ab74519de1d",
 						"type": "text/javascript",
 						"exec": [
 							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
@@ -302,7 +302,7 @@
 							"",
 							"pm.globals.set(\"status\", getRandomArrayItem(statuses));",
 							"pm.globals.set(\"priority\", getRandomArrayItem(priorities));",
-							"pm.globals.set(\"ticketType\", getRandomArrayItem(ticketTypes));",
+							"pm.globals.set(\"type\", getRandomArrayItem(ticketTypes));",
 							"",
 							"pm.globals.set(\"links\", JSON.stringify(getRandomTicketLinks()));",
 							"pm.globals.set(\"tags\", JSON.stringify(getRandomTags()));",
@@ -324,7 +324,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"raisedByUser\": \"{{creator}}\",\r\n    \"assignTo\": \"{{assignTo}}\",\r\n    \"title\": \"{{title}}\",\r\n    \"description\": \"{{description}}\",\r\n    \"tags\": {{tags}},\r\n    \"storyPoints\": {{storyPoints}},\r\n    \"priority\": \"{{priority}}\",\r\n    \"ticketType\": \"{{ticketType}}\",\r\n    \"ticketStatus\": \"{{status}}\",\r\n    \"links\": {{links}}\r\n}"
+					"raw": "{\r\n    \"raisedByUser\": \"{{creator}}\",\r\n    \"assignTo\": \"{{assignTo}}\",\r\n    \"title\": \"{{title}}\",\r\n    \"description\": \"{{description}}\",\r\n    \"tags\": {{tags}},\r\n    \"storyPoints\": {{storyPoints}},\r\n    \"priority\": \"{{priority}}\",\r\n    \"type\": \"{{type}}\",\r\n    \"status\": \"{{status}}\",\r\n    \"links\": {{links}}\r\n}"
 				},
 				"url": {
 					"raw": "{{apiBaseUrl}}/api/ticketcommands",

@@ -63,7 +63,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 {
                     CorrelationId = correlationId,
                     CausedBy = request.RaisedByUser,
-                    TicketType = request.TicketType,
+                    TicketType = request.Type,
                     TicketCreatedEvent = ticketCreatedEvent
                 });
                 context.TicketStatusChangedEvents.Add(new TicketStatusChangedEvent
@@ -71,7 +71,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     CorrelationId = correlationId,
                     TicketCreatedEvent = ticketCreatedEvent,
                     CausedBy = request.RaisedByUser,
-                    TicketStatus = request.TicketStatus
+                    TicketStatus = request.Status
                 });
                 context.TicketAssignedEvents.Add(new TicketAssignedEvent
                 {

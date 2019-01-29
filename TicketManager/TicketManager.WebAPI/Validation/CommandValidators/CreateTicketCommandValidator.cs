@@ -36,11 +36,11 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketPriorities>("priority"));
 
-            RuleFor(cmd => cmd.TicketType)
+            RuleFor(cmd => cmd.Type)
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketTypes>("ticket type"));
 
-            RuleFor(cmd => cmd.TicketStatus)
+            RuleFor(cmd => cmd.Status)
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketTypes>("ticket status"));
 
