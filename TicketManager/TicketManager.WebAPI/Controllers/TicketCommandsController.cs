@@ -254,9 +254,22 @@ namespace TicketManager.WebAPI.Controllers
         [Route("{id:int}/tags")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> AddTags([FromRoute]long id, AddTicketTagsCommandModel commandModel)
+        public async Task<IActionResult> AddTags([FromRoute]long id, TicketTagsCommandModel commandModel)
         {
             var command = new AddTicketTagsCommand(id, commandModel.RaisedByUser, commandModel.Tags);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpDelete]
+        [Route("{id:int}/tags")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> RemoveTags([FromRoute]long id, TicketTagsCommandModel commandModel)
+        {
+            var command = new RemoveTicketTagsCommand(id, commandModel.RaisedByUser, commandModel.Tags);
 
             await mediator.Send(command);
 

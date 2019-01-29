@@ -445,6 +445,89 @@
 			"response": []
 		},
 		{
+			"name": "DELETE Remove ticket tags",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f593be9f-b05b-4a01-91ed-31365e23fccd",
+						"type": "text/javascript",
+						"exec": [
+							"var tickets = pm.globals.get(\"tickets\");",
+							"var users = pm.globals.get(\"users\");",
+							"var tagGroups = pm.globals.get(\"tagGroups\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"var ticketId = null;",
+							"var tags = null;",
+							"",
+							"while (tags == null || ticketId == null) {",
+							"    var affectedTicket = getRandomArrayItem(tickets);",
+							"",
+							"    if (!affectedTicket.tags.length) {",
+							"        continue;",
+							"    }",
+							"",
+							"    var resultSet = {};",
+							"    var count = 1 + Math.round(Math.random() * 3);",
+							"",
+							"    for (var i = 0; i < count; ++i) {",
+							"        var tagToRemove = getRandomArrayItem(affectedTicket.tags);",
+							"",
+							"        resultSet[tagToRemove] = true;",
+							"    }",
+							"",
+							"    ticketId = affectedTicket.id;",
+							"    tags = Object.keys(resultSet);",
+							"}",
+							"",
+							"pm.globals.set(\"ticketId\", ticketId);",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"tags\", JSON.stringify(tags));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"tags\": {{tags}}\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/tags",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "PATCH Assign ticket",
 			"event": [
 				{
