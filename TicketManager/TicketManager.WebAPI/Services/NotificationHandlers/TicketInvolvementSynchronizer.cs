@@ -6,12 +6,13 @@ using Raven.Client.Documents;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
+using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.DTOs.Notifications.Abstractions;
 using TicketManager.WebAPI.Services.EventAggregators;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {
-    public class TicketInvolvementSynchronizer : INotificationHandler<ITicketNotification>
+    public class TicketInvolvementSynchronizer : INotificationHandler<ITicketNotification>, INotificationHandler<TicketUserInvolvementCancelledNotification>
     {
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<TicketInvolvement> eventAggregator;
@@ -20,6 +21,11 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
+        }
+
+        public Task Handle(TicketUserInvolvementCancelledNotification notification, CancellationToken cancellationToken)
+        {
+            return Handle((ITicketNotification)notification, cancellationToken);
         }
 
         public async Task Handle(ITicketNotification notification, CancellationToken cancellationToken)
