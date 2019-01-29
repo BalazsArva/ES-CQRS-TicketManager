@@ -459,12 +459,12 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "08c11743-286b-4cdb-8262-00ac3f0a4ddb",
+						"id": "404422c2-94a2-40c9-88ac-14f330cf1308",
 						"type": "text/javascript",
 						"exec": [
 							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
-							"var titles = pm.globals.get(\"titles\");",
 							"var users = pm.globals.get(\"users\");",
+							"var titles = pm.globals.get(\"titles\");",
 							"",
 							"function getRandomArrayItem(array) {",
 							"    if (!array || !array.length) {",
@@ -504,6 +504,63 @@
 						"ticketcommands",
 						"{{ticketId}}",
 						"title"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Change ticket type",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fbcff090-dd75-4cc4-843c-30de5facab36",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var ticketTypes = pm.globals.get(\"ticketTypes\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"ticketType\", getRandomArrayItem(ticketTypes));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"ticketType\": \"{{ticketType}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/type",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"type"
 					]
 				},
 				"description": ""

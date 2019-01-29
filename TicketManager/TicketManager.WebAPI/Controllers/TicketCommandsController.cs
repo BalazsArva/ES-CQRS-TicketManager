@@ -173,10 +173,10 @@ namespace TicketManager.WebAPI.Controllers
         }
 
         [HttpPatch]
-        [Route("{id:int}/title")]
+        [Route("{id:int}/type")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> ChangeTicketTitle([FromRoute]long id, [FromBody]ChangeTicketTypeCommandModel commandModel)
+        public async Task<IActionResult> ChangeTicketType([FromRoute]long id, [FromBody]ChangeTicketTypeCommandModel commandModel)
         {
             var command = new ChangeTicketTypeCommand(id, commandModel.RaisedByUser, commandModel.TicketType);
 
