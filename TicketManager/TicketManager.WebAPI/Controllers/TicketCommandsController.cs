@@ -249,5 +249,18 @@ namespace TicketManager.WebAPI.Controllers
 
             return Accepted();
         }
+
+        [HttpPost]
+        [Route("{id:int}/tags")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> AddTags([FromRoute]long id, AddTicketTagsCommandModel commandModel)
+        {
+            var command = new AddTicketTagsCommand(id, commandModel.RaisedByUser, commandModel.Tags);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
     }
 }

@@ -1,14 +1,13 @@
 {
 	"info": {
 		"name": "CQRSTicketManager",
-		"_postman_id": "de9a47cb-3662-0a0b-36e9-09261462d2ab",
+		"_postman_id": "3c696db2-6605-0b09-1cd3-c7a8e1e5e984",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Environment",
-			"description": "",
 			"item": [
 				{
 					"name": "GET PopulateExistingTicketIds",
@@ -40,7 +39,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{apiBaseUrl}}/api/ticketqueries?orderBy=Id&pageSize=1000",
 							"host": [
@@ -62,8 +64,7 @@
 									"equals": true
 								}
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				},
@@ -92,7 +93,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "https://baconipsum.com/api/?type=meat-and-filler&paras=100",
 							"protocol": "https",
@@ -148,7 +152,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "https://baconipsum.com/api/?type=meat-and-filler&sentences=100",
 							"protocol": "https",
@@ -217,14 +224,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{apiBaseUrl}}",
 							"host": [
 								"{{apiBaseUrl}}"
 							]
-						},
-						"description": ""
+						}
 					},
 					"response": []
 				}
@@ -341,8 +350,97 @@
 						"api",
 						"ticketcommands"
 					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Add ticket tags",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b9b6753b-3aa7-4250-ad7b-7fb2f90c1f66",
+						"type": "text/javascript",
+						"exec": [
+							"var tickets = pm.globals.get(\"tickets\");",
+							"var users = pm.globals.get(\"users\");",
+							"var tagGroups = pm.globals.get(\"tagGroups\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"var ticketId = null;",
+							"var tags = null;",
+							"",
+							"while (tags == null || ticketId == null) {",
+							"    var affectedTicket = getRandomArrayItem(tickets);",
+							"",
+							"    // Determine the original tag group so only relevant tags will be added",
+							"    // This might result in empty if new tags/tag groups are added later on",
+							"    var tagGroup = tagGroups.filter(grp => affectedTicket.tags.every(assignedTag => grp.indexOf(assignedTag) != -1))[0];",
+							"    if (!tagGroup) {",
+							"        continue;",
+							"    }",
+							"",
+							"    var notYetAssignedTagsFromGroup = tagGroup.filter(tag => affectedTicket.tags.indexOf(tag) == -1);",
+							"",
+							"    if (notYetAssignedTagsFromGroup.length) {",
+							"        var resultSet = {};",
+							"        var count = 1 + Math.round(Math.random() * 3);",
+							"",
+							"        for (var i = 0; i < count; ++i) {",
+							"            var tagToAssign = getRandomArrayItem(notYetAssignedTagsFromGroup);",
+							"",
+							"            resultSet[tagToAssign] = true;",
+							"        }",
+							"",
+							"        ticketId = affectedTicket.id;",
+							"        tags = Object.keys(resultSet);",
+							"    }",
+							"}",
+							"",
+							"pm.globals.set(\"ticketId\", ticketId);",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"tags\", JSON.stringify(tags));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"tags\": {{tags}}\r\n}"
 				},
-				"description": ""
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/tags",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"tags"
+					]
+				}
 			},
 			"response": []
 		},
@@ -402,8 +500,7 @@
 						"{{ticketId}}",
 						"assignment"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -462,8 +559,7 @@
 						"{{ticketId}}",
 						"storyPoints"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -523,8 +619,7 @@
 						"{{ticketId}}",
 						"title"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -584,8 +679,7 @@
 						"{{ticketId}}",
 						"description"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -645,8 +739,7 @@
 						"{{ticketId}}",
 						"type"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -706,8 +799,7 @@
 						"{{ticketId}}",
 						"priority"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -767,8 +859,7 @@
 						"{{ticketId}}",
 						"status"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -816,7 +907,10 @@
 						"value": "{{$guid}}"
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/involvement/{{raisedByUser}}",
 					"host": [
@@ -829,8 +923,7 @@
 						"involvement",
 						"{{raisedByUser}}"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		}
