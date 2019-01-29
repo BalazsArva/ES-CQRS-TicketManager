@@ -320,6 +320,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -375,6 +379,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -431,6 +439,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -488,6 +500,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -545,6 +561,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -602,6 +622,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -659,6 +683,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -716,6 +744,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
