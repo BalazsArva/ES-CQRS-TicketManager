@@ -3,10 +3,10 @@ using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Commands
 {
-    public class EditTicketTitleCommand : TicketCommandBase
+    public class ChangeTicketTitleCommand : TicketCommandBase
     {
         [JsonConstructor]
-        public EditTicketTitleCommand(long ticketId, string raisedByUser, string title)
+        public ChangeTicketTitleCommand(long ticketId, string raisedByUser, string title)
             : base(ticketId, raisedByUser)
         {
             Title = title;
