@@ -16,7 +16,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ae460bab-72fa-4f72-a324-1698b7233613",
+								"id": "32a69242-2dc0-4d9f-8896-b2748dcba871",
 								"type": "text/javascript",
 								"exec": [
 									"pm.environment.unset(\"ticketIds\");",
@@ -26,8 +26,10 @@
 									"} else if (pm.response.code == 200) {",
 									"    var responseJson = pm.response.json();",
 									"    var ids = responseJson.pagedResults.map((item) => item.id);",
+									"    var tickets = responseJson.pagedResults;",
 									"",
 									"    pm.globals.set(\"ticketIds\", ids);",
+									"    pm.globals.set(\"tickets\", tickets);",
 									"}",
 									"",
 									""
@@ -764,6 +766,68 @@
 						"ticketcommands",
 						"{{ticketId}}",
 						"status"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Cancel ticket user involvement",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "425517d0-e364-4455-a5f0-ad06a5c5c7e3",
+						"type": "text/javascript",
+						"exec": [
+							"var tickets = pm.globals.get(\"tickets\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"var user = null;",
+							"var ticketId = null;",
+							"",
+							"while (user == null || ticketId == null) {",
+							"    var affectedTicket = getRandomArrayItem(tickets);",
+							"",
+							"    ticketId = affectedTicket.id;",
+							"    user = getRandomArrayItem(affectedTicket.involvedUsers);",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", user);",
+							"pm.globals.set(\"ticketId\", ticketId);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Correlation-Id",
+						"value": "{{$guid}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/involvement/{{raisedByUser}}",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"involvement",
+						"{{raisedByUser}}"
 					]
 				},
 				"description": ""

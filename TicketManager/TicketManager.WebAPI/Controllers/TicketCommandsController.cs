@@ -236,5 +236,18 @@ namespace TicketManager.WebAPI.Controllers
 
             return Accepted();
         }
+
+        [HttpDelete]
+        [Route("{id:int}/involvement/{user}")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> CancelTicketUserInvolvement([FromRoute]long id, string user)
+        {
+            var command = new CancelTicketInvolvementCommand(id, user, user);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
     }
 }
