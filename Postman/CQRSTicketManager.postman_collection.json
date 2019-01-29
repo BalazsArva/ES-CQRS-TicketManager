@@ -511,6 +511,63 @@
 			"response": []
 		},
 		{
+			"name": "PATCH Change ticket description",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "61bab3e0-9252-444d-a3c6-dbfa257202cc",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var descriptions = pm.globals.get(\"descriptions\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"description\", getRandomArrayItem(descriptions));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"description\": \"{{description}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/description",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"description"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "PATCH Change ticket type",
 			"event": [
 				{

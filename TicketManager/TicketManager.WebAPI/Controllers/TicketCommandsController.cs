@@ -44,7 +44,7 @@ namespace TicketManager.WebAPI.Controllers
             await mediator.Send(new CancelTicketInvolvementCommand(id, user5, user5));
 
             await mediator.Send(new ChangeTicketTitleCommand(id, user1, "Test ticket - edited"));
-            await mediator.Send(new EditTicketDescriptionCommand(id, user1, "Test ticket description - edited"));
+            await mediator.Send(new ChangeTicketDescriptionCommand(id, user1, "Test ticket description - edited"));
             await mediator.Send(new ChangeTicketStatusCommand(id, user1, TicketStatuses.InProgress));
             await mediator.Send(new AddTicketTagsCommand(id, user1, new[] { "Dev" }));
             await mediator.Send(new AddTicketTagsCommand(id, user1, new[] { "PoC", "Backend" }));
@@ -218,6 +218,19 @@ namespace TicketManager.WebAPI.Controllers
         public async Task<IActionResult> ChangeTicketTitle([FromRoute]long id, [FromBody]ChangeTicketTitleCommandModel commandModel)
         {
             var command = new ChangeTicketTitleCommand(id, commandModel.RaisedByUser, commandModel.Title);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/description")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketDescription([FromRoute]long id, [FromBody]ChangeTicketDescriptionCommandModel commandModel)
+        {
+            var command = new ChangeTicketDescriptionCommand(id, commandModel.RaisedByUser, commandModel.Description);
 
             await mediator.Send(command);
 

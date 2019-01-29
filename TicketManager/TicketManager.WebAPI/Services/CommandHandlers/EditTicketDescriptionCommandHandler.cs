@@ -11,14 +11,14 @@ using TicketManager.WebAPI.Services.Providers;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
-    public class EditTicketDescriptionCommandHandler : IRequestHandler<EditTicketDescriptionCommand>
+    public class EditTicketDescriptionCommandHandler : IRequestHandler<ChangeTicketDescriptionCommand>
     {
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
-        private readonly IValidator<EditTicketDescriptionCommand> validator;
+        private readonly IValidator<ChangeTicketDescriptionCommand> validator;
         private readonly ICorrelationIdProvider correlationIdProvider;
 
-        public EditTicketDescriptionCommandHandler(ICorrelationIdProvider correlationIdProvider, IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<EditTicketDescriptionCommand> validator)
+        public EditTicketDescriptionCommandHandler(ICorrelationIdProvider correlationIdProvider, IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<ChangeTicketDescriptionCommand> validator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
@@ -26,7 +26,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
         }
 
-        public async Task<Unit> Handle(EditTicketDescriptionCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ChangeTicketDescriptionCommand request, CancellationToken cancellationToken)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
