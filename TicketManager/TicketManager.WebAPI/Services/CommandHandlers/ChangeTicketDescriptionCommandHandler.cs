@@ -11,14 +11,14 @@ using TicketManager.WebAPI.Services.Providers;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
 {
-    public class EditTicketTitleCommandHandler : IRequestHandler<ChangeTicketTitleCommand>
+    public class ChangeTicketDescriptionCommandHandler : IRequestHandler<ChangeTicketDescriptionCommand>
     {
         private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
-        private readonly IValidator<ChangeTicketTitleCommand> validator;
+        private readonly IValidator<ChangeTicketDescriptionCommand> validator;
         private readonly ICorrelationIdProvider correlationIdProvider;
 
-        public EditTicketTitleCommandHandler(ICorrelationIdProvider correlationIdProvider, IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<ChangeTicketTitleCommand> validator)
+        public ChangeTicketDescriptionCommandHandler(ICorrelationIdProvider correlationIdProvider, IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<ChangeTicketDescriptionCommand> validator)
         {
             this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
@@ -26,24 +26,24 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
         }
 
-        public async Task<Unit> Handle(ChangeTicketTitleCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ChangeTicketDescriptionCommand request, CancellationToken cancellationToken)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             using (var context = eventsContextFactory.CreateContext())
             {
-                context.TicketTitleChangedEvents.Add(new TicketTitleChangedEvent
+                context.TicketDescriptionChangedEvents.Add(new TicketDescriptionChangedEvent
                 {
                     CorrelationId = correlationIdProvider.GetCorrelationId(),
                     CausedBy = request.RaisedByUser,
-                    TicketCreatedEventId = request.TicketId,
-                    Title = request.Title
+                    Description = request.Description,
+                    TicketCreatedEventId = request.TicketId
                 });
 
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await mediator.Publish(new TicketTitleChangedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
+            await mediator.Publish(new TicketDescriptionChangedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
 
             return Unit.Value;
         }
