@@ -186,6 +186,19 @@ namespace TicketManager.WebAPI.Controllers
         }
 
         [HttpPatch]
+        [Route("{id:int}/priority")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketPriority([FromRoute]long id, [FromBody]ChangeTicketPriorityCommandModel commandModel)
+        {
+            var command = new ChangeTicketPriorityCommand(id, commandModel.RaisedByUser, commandModel.Priority);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
         [Route("{id:int}/title")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesDefaultResponseType]

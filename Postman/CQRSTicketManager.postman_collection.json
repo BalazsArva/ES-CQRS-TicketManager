@@ -566,6 +566,63 @@
 				"description": ""
 			},
 			"response": []
+		},
+		{
+			"name": "PATCH Change ticket priority",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42e7a175-def7-4345-bd49-85e0616aa8cb",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var priorities = pm.globals.get(\"priorities\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"priority\", getRandomArrayItem(priorities));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"priority\": \"{{priority}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/priority",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"priority"
+					]
+				},
+				"description": ""
+			},
+			"response": []
 		}
 	]
 }
