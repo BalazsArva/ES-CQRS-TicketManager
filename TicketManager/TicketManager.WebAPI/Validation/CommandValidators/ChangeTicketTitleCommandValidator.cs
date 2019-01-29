@@ -5,9 +5,9 @@ using TicketManager.WebAPI.Validation.CommandValidators.Abstractions;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators
 {
-    public class EditTicketTitleCommandValidator : TicketCommandValidatorBase<EditTicketTitleCommand>
+    public class ChangeTicketTitleCommandValidator : TicketCommandValidatorBase<ChangeTicketTitleCommand>
     {
-        public EditTicketTitleCommandValidator(IEventsContextFactory eventsContextFactory)
+        public ChangeTicketTitleCommandValidator(IEventsContextFactory eventsContextFactory)
             : base(eventsContextFactory)
         {
             RuleFor(cmd => cmd.Title)

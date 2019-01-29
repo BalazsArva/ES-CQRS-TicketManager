@@ -3,18 +3,18 @@ using Raven.Client.Documents.Indexes;
 using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
+namespace TicketManager.DataAccess.Documents.Indexes.Statistics
 {
-    public class TicketStatistics_TypeCounts : AbstractIndexCreationTask<Ticket, TicketStatistics_TypeCounts.IndexEntry>
+    public class TicketStatistics_CountByStatus : AbstractIndexCreationTask<Ticket, TicketStatistics_CountByStatus.IndexEntry>
     {
         public class IndexEntry
         {
-            public TicketTypes Type { get; set; }
+            public TicketStatuses Status { get; set; }
 
             public int Count { get; set; }
         }
 
-        public TicketStatistics_TypeCounts()
+        public TicketStatistics_CountByStatus()
         {
             Priority = IndexPriority.High;
 
@@ -23,16 +23,16 @@ namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
                 from t in tickets
                 select new IndexEntry
                 {
-                    Type = t.TicketType.Type,
+                    Status = t.TicketStatus.Status,
                     Count = 1
                 };
 
             Reduce = results => 
                 from result in results
-                group result by result.Type into g
+                group result by result.Status into g
                 select new IndexEntry
                 {
-                    Type = g.Key,
+                    Status = g.Key,
                     Count = g.Sum(x => x.Count)
                 };
 

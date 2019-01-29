@@ -3,9 +3,9 @@ using Raven.Client.Documents.Indexes;
 using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
+namespace TicketManager.DataAccess.Documents.Indexes.Statistics
 {
-    public class TicketStatistics_StatusCountsByUser : AbstractIndexCreationTask<Ticket, TicketStatistics_StatusCountsByUser.IndexEntry>
+    public class TicketStatistics_StoryPointsByStatusAndAssignee : AbstractIndexCreationTask<Ticket, TicketStatistics_StoryPointsByStatusAndAssignee.IndexEntry>
     {
         public class IndexEntry
         {
@@ -13,31 +13,31 @@ namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
 
             public TicketStatuses Status { get; set; }
 
-            public int Count { get; set; }
+            public int StoryPoints { get; set; }
         }
 
-        public TicketStatistics_StatusCountsByUser()
+        public TicketStatistics_StoryPointsByStatusAndAssignee()
         {
             Priority = IndexPriority.High;
 
             // TODO: Add sprint/iteration support and create index by its value
-            Map = tickets => 
+            Map = tickets =>
                 from t in tickets
                 select new IndexEntry
                 {
                     User = t.Assignment.AssignedTo,
                     Status = t.TicketStatus.Status,
-                    Count = 1
+                    StoryPoints = 1
                 };
 
-            Reduce = results => 
+            Reduce = results =>
                 from result in results
                 group result by new { result.User, result.Status } into g
                 select new IndexEntry
                 {
                     User = g.Key.User,
                     Status = g.Key.Status,
-                    Count = g.Sum(x => x.Count)
+                    StoryPoints = g.Sum(x => x.StoryPoints)
                 };
 
             StoreAllFields(FieldStorage.Yes);

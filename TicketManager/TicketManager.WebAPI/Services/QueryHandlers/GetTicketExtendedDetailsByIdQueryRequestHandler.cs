@@ -89,7 +89,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
         private async Task<List<TicketLinkViewModel>> GetLinksLazilyAsync(IAsyncDocumentSession session, string ticketDocumentId, CancellationToken cancellationToken)
         {
-            var incomingLinks = await session
+            var links = await session
                 .Query<Tickets_ByTicketIdsAndType.IndexEntry, Tickets_ByTicketIdsAndType>()
                 .Where(indexEntry => indexEntry.TargetTicketId == ticketDocumentId || indexEntry.SourceTicketId == ticketDocumentId)
                 .ProjectInto<Tickets_ByTicketIdsAndType.IndexEntry>()
@@ -97,7 +97,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .Value
                 .ConfigureAwait(false);
 
-            return incomingLinks
+            return links
                 .Select(link => new TicketLinkViewModel
                 {
                     LinkType = link.LinkType,

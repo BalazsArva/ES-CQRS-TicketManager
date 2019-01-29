@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TicketManager.Common.Http;
+using TicketManager.Contracts.CommandApi;
 using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
+using TicketManager.WebAPI.DTOs.Queries;
 
 namespace TicketManager.WebAPI.Controllers
 {
@@ -38,8 +43,8 @@ namespace TicketManager.WebAPI.Controllers
 
             await mediator.Send(new CancelTicketInvolvementCommand(id, user5, user5));
 
-            await mediator.Send(new EditTicketTitleCommand(id, user1, "Test ticket - edited"));
-            await mediator.Send(new EditTicketDescriptionCommand(id, user1, "Test ticket description - edited"));
+            await mediator.Send(new ChangeTicketTitleCommand(id, user1, "Test ticket - edited"));
+            await mediator.Send(new ChangeTicketDescriptionCommand(id, user1, "Test ticket description - edited"));
             await mediator.Send(new ChangeTicketStatusCommand(id, user1, TicketStatuses.InProgress));
             await mediator.Send(new AddTicketTagsCommand(id, user1, new[] { "Dev" }));
             await mediator.Send(new AddTicketTagsCommand(id, user1, new[] { "PoC", "Backend" }));
@@ -117,6 +122,119 @@ namespace TicketManager.WebAPI.Controllers
                     }));
 
             return Ok();
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> CreateTicket([FromBody]CreateTicketCommand command)
+        {
+            var id = await mediator.Send(command);
+
+            // TODO: The links are loaded from index (both incoming and outgoing) so the links in the returned object might be stale. Do something about it. E.g. at the time of creation,
+            // there almost certainly won't be anything referencing the just-created ticket so could write a separate handler which loads only the outgoing links stored in the doc itself
+            // instead of outgoing+incoming in the index. Consider how that would affect ETags both in that implementation and in the GetTicketExtendedDetailsByIdQueryRequest.
+            var queryResult = await mediator.Send(new GetTicketExtendedDetailsByIdQueryRequest(id, Enumerable.Empty<string>()));
+
+            // TODO: Refactor this
+            var ticket = queryResult.Result;
+            if (!string.IsNullOrWhiteSpace(queryResult.ETag))
+            {
+                Response.Headers[StandardResponseHeaders.ETag] = queryResult.ETag;
+            }
+
+            return CreatedAtRoute(RouteNames.Tickets_Queries_Get_ById_Extended, new { id }, ticket);
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/assignment")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> AssignTicket([FromRoute]long id, [FromBody]AssignTicketCommandModel commandModel)
+        {
+            var command = new AssignTicketCommand(id, commandModel.RaisedByUser, commandModel.RaisedByUser);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/storyPoints")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketStoryPoints([FromRoute]long id, [FromBody]ChangeTicketStoryPointsCommandModel commandModel)
+        {
+            var command = new ChangeTicketStoryPointsCommand(id, commandModel.RaisedByUser, commandModel.StoryPoints);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/type")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketType([FromRoute]long id, [FromBody]ChangeTicketTypeCommandModel commandModel)
+        {
+            var command = new ChangeTicketTypeCommand(id, commandModel.RaisedByUser, commandModel.TicketType);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/priority")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketPriority([FromRoute]long id, [FromBody]ChangeTicketPriorityCommandModel commandModel)
+        {
+            var command = new ChangeTicketPriorityCommand(id, commandModel.RaisedByUser, commandModel.Priority);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/status")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketStatus([FromRoute]long id, [FromBody]ChangeTicketStatusCommandModel commandModel)
+        {
+            var command = new ChangeTicketStatusCommand(id, commandModel.RaisedByUser, commandModel.Status);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/title")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketTitle([FromRoute]long id, [FromBody]ChangeTicketTitleCommandModel commandModel)
+        {
+            var command = new ChangeTicketTitleCommand(id, commandModel.RaisedByUser, commandModel.Title);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}/description")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketDescription([FromRoute]long id, [FromBody]ChangeTicketDescriptionCommandModel commandModel)
+        {
+            var command = new ChangeTicketDescriptionCommand(id, commandModel.RaisedByUser, commandModel.Description);
+
+            await mediator.Send(command);
+
+            return Accepted();
         }
     }
 }

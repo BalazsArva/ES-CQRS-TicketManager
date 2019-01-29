@@ -3,9 +3,9 @@ using Raven.Client.Documents.Indexes;
 using TicketManager.Contracts.Common;
 using TicketManager.DataAccess.Documents.DataModel;
 
-namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
+namespace TicketManager.DataAccess.Documents.Indexes.Statistics
 {
-    public class TicketStatistics_ActiveIssuesByAssignee : AbstractIndexCreationTask<Ticket, TicketStatistics_ActiveIssuesByAssignee.IndexEntry>
+    public class TicketStatistics_ActiveIssueCountByAssignee : AbstractIndexCreationTask<Ticket, TicketStatistics_ActiveIssueCountByAssignee.IndexEntry>
     {
         public class IndexEntry
         {
@@ -14,7 +14,7 @@ namespace TicketManager.DataAccess.Documents.Indexes.TicketStatistics
             public int Count { get; set; }
         }
 
-        public TicketStatistics_ActiveIssuesByAssignee()
+        public TicketStatistics_ActiveIssueCountByAssignee()
         {
             Priority = IndexPriority.High;
 

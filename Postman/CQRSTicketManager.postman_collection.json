@@ -1,0 +1,742 @@
+{
+	"info": {
+		"name": "CQRSTicketManager",
+		"_postman_id": "de9a47cb-3662-0a0b-36e9-09261462d2ab",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Environment",
+			"description": "",
+			"item": [
+				{
+					"name": "GET PopulateExistingTicketIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ae460bab-72fa-4f72-a324-1698b7233613",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.unset(\"ticketIds\");",
+									"",
+									"if (pm.response.code == 404) {",
+									"    pm.globals.set(\"ticketIds\", []);",
+									"} else if (pm.response.code == 200) {",
+									"    var responseJson = pm.response.json();",
+									"    var ids = responseJson.pagedResults.map((item) => item.id);",
+									"",
+									"    pm.globals.set(\"ticketIds\", ids);",
+									"}",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{apiBaseUrl}}/api/ticketqueries?orderBy=Id&pageSize=1000",
+							"host": [
+								"{{apiBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"ticketqueries"
+							],
+							"query": [
+								{
+									"key": "orderBy",
+									"value": "Id",
+									"equals": true
+								},
+								{
+									"key": "pageSize",
+									"value": "1000",
+									"equals": true
+								}
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET BaconIpsum descriptions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e5f2f4ac-d051-4b94-b3ce-e149927ece5a",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.unset(\"descriptions\");",
+									"",
+									"if (pm.response.code == 200) {",
+									"    var paragraphs = pm.response.json();",
+									"",
+									"    pm.globals.set(\"descriptions\", paragraphs);",
+									"}",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "https://baconipsum.com/api/?type=meat-and-filler&paras=100",
+							"protocol": "https",
+							"host": [
+								"baconipsum",
+								"com"
+							],
+							"path": [
+								"api",
+								""
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "meat-and-filler",
+									"equals": true
+								},
+								{
+									"key": "paras",
+									"value": "100",
+									"equals": true
+								}
+							]
+						},
+						"description": "Get BaconIpsum texts for descriptions."
+					},
+					"response": []
+				},
+				{
+					"name": "GET BaconIpsum titles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c1727c4f-2f9e-48bc-8c9c-df6c1054c731",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.unset(\"titles\");",
+									"",
+									"if (pm.response.code == 200) {",
+									"    var response = pm.response.json();",
+									"    var text = response[0];",
+									"    var sentences = text.split('.').map(item => item.trim());",
+									"",
+									"    pm.globals.set(\"titles\", sentences);",
+									"}",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "https://baconipsum.com/api/?type=meat-and-filler&sentences=100",
+							"protocol": "https",
+							"host": [
+								"baconipsum",
+								"com"
+							],
+							"path": [
+								"api",
+								""
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "meat-and-filler",
+									"equals": true
+								},
+								{
+									"key": "sentences",
+									"value": "100",
+									"equals": true
+								}
+							]
+						},
+						"description": "Get title placeholder sentences from BaconIpsum"
+					},
+					"response": []
+				},
+				{
+					"name": "Configure environment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f253e893-6075-4f70-ae5d-668087cea8ea",
+								"type": "text/javascript",
+								"exec": [
+									"var users = ['Amelia', 'Margaret', 'Emma', 'Mary', 'Olivia', 'Samantha', 'Olivia', 'Patricia', 'Isla', 'Bethany', 'Sophia', 'Jennifer', 'Emily', 'Elizabeth', 'Isabella', 'Elizabeth', 'Poppy', 'Joanne', 'Ava', 'Linda', 'Ava', 'Megan', 'Mia', 'Barbara', 'Isabella', 'Victoria', 'Emily', 'Susan', 'Jessica', 'Lauren', 'Abigail', 'Margaret', 'Lily', 'Michelle', 'Madison', 'Jessica', 'Sophie', 'Tracy', 'Charlotte', 'Sarah', 'Oliver', 'Jake', 'Noah', 'James', 'Jack', 'Connor', 'Liam', 'John', 'Harry', 'Callum', 'Mason', 'Robert', 'Jacob', 'Jacob', 'Jacob', 'Michael', 'Charlie', 'Kyle', 'William', 'William', 'Thomas', 'Joe', 'Ethan', 'David', 'George', 'Reece', 'Michael', 'Richard', 'Oscar', 'Rhys', 'Alexander', 'Joseph', 'James', 'Charlie', 'James', 'Charles', 'William', 'Damian', 'Daniel', 'Thomas'];",
+									"var usersAndNull = users.concat([null]);",
+									"",
+									"var statuses = ['NotStarted', 'InProgress', 'Blocked', 'InTest', 'UnderReview', 'Done', 'Removed'];",
+									"var priorities = ['Lowest', 'Low', 'Medium', 'High', 'Highest'];",
+									"var ticketTypes = ['Task', 'Bug'];",
+									"var linkTypes = ['RelatedTo', 'DuplicatedBy', 'ClonedBy', 'PartOf', 'BlockedBy'];",
+									"",
+									"var tagGroups = [",
+									"    ['PoC', 'SPIKE', 'Feasibility'],",
+									"    ['Test', 'QA', 'Regression', 'Unit-Test', 'Mock', 'E2E', 'Integration-Test', 'Performance-Test', 'Regression-Test'],",
+									"    ['Dev', 'Backend', 'Architecture', 'Performance', 'Database', 'PoC', 'Communication'],",
+									"    ['Frontend', 'Design', 'UI', 'UX', 'Accessibility', 'PoC', 'Layout', 'SEO', 'Localization']",
+									"];",
+									"",
+									"pm.globals.set(\"apiBaseUrl\", \"http://localhost:54067\");",
+									"pm.globals.set(\"users\", users);",
+									"pm.globals.set(\"usersAndNull\", usersAndNull);",
+									"pm.globals.set(\"statuses\", statuses);",
+									"pm.globals.set(\"priorities\", priorities);",
+									"pm.globals.set(\"ticketTypes\", ticketTypes);",
+									"pm.globals.set(\"linkTypes\", linkTypes);",
+									"pm.globals.set(\"tagGroups\", tagGroups);",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{apiBaseUrl}}",
+							"host": [
+								"{{apiBaseUrl}}"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POST Create ticket",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9355bb10-556f-4cee-aa20-2ab74519de1d",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var descriptions = pm.globals.get(\"descriptions\");",
+							"var titles = pm.globals.get(\"titles\");",
+							"var users = pm.globals.get(\"users\");",
+							"var usersAndNull = pm.globals.get(\"usersAndNull\");",
+							"",
+							"var statuses = pm.globals.get(\"statuses\");",
+							"var priorities = pm.globals.get(\"priorities\");",
+							"var ticketTypes = pm.globals.get(\"ticketTypes\");",
+							"var linkTypes = pm.globals.get(\"linkTypes\");",
+							"",
+							"var tagGroups = pm.globals.get(\"tagGroups\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"function getRandomTicketLinks() {",
+							"    if (!existingTicketIds.length) {",
+							"        return [];",
+							"    }",
+							"",
+							"    var result = [];",
+							"    var maxCount = Math.round(Math.random() * 10);",
+							"",
+							"    for (var i = 0; i < maxCount; ++i) {",
+							"        var targetTicketId = getRandomArrayItem(existingTicketIds);",
+							"        var linkType = getRandomArrayItem(linkTypes);",
+							"",
+							"        if (!result.some(item => item.targetTicketId == targetTicketId && item.linkType == linkType)) {",
+							"            result.push({",
+							"                targetTicketId: targetTicketId,",
+							"                linkType: linkType",
+							"            });",
+							"        }",
+							"    }",
+							"",
+							"    return result;",
+							"}",
+							"",
+							"function getRandomTags() {",
+							"    var groupIndex = Math.floor(Math.random() * tagGroups.length);",
+							"    var tagGroup = tagGroups[groupIndex];",
+							"    var count = Math.random() * 10;",
+							"",
+							"    var set = {};",
+							"    for (var i = 0; i < count; ++i) {",
+							"        var key = getRandomArrayItem(tagGroup);",
+							"",
+							"        set[key] = true;",
+							"    }",
+							"",
+							"    return Object.keys(set);",
+							"}",
+							"",
+							"pm.globals.set(\"creator\", getRandomArrayItem(users));",
+							"pm.globals.set(\"assignTo\", getRandomArrayItem(usersAndNull));",
+							"",
+							"pm.globals.set(\"status\", getRandomArrayItem(statuses));",
+							"pm.globals.set(\"priority\", getRandomArrayItem(priorities));",
+							"pm.globals.set(\"type\", getRandomArrayItem(ticketTypes));",
+							"",
+							"pm.globals.set(\"links\", JSON.stringify(getRandomTicketLinks()));",
+							"pm.globals.set(\"tags\", JSON.stringify(getRandomTags()));",
+							"",
+							"pm.globals.set(\"description\", getRandomArrayItem(descriptions));",
+							"pm.globals.set(\"title\", getRandomArrayItem(titles));",
+							"pm.globals.set(\"storyPoints\", Math.round(Math.random() * 10));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{creator}}\",\r\n    \"assignTo\": \"{{assignTo}}\",\r\n    \"title\": \"{{title}}\",\r\n    \"description\": \"{{description}}\",\r\n    \"tags\": {{tags}},\r\n    \"storyPoints\": {{storyPoints}},\r\n    \"priority\": \"{{priority}}\",\r\n    \"type\": \"{{type}}\",\r\n    \"status\": \"{{status}}\",\r\n    \"links\": {{links}}\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Assign ticket",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "468dd549-d011-4d2f-b050-246cd3f797da",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var usersAndNull = pm.globals.get(\"usersAndNull\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"assignTo\", getRandomArrayItem(usersAndNull));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"assignTo\": \"{{assignTo}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/assignment",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"assignment"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Change ticket story points",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "bcfa5dce-285f-4c6d-a1ac-697ebad0ce8e",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"storyPoints\", Math.round(Math.random() * 10));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"storyPoints\": {{storyPoints}}\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/storyPoints",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"storyPoints"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Change ticket title",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "404422c2-94a2-40c9-88ac-14f330cf1308",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var titles = pm.globals.get(\"titles\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"title\", getRandomArrayItem(titles));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"title\": \"{{title}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/title",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"title"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Change ticket description",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "61bab3e0-9252-444d-a3c6-dbfa257202cc",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var descriptions = pm.globals.get(\"descriptions\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"description\", getRandomArrayItem(descriptions));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"description\": \"{{description}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/description",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"description"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Change ticket type",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fbcff090-dd75-4cc4-843c-30de5facab36",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var ticketTypes = pm.globals.get(\"ticketTypes\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"ticketType\", getRandomArrayItem(ticketTypes));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"ticketType\": \"{{ticketType}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/type",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"type"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Change ticket priority",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "42e7a175-def7-4345-bd49-85e0616aa8cb",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var priorities = pm.globals.get(\"priorities\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"priority\", getRandomArrayItem(priorities));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"priority\": \"{{priority}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/priority",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"priority"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH Change ticket status",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8e3078ee-144e-425c-a7c1-1f643370cc5c",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var statuses = pm.globals.get(\"statuses\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"status\", getRandomArrayItem(statuses));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"status\": \"{{status}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/status",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"status"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
