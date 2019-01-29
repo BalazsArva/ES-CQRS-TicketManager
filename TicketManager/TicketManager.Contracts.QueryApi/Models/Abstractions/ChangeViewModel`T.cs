@@ -9,5 +9,7 @@ namespace TicketManager.Contracts.QueryApi.Models.Abstractions
         public string ChangedBy { get; set; }
 
         public virtual T ChangedTo { get; set; }
+
+        public string Reason { get; set; }
     }
 }

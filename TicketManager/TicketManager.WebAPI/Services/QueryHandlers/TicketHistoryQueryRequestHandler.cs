@@ -92,6 +92,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new ChangeViewModel<string>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.Title,
                     UtcDateChanged = evt.UtcDateRecorded
@@ -111,6 +112,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new ChangeViewModel<string>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.Description,
                     UtcDateChanged = evt.UtcDateRecorded
@@ -130,6 +132,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new EnumChangeViewModel<TicketStatuses>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.TicketStatus,
                     UtcDateChanged = evt.UtcDateRecorded
@@ -149,6 +152,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new ChangeViewModel<int>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.StoryPoints,
                     UtcDateChanged = evt.UtcDateRecorded
@@ -168,6 +172,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new EnumChangeViewModel<TicketTypes>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.TicketType,
                     UtcDateChanged = evt.UtcDateRecorded
@@ -187,6 +192,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new EnumChangeViewModel<TicketPriorities>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.Priority,
                     UtcDateChanged = evt.UtcDateRecorded
@@ -206,6 +212,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new ChangeViewModel<string>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = evt.AssignedTo,
                     UtcDateChanged = evt.UtcDateRecorded
@@ -225,6 +232,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new ChangeViewModel<TicketTagChangeViewModel>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = new TicketTagChangeViewModel
                     {
@@ -248,6 +256,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                 .OrderBy(evt => evt.Id)
                 .Select(evt => new ChangeViewModel<TicketLinkChangeViewModel>
                 {
+                    Reason = evt.Reason,
                     ChangedBy = evt.CausedBy,
                     ChangedTo = new TicketLinkChangeViewModel
                     {
