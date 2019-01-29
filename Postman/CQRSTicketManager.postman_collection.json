@@ -181,10 +181,33 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c0106c7-fd88-4956-92a5-964c9ab7c40f",
+								"id": "f253e893-6075-4f70-ae5d-668087cea8ea",
 								"type": "text/javascript",
 								"exec": [
-									"pm.globals.set(\"apiBaseUrl\", \"http://localhost:54067\");"
+									"var users = ['Amelia', 'Margaret', 'Emma', 'Mary', 'Olivia', 'Samantha', 'Olivia', 'Patricia', 'Isla', 'Bethany', 'Sophia', 'Jennifer', 'Emily', 'Elizabeth', 'Isabella', 'Elizabeth', 'Poppy', 'Joanne', 'Ava', 'Linda', 'Ava', 'Megan', 'Mia', 'Barbara', 'Isabella', 'Victoria', 'Emily', 'Susan', 'Jessica', 'Lauren', 'Abigail', 'Margaret', 'Lily', 'Michelle', 'Madison', 'Jessica', 'Sophie', 'Tracy', 'Charlotte', 'Sarah', 'Oliver', 'Jake', 'Noah', 'James', 'Jack', 'Connor', 'Liam', 'John', 'Harry', 'Callum', 'Mason', 'Robert', 'Jacob', 'Jacob', 'Jacob', 'Michael', 'Charlie', 'Kyle', 'William', 'William', 'Thomas', 'Joe', 'Ethan', 'David', 'George', 'Reece', 'Michael', 'Richard', 'Oscar', 'Rhys', 'Alexander', 'Joseph', 'James', 'Charlie', 'James', 'Charles', 'William', 'Damian', 'Daniel', 'Thomas'];",
+									"var usersAndNull = users.concat([null]);",
+									"",
+									"var statuses = ['NotStarted', 'InProgress', 'Blocked', 'InTest', 'UnderReview', 'Done', 'Removed'];",
+									"var priorities = ['Lowest', 'Low', 'Medium', 'High', 'Highest'];",
+									"var ticketTypes = ['Task', 'Bug'];",
+									"var linkTypes = ['RelatedTo', 'DuplicatedBy', 'ClonedBy', 'PartOf', 'BlockedBy'];",
+									"",
+									"var tagGroups = [",
+									"    ['PoC', 'SPIKE', 'Feasibility'],",
+									"    ['Test', 'QA', 'Regression', 'Unit-Test', 'Mock', 'E2E', 'Integration-Test', 'Performance-Test', 'Regression-Test'],",
+									"    ['Dev', 'Backend', 'Architecture', 'Performance', 'Database', 'PoC', 'Communication'],",
+									"    ['Frontend', 'Design', 'UI', 'UX', 'Accessibility', 'PoC', 'Layout', 'SEO', 'Localization']",
+									"];",
+									"",
+									"pm.globals.set(\"apiBaseUrl\", \"http://localhost:54067\");",
+									"pm.globals.set(\"users\", users);",
+									"pm.globals.set(\"usersAndNull\", usersAndNull);",
+									"pm.globals.set(\"statuses\", statuses);",
+									"pm.globals.set(\"priorities\", priorities);",
+									"pm.globals.set(\"ticketTypes\", ticketTypes);",
+									"pm.globals.set(\"linkTypes\", linkTypes);",
+									"pm.globals.set(\"tagGroups\", tagGroups);",
+									""
 								]
 							}
 						}
@@ -211,27 +234,21 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "fefcb814-d62c-41af-ad08-de27d3d53e84",
+						"id": "aea39e38-3331-4a1d-af8d-195fa360273a",
 						"type": "text/javascript",
 						"exec": [
 							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
 							"var descriptions = pm.globals.get(\"descriptions\");",
 							"var titles = pm.globals.get(\"titles\");",
+							"var users = pm.globals.get(\"users\");",
+							"var usersAndNull = pm.globals.get(\"usersAndNull\");",
 							"",
-							"var users = ['Amelia', 'Margaret', 'Emma', 'Mary', 'Olivia', 'Samantha', 'Olivia', 'Patricia', 'Isla', 'Bethany', 'Sophia', 'Jennifer', 'Emily', 'Elizabeth', 'Isabella', 'Elizabeth', 'Poppy', 'Joanne', 'Ava', 'Linda', 'Ava', 'Megan', 'Mia', 'Barbara', 'Isabella', 'Victoria', 'Emily', 'Susan', 'Jessica', 'Lauren', 'Abigail', 'Margaret', 'Lily', 'Michelle', 'Madison', 'Jessica', 'Sophie', 'Tracy', 'Charlotte', 'Sarah', 'Oliver', 'Jake', 'Noah', 'James', 'Jack', 'Connor', 'Liam', 'John', 'Harry', 'Callum', 'Mason', 'Robert', 'Jacob', 'Jacob', 'Jacob', 'Michael', 'Charlie', 'Kyle', 'William', 'William', 'Thomas', 'Joe', 'Ethan', 'David', 'George', 'Reece', 'Michael', 'Richard', 'Oscar', 'Rhys', 'Alexander', 'Joseph', 'James', 'Charlie', 'James', 'Charles', 'William', 'Damian', 'Daniel', 'Thomas'];",
-							"var usersAndNull = users.concat([null]);",
+							"var statuses = pm.globals.get(\"statuses\");",
+							"var priorities = pm.globals.get(\"priorities\");",
+							"var ticketTypes = pm.globals.get(\"ticketTypes\");",
+							"var linkTypes = pm.globals.get(\"linkTypes\");",
 							"",
-							"var statuses = ['NotStarted', 'InProgress', 'Blocked', 'InTest', 'UnderReview', 'Done', 'Removed'];",
-							"var priorities = ['Lowest', 'Low', 'Medium', 'High', 'Highest'];",
-							"var ticketTypes = ['Task', 'Bug'];",
-							"var linkTypes = ['RelatedTo', 'DuplicatedBy', 'ClonedBy', 'PartOf', 'BlockedBy'];",
-							"",
-							"var tagGroups = [",
-							"    ['PoC', 'SPIKE', 'Feasibility'],",
-							"    ['Test', 'QA', 'Regression', 'Unit-Test', 'Mock', 'E2E', 'Integration-Test', 'Performance-Test', 'Regression-Test'],",
-							"    ['Dev', 'Backend', 'Architecture', 'Performance', 'Database', 'PoC', 'Communication'],",
-							"    ['Frontend', 'Design', 'UI', 'UX', 'Accessibility', 'PoC', 'Layout', 'SEO', 'Localization']",
-							"];",
+							"var tagGroups = pm.globals.get(\"tagGroups\");",
 							"",
 							"function getRandomArrayItem(array) {",
 							"    if (!array || !array.length) {",
@@ -329,13 +346,12 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "f7418b93-e4ba-4bd0-a3b5-dcb651dc7152",
+						"id": "468dd549-d011-4d2f-b050-246cd3f797da",
 						"type": "text/javascript",
 						"exec": [
 							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
-							"",
-							"var users = ['Amelia', 'Margaret', 'Emma', 'Mary', 'Olivia', 'Samantha', 'Olivia', 'Patricia', 'Isla', 'Bethany', 'Sophia', 'Jennifer', 'Emily', 'Elizabeth', 'Isabella', 'Elizabeth', 'Poppy', 'Joanne', 'Ava', 'Linda', 'Ava', 'Megan', 'Mia', 'Barbara', 'Isabella', 'Victoria', 'Emily', 'Susan', 'Jessica', 'Lauren', 'Abigail', 'Margaret', 'Lily', 'Michelle', 'Madison', 'Jessica', 'Sophie', 'Tracy', 'Charlotte', 'Sarah', 'Oliver', 'Jake', 'Noah', 'James', 'Jack', 'Connor', 'Liam', 'John', 'Harry', 'Callum', 'Mason', 'Robert', 'Jacob', 'Jacob', 'Jacob', 'Michael', 'Charlie', 'Kyle', 'William', 'William', 'Thomas', 'Joe', 'Ethan', 'David', 'George', 'Reece', 'Michael', 'Richard', 'Oscar', 'Rhys', 'Alexander', 'Joseph', 'James', 'Charlie', 'James', 'Charles', 'William', 'Damian', 'Daniel', 'Thomas'];",
-							"var usersAndNull = users.concat([null]);",
+							"var users = pm.globals.get(\"users\");",
+							"var usersAndNull = pm.globals.get(\"usersAndNull\");",
 							"",
 							"function getRandomArrayItem(array) {",
 							"    if (!array || !array.length) {",
@@ -387,12 +403,11 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d5a3d3ff-5a3c-495c-8fdd-4ce2805a2b05",
+						"id": "bcfa5dce-285f-4c6d-a1ac-697ebad0ce8e",
 						"type": "text/javascript",
 						"exec": [
 							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
-							"",
-							"var users = ['Amelia', 'Margaret', 'Emma', 'Mary', 'Olivia', 'Samantha', 'Olivia', 'Patricia', 'Isla', 'Bethany', 'Sophia', 'Jennifer', 'Emily', 'Elizabeth', 'Isabella', 'Elizabeth', 'Poppy', 'Joanne', 'Ava', 'Linda', 'Ava', 'Megan', 'Mia', 'Barbara', 'Isabella', 'Victoria', 'Emily', 'Susan', 'Jessica', 'Lauren', 'Abigail', 'Margaret', 'Lily', 'Michelle', 'Madison', 'Jessica', 'Sophie', 'Tracy', 'Charlotte', 'Sarah', 'Oliver', 'Jake', 'Noah', 'James', 'Jack', 'Connor', 'Liam', 'John', 'Harry', 'Callum', 'Mason', 'Robert', 'Jacob', 'Jacob', 'Jacob', 'Michael', 'Charlie', 'Kyle', 'William', 'William', 'Thomas', 'Joe', 'Ethan', 'David', 'George', 'Reece', 'Michael', 'Richard', 'Oscar', 'Rhys', 'Alexander', 'Joseph', 'James', 'Charlie', 'James', 'Charles', 'William', 'Damian', 'Daniel', 'Thomas'];",
+							"var users = pm.globals.get(\"users\");",
 							"",
 							"function getRandomArrayItem(array) {",
 							"    if (!array || !array.length) {",
@@ -444,13 +459,12 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "89d030bf-ac21-4931-ab2c-38a75a9726dc",
+						"id": "08c11743-286b-4cdb-8262-00ac3f0a4ddb",
 						"type": "text/javascript",
 						"exec": [
 							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
 							"var titles = pm.globals.get(\"titles\");",
-							"",
-							"var users = ['Amelia', 'Margaret', 'Emma', 'Mary', 'Olivia', 'Samantha', 'Olivia', 'Patricia', 'Isla', 'Bethany', 'Sophia', 'Jennifer', 'Emily', 'Elizabeth', 'Isabella', 'Elizabeth', 'Poppy', 'Joanne', 'Ava', 'Linda', 'Ava', 'Megan', 'Mia', 'Barbara', 'Isabella', 'Victoria', 'Emily', 'Susan', 'Jessica', 'Lauren', 'Abigail', 'Margaret', 'Lily', 'Michelle', 'Madison', 'Jessica', 'Sophie', 'Tracy', 'Charlotte', 'Sarah', 'Oliver', 'Jake', 'Noah', 'James', 'Jack', 'Connor', 'Liam', 'John', 'Harry', 'Callum', 'Mason', 'Robert', 'Jacob', 'Jacob', 'Jacob', 'Michael', 'Charlie', 'Kyle', 'William', 'William', 'Thomas', 'Joe', 'Ethan', 'David', 'George', 'Reece', 'Michael', 'Richard', 'Oscar', 'Rhys', 'Alexander', 'Joseph', 'James', 'Charlie', 'James', 'Charles', 'William', 'Damian', 'Daniel', 'Thomas'];",
+							"var users = pm.globals.get(\"users\");",
 							"",
 							"function getRandomArrayItem(array) {",
 							"    if (!array || !array.length) {",
