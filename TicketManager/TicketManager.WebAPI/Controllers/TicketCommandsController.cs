@@ -171,5 +171,18 @@ namespace TicketManager.WebAPI.Controllers
 
             return Accepted();
         }
+
+        [HttpPatch]
+        [Route("{id:int}/title")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketTitle([FromRoute]long id, [FromBody]ChangeTicketTypeCommandModel commandModel)
+        {
+            var command = new ChangeTicketTypeCommand(id, commandModel.RaisedByUser, commandModel.TicketType);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
     }
 }
