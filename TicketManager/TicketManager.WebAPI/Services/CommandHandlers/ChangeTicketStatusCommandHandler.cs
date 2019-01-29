@@ -37,7 +37,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     CorrelationId = correlationIdProvider.GetCorrelationId(),
                     CausedBy = request.RaisedByUser,
                     TicketCreatedEventId = request.TicketId,
-                    TicketStatus = request.NewStatus
+                    TicketStatus = request.Status
                 });
 
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

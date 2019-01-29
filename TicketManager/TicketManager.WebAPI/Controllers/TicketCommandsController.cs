@@ -199,6 +199,19 @@ namespace TicketManager.WebAPI.Controllers
         }
 
         [HttpPatch]
+        [Route("{id:int}/status")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ChangeTicketStatus([FromRoute]long id, [FromBody]ChangeTicketStatusCommandModel commandModel)
+        {
+            var command = new ChangeTicketStatusCommand(id, commandModel.RaisedByUser, commandModel.Status);
+
+            await mediator.Send(command);
+
+            return Accepted();
+        }
+
+        [HttpPatch]
         [Route("{id:int}/title")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesDefaultResponseType]

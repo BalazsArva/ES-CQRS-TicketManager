@@ -623,6 +623,63 @@
 				"description": ""
 			},
 			"response": []
+		},
+		{
+			"name": "PATCH Change ticket status",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8e3078ee-144e-425c-a7c1-1f643370cc5c",
+						"type": "text/javascript",
+						"exec": [
+							"var existingTicketIds = pm.globals.get(\"ticketIds\");",
+							"var users = pm.globals.get(\"users\");",
+							"var statuses = pm.globals.get(\"statuses\");",
+							"",
+							"function getRandomArrayItem(array) {",
+							"    if (!array || !array.length) {",
+							"        return null;",
+							"    }",
+							"",
+							"    var index = Math.floor(Math.random() * array.length);",
+							"    return array[index];",
+							"}",
+							"",
+							"pm.globals.set(\"raisedByUser\", getRandomArrayItem(users));",
+							"pm.globals.set(\"ticketId\", getRandomArrayItem(existingTicketIds));",
+							"pm.globals.set(\"status\", getRandomArrayItem(statuses));"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"raisedByUser\": \"{{raisedByUser}}\",\r\n    \"status\": \"{{status}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{apiBaseUrl}}/api/ticketcommands/{{ticketId}}/status",
+					"host": [
+						"{{apiBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"ticketcommands",
+						"{{ticketId}}",
+						"status"
+					]
+				},
+				"description": ""
+			},
+			"response": []
 		}
 	]
 }

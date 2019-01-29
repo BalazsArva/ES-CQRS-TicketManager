@@ -11,7 +11,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
         public ChangeTicketStatusCommandValidator(IEventsContextFactory eventsContextFactory)
             : base(eventsContextFactory)
         {
-            RuleFor(cmd => cmd.NewStatus)
+            RuleFor(cmd => cmd.Status)
                 .IsInEnum()
                 .WithMessage(ValidationMessageProvider.OnlyEnumValuesAreAllowed<TicketPriorities>("new status"));
         }
