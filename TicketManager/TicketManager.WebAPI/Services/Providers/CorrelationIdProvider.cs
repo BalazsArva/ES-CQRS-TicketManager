@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
+using TicketManager.Common.Http;
 
 namespace TicketManager.WebAPI.Services.Providers
 {
@@ -14,6 +15,12 @@ namespace TicketManager.WebAPI.Services.Providers
 
         public string GetCorrelationId()
         {
+            var headers = httpContextAccessor.HttpContext.Request.Headers;
+            if (headers.ContainsKey(CustomRequestHeaders.CorrelationId) && !string.IsNullOrEmpty(headers[CustomRequestHeaders.CorrelationId]))
+            {
+                return headers[CustomRequestHeaders.CorrelationId];
+            }
+
             return httpContextAccessor.HttpContext.TraceIdentifier;
         }
     }
