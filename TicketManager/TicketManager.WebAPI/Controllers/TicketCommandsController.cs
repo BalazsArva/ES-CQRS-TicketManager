@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TicketManager.Common.Http;
 using TicketManager.Contracts.CommandApi;
 using TicketManager.Contracts.Common;
 using TicketManager.WebAPI.DTOs;
 using TicketManager.WebAPI.DTOs.Commands;
-using TicketManager.WebAPI.DTOs.Queries;
 
 namespace TicketManager.WebAPI.Controllers
 {
@@ -131,19 +128,7 @@ namespace TicketManager.WebAPI.Controllers
         {
             var id = await mediator.Send(command);
 
-            // TODO: The links are loaded from index (both incoming and outgoing) so the links in the returned object might be stale. Do something about it. E.g. at the time of creation,
-            // there almost certainly won't be anything referencing the just-created ticket so could write a separate handler which loads only the outgoing links stored in the doc itself
-            // instead of outgoing+incoming in the index. Consider how that would affect ETags both in that implementation and in the GetTicketExtendedDetailsByIdQueryRequest.
-            var queryResult = await mediator.Send(new GetTicketExtendedDetailsByIdQueryRequest(id, Enumerable.Empty<string>()));
-
-            // TODO: Refactor this
-            var ticket = queryResult.Result;
-            if (!string.IsNullOrWhiteSpace(queryResult.ETag))
-            {
-                Response.Headers[StandardResponseHeaders.ETag] = queryResult.ETag;
-            }
-
-            return CreatedAtRoute(RouteNames.Tickets_Queries_Get_ById_Extended, new { id }, ticket);
+            return CreatedAtRoute(RouteNames.Tickets_Queries_Get_ById_Extended, new { id }, value: null);
         }
 
         [HttpPatch]

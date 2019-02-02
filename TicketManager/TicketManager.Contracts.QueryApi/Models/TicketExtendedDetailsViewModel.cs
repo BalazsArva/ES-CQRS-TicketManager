@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace TicketManager.Contracts.QueryApi.Models
+﻿namespace TicketManager.Contracts.QueryApi.Models
 {
     public class TicketExtendedDetailsViewModel : TicketBasicDetailsViewModel
     {
         public string Description { get; set; }
 
-        public IEnumerable<TicketLinkViewModel> Links { get; set; }
+        public TicketLinksViewModel Links { get; set; }
     }
 }

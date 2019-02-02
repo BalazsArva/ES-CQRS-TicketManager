@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,9 +71,9 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             }
         }
 
-        private string GetCombinedETag(IAsyncDocumentSession session, Ticket ticket, IEnumerable<TicketLinkViewModel> links)
+        private string GetCombinedETag(IAsyncDocumentSession session, Ticket ticket, TicketLinksViewModel links)
         {
-            var linkStrings = links
+            var linkStrings = links.LinkSet
                 .OrderBy(link => link.SourceTicketId)
                 .ThenBy(link => link.TargetTicketId)
                 .ThenBy(link => link.LinkType)
@@ -83,21 +82,23 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
             // Since incoming links affect the current state of a ticket, we must consier the links as well when generating the eTag.
             var ticketETag = session.Advanced.GetChangeVectorFor(ticket);
             var incomingLinksETag = string.Join(",", linkStrings);
+            var isStaleFlag = $"IsStale:{links.IsStale}";
 
-            return etagProvider.CreateCombinedETagFromDocumentETags(ticketETag, incomingLinksETag);
+            return etagProvider.CreateCombinedETagFromDocumentETags(ticketETag, incomingLinksETag, isStaleFlag);
         }
 
-        private async Task<List<TicketLinkViewModel>> GetLinksLazilyAsync(IAsyncDocumentSession session, string ticketDocumentId, CancellationToken cancellationToken)
+        private async Task<TicketLinksViewModel> GetLinksLazilyAsync(IAsyncDocumentSession session, string ticketDocumentId, CancellationToken cancellationToken)
         {
             var links = await session
                 .Query<Tickets_ByTicketIdsAndType.IndexEntry, Tickets_ByTicketIdsAndType>()
                 .Where(indexEntry => indexEntry.TargetTicketId == ticketDocumentId || indexEntry.SourceTicketId == ticketDocumentId)
                 .ProjectInto<Tickets_ByTicketIdsAndType.IndexEntry>()
+                .Statistics(out var stats)
                 .LazilyAsync()
                 .Value
                 .ConfigureAwait(false);
 
-            return links
+            var linkSet = links
                 .Select(link => new TicketLinkViewModel
                 {
                     LinkType = link.LinkType,
@@ -107,6 +108,12 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
                     TargetTicketTitle = link.TargetTicketTitle
                 })
                 .ToList();
+
+            return new TicketLinksViewModel
+            {
+                IsStale = stats.IsStale,
+                LinkSet = linkSet
+            };
         }
     }
 }
