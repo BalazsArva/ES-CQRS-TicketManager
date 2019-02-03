@@ -35,6 +35,7 @@ services:
       - MSSQL_DBNAME=CQRSTicketManager
       - MSSQL_DBMIGRATE=true
       - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:?err}
+      - ASPNETCORE_ENVIRONMENT=Docker
     depends_on:
       - mssql
       - ravendb1
