@@ -18,14 +18,23 @@ namespace TicketManager.WebAPI.Extensions
     {
         public static IServiceCollection AddEventsContext(this IServiceCollection services, IConfiguration Configuration)
         {
-            // TODO: Maybe should default to localhost and local settings (integrated security, etc.)
-            var dbHost = Configuration["DBHOST"] ?? "mssql";
-            var userId = Configuration["DBUSERID"] ?? "sa";
-            var password = Configuration["SA_PASSWORD"];
-            var dbPort = Configuration["DBPORT"] ?? "1433";
             var database = Configuration["DBNAME"] ?? "CQRSTicketManager";
 
-            var sqlConnectionString = $"Data Source={dbHost},{dbPort};Initial Catalog={database};User Id={userId};Password={password}";
+            var dbHost = Configuration["DBHOST"];
+            var dbPort = Configuration["DBPORT"];
+
+            var userId = Configuration["DBUSERID"];
+            var password = Configuration["SA_PASSWORD"];
+
+            var hostSegment = string.IsNullOrEmpty(dbHost)
+                ? "(localdb)\\MSSQLLocalDb"
+                : $"{dbHost},{dbPort}";
+
+            var authorizationSegment = string.IsNullOrEmpty(userId) && string.IsNullOrEmpty(password)
+                ? "Integrated Security=true"
+                : $"User Id={userId};Password={password}";
+
+            var sqlConnectionString = $"Data Source={hostSegment};Initial Catalog={database};{authorizationSegment}";
 
             var options = new DbContextOptionsBuilder<EventsContext>()
                 .UseSqlServer(sqlConnectionString)
