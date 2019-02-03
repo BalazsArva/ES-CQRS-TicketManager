@@ -8,20 +8,19 @@ namespace TicketManager.WebAPI.Validation.QueryValidators
 {
     public class SearchTicketsQueryRequestValidator : ValidatorBase<SearchTicketsQueryRequest>
     {
-        // TODO: Move to ValidationConstants
-        private const int MinPage = 1;
-
-        private const int MinPageSize = 1;
-
         public SearchTicketsQueryRequestValidator()
         {
             RuleFor(r => r.Page)
-                .GreaterThanOrEqualTo(MinPage)
-                .WithMessage(ValidationMessageProvider.MustBeAtLeast("page", MinPage));
+                .GreaterThanOrEqualTo(ValidationConstants.MinPage)
+                .WithMessage(ValidationMessageProvider.MustBeAtLeast("page", ValidationConstants.MinPage));
 
             RuleFor(r => r.PageSize)
-                .GreaterThanOrEqualTo(MinPageSize)
-                .WithMessage(ValidationMessageProvider.MustBeAtLeast("page size", MinPageSize));
+                .GreaterThanOrEqualTo(ValidationConstants.MinPageSize)
+                .WithMessage(ValidationMessageProvider.MustBeAtLeast("page size", ValidationConstants.MinPageSize));
+
+            RuleFor(r => r.PageSize)
+                .GreaterThanOrEqualTo(ValidationConstants.MaxPageSize)
+                .WithMessage(ValidationMessageProvider.MustBeAtMost("page size", ValidationConstants.MaxPageSize));
 
             RuleFor(r => r.DateCreatedFrom)
                 .Must(BeValidIsoDateString)

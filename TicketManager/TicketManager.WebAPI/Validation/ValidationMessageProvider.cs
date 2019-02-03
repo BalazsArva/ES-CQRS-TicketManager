@@ -34,7 +34,9 @@ namespace TicketManager.WebAPI.Validation
 
         public static string MustNotBeAnAssignedLink() => "This ticket is already linked with this link type.";
 
-        public static string MustBeAtLeast(string propertyDisplayName, int minValue) => $"The {propertyDisplayName} must be at least {minValue}.";
+        public static string MustBeAtLeast(string propertyDisplayName, int minValue) => $"The {propertyDisplayName} cannot be less than {minValue}.";
+
+        public static string MustBeAtMost(string propertyDisplayName, int maxValue) => $"The {propertyDisplayName} cannot be greater than {maxValue}.";
 
         public static string MustBeValidIsoDateString(string propertyDisplayName) => $"The {propertyDisplayName} must be a valid ISO date and time.";
 
