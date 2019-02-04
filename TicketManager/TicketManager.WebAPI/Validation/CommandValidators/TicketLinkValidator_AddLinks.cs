@@ -31,8 +31,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                     throw new InvalidOperationException(
                         "The validation could not be performed because the collection of assigned links was not found in the validation context data.");
                 })
-                .WithMessage(ValidationMessageProvider.MustNotBeAnAssignedLink())
-                .WithErrorCode(ValidationErrorCodes.Conflict);
+                .WithMessage(ValidationMessageProvider.MustNotBeAnAssignedLink());
         }
     }
 }

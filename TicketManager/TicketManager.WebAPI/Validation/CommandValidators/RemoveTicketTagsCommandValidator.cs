@@ -25,18 +25,15 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.Tags)
                 .NotEmpty()
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyCollection("tag"))
-                .WithErrorCode(ValidationErrorCodes.BadRequest)
                 .DependentRules(() =>
                 {
                     RuleForEach(cmd => cmd.Tags)
                         .Must(TagValidationHelper.BeAUniqueTag)
-                        .WithMessage("This tag is being removed multiple times.")
-                        .WithErrorCode(ValidationErrorCodes.Conflict);
+                        .WithMessage("This tag is being removed multiple times.");
 
                     RuleForEach(cmd => cmd.Tags)
                         .Must(BeAnAssignedTag)
-                        .WithMessage(ValidationMessageProvider.MustBeAnAssignedTag("tag"))
-                        .WithErrorCode(ValidationErrorCodes.NotFound);
+                        .WithMessage(ValidationMessageProvider.MustBeAnAssignedTag("tag"));
                 });
         }
 

@@ -48,16 +48,13 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
                 .GreaterThanOrEqualTo(ValidationConstants.MinStoryPoints)
                 .WithMessage(ValidationMessageProvider.CannotBeNegative("story points"));
 
-            // TODO: Review WithErrorCode everywhere
             RuleForEach(cmd => cmd.Tags)
                 .Must(NotBeWhitespaceOnly)
-                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"))
-                .WithErrorCode(ValidationErrorCodes.BadRequest);
+                .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
 
             RuleForEach(cmd => cmd.Tags)
                 .Must(TagValidationHelper.BeAUniqueTag)
-                .WithMessage("This tag is being added multiple times.")
-                .WithErrorCode(ValidationErrorCodes.Conflict);
+                .WithMessage("This tag is being added multiple times.");
 
             RuleForEach(cmd => cmd.Links)
                 .SetValidator(ticketLinkValidator);

@@ -60,8 +60,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
 
                     RuleForEach(cmd => cmd.Tags)
                         .Must(TagValidationHelper.BeAUniqueTag)
-                        .WithMessage("This tag is being removed multiple times.")
-                        .WithErrorCode(ValidationErrorCodes.Conflict);
+                        .WithMessage("This tag is being removed multiple times.");
                 });
 
             When(

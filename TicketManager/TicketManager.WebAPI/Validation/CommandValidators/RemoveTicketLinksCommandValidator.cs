@@ -29,18 +29,15 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.Links)
                 .NotEmpty()
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyCollection("link"))
-                .WithErrorCode(ValidationErrorCodes.BadRequest)
                 .DependentRules(() =>
                 {
                     RuleForEach(cmd => cmd.Links)
                         .Must(LinkValidationHelper.BeAUniqueLink)
-                        .WithMessage("This link is being removed multiple times.")
-                        .WithErrorCode(ValidationErrorCodes.Conflict);
+                        .WithMessage("This link is being removed multiple times.");
 
                     RuleForEach(cmd => cmd.Links)
                         .Must(BeAnExistingLink)
-                        .WithMessage(ValidationMessageProvider.MustNotBeAnAssignedLink())
-                        .WithErrorCode(ValidationErrorCodes.Conflict);
+                        .WithMessage(ValidationMessageProvider.MustNotBeAnAssignedLink());
                 });
         }
 

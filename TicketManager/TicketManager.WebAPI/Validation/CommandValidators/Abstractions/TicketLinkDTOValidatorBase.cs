@@ -20,8 +20,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
 
                     return numberOfLinksWithSameProperties == 1;
                 })
-                .WithMessage("This link is being added multiple times.")
-                .WithErrorCode(ValidationErrorCodes.Conflict);
+                .WithMessage("This link is being added multiple times.");
 
             RuleFor(link => link.LinkType)
                 .IsInEnum()
@@ -34,8 +33,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
 
                     return targetTicketId != parent.TicketId;
                 })
-                .WithMessage("A ticket cannot be linked to itself.")
-                .WithErrorCode(ValidationErrorCodes.BadRequest);
+                .WithMessage("A ticket cannot be linked to itself.");
 
             RuleFor(link => link.TargetTicketId)
                 .Must((link, targetTicketId, context) =>
@@ -48,8 +46,7 @@ namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions
                     throw new InvalidOperationException(
                         "The validation could not be performed because the collection of existing ticket identifiers was not found in the context data of the validation context.");
                 })
-                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("link"))
-                .WithErrorCode(ValidationErrorCodes.NotFound);
+                .WithMessage(ValidationMessageProvider.MustReferenceAnExistingTicket("link"));
         }
     }
 }

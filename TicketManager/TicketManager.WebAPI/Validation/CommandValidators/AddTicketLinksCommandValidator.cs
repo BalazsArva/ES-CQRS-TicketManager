@@ -25,7 +25,6 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.Links)
                 .NotEmpty()
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyCollection("link"))
-                .WithErrorCode(ValidationErrorCodes.BadRequest)
                 .DependentRules(() =>
                 {
                     RuleForEach(cmd => cmd.Links)

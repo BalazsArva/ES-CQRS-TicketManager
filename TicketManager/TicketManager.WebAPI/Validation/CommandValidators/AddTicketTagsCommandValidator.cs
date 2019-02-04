@@ -25,23 +25,19 @@ namespace TicketManager.WebAPI.Validation.CommandValidators
             RuleFor(cmd => cmd.Tags)
                 .NotEmpty()
                 .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyCollection("tag"))
-                .WithErrorCode(ValidationErrorCodes.BadRequest)
                 .DependentRules(() =>
                 {
                     RuleForEach(cmd => cmd.Tags)
                         .Must(NotBeWhitespaceOnly)
-                        .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"))
-                        .WithErrorCode(ValidationErrorCodes.BadRequest);
+                        .WithMessage(ValidationMessageProvider.CannotBeNullOrEmptyOrWhitespace("tag"));
 
                     RuleForEach(cmd => cmd.Tags)
                         .Must(TagValidationHelper.BeAUniqueTag)
-                        .WithMessage("This tag is being added multiple times.")
-                        .WithErrorCode(ValidationErrorCodes.Conflict);
+                        .WithMessage("This tag is being added multiple times.");
 
                     RuleForEach(cmd => cmd.Tags)
                         .Must(NotBeAnAssignedTag)
-                        .WithMessage(ValidationMessageProvider.MustNotBeAnAssignedTag("tag"))
-                        .WithErrorCode(ValidationErrorCodes.Conflict);
+                        .WithMessage(ValidationMessageProvider.MustNotBeAnAssignedTag("tag"));
                 });
         }
 
