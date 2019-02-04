@@ -38,7 +38,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
                 if (ticket == null)
                 {
-                    return QueryResult<TicketExtendedDetailsViewModel>.NotFound;
+                    return null;
                 }
 
                 var etag = GetCombinedETag(session, ticket, links);

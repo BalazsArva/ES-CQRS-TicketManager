@@ -10,11 +10,10 @@ using TicketManager.Contracts.QueryApi.Models;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.WebAPI.DTOs.Queries;
-using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.Services.QueryHandlers.SearchTickets
 {
-    public class SearchTicketsQueryRequestHandler : IRequestHandler<SearchTicketsQueryRequest, QueryResult<TicketSearchResultViewModel>>
+    public class SearchTicketsQueryRequestHandler : IRequestHandler<SearchTicketsQueryRequest, TicketSearchResultViewModel>
     {
         private readonly IDocumentStore documentStore;
         private readonly IValidator<SearchTicketsQueryRequest> validator;
@@ -25,7 +24,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers.SearchTickets
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public async Task<QueryResult<TicketSearchResultViewModel>> Handle(SearchTicketsQueryRequest request, CancellationToken cancellationToken)
+        public async Task<TicketSearchResultViewModel> Handle(SearchTicketsQueryRequest request, CancellationToken cancellationToken)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -58,7 +57,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers.SearchTickets
 
                 if (dbResults.Count == 0)
                 {
-                    return QueryResult<TicketSearchResultViewModel>.NotFound;
+                    return null;
                 }
 
                 var mappedResults = dbResults
@@ -80,14 +79,13 @@ namespace TicketManager.WebAPI.Services.QueryHandlers.SearchTickets
                     })
                     .ToList();
 
-                return new QueryResult<TicketSearchResultViewModel>(
-                    new TicketSearchResultViewModel
-                    {
-                        PagedResults = mappedResults,
-                        Total = stats.TotalResults,
-                        IsStale = stats.IsStale,
-                        IndexTimestamp = stats.IndexTimestamp
-                    });
+                return new TicketSearchResultViewModel
+                {
+                    PagedResults = mappedResults,
+                    Total = stats.TotalResults,
+                    IsStale = stats.IsStale,
+                    IndexTimestamp = stats.IndexTimestamp
+                };
             }
         }
     }

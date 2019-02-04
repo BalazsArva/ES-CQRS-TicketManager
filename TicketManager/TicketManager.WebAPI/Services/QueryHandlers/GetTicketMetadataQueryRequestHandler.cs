@@ -31,13 +31,12 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
                 if (ticketDocument == null)
                 {
-                    // TODO: Consider returning null
-                    return GetTicketMetadataQueryResult.NotFound;
+                    return null;
                 }
 
                 var etag = etagProvider.CreateCombinedETagFromDocumentETags(session.Advanced.GetChangeVectorFor(ticketDocument));
 
-                return new GetTicketMetadataQueryResult(Existences.Found, etag);
+                return new GetTicketMetadataQueryResult(etag);
             }
         }
     }

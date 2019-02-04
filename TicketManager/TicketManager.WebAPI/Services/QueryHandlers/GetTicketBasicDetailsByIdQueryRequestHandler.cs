@@ -33,7 +33,7 @@ namespace TicketManager.WebAPI.Services.QueryHandlers
 
                 if (ticket == null)
                 {
-                    return QueryResult<TicketBasicDetailsViewModel>.NotFound;
+                    return null;
                 }
 
                 var etag = etagProvider.CreateCombinedETagFromDocumentETags(session.Advanced.GetChangeVectorFor(ticket));

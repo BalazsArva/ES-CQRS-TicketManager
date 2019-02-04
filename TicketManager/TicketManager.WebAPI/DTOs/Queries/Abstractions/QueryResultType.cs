@@ -4,8 +4,6 @@
     {
         Success,
 
-        NotFound,
-
         NotModified
     }
 }

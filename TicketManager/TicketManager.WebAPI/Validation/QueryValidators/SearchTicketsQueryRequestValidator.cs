@@ -19,7 +19,7 @@ namespace TicketManager.WebAPI.Validation.QueryValidators
                 .WithMessage(ValidationMessageProvider.MustBeAtLeast("page size", ValidationConstants.MinPageSize));
 
             RuleFor(r => r.PageSize)
-                .GreaterThanOrEqualTo(ValidationConstants.MaxPageSize)
+                .LessThanOrEqualTo(ValidationConstants.MaxPageSize)
                 .WithMessage(ValidationMessageProvider.MustBeAtMost("page size", ValidationConstants.MaxPageSize));
 
             RuleFor(r => r.DateCreatedFrom)

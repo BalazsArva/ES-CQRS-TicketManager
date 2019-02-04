@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TicketManager.Common.Http;
 using TicketManager.Contracts.QueryApi;
@@ -30,15 +31,23 @@ namespace TicketManager.WebAPI.Controllers
 
         [HttpGet]
         [Route("", Name = RouteNames.Tickets_Queries_Get_ByCriteria)]
+        [ProducesDefaultResponseType]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> SearchTickets([FromQuery]string title, [FromQuery]string createdBy, [FromQuery]string lastUpdatedBy, [FromQuery]string involvedUsers, [FromQuery]string tags, [FromQuery]string orderBy, [FromQuery]string status, [FromQuery]int? storyPoints, [FromQuery]string priority, [FromQuery]string type, [FromQuery]string orderDirection, [FromQuery]string dateCreatedFrom, [FromQuery]string dateCreatedTo, [FromQuery] string dateLastModifiedFrom, [FromQuery]string dateLastModifiedTo, CancellationToken cancellationToken, [FromQuery]int page = DefaultPage, [FromQuery]int pageSize = DefaultPageSize)
         {
             var involvedUsersArray = involvedUsers?.Split(',', StringSplitOptions.RemoveEmptyEntries);
             var tagsArray = tags?.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
             var searchRequest = new SearchTicketsQueryRequest(page, pageSize, title, createdBy, lastUpdatedBy, storyPoints, involvedUsersArray, tagsArray, dateCreatedFrom, dateCreatedTo, dateLastModifiedFrom, dateLastModifiedTo, status, type, priority, orderBy ?? DefaultOrderByProperty, orderDirection ?? DefaultOrderDirection);
-            var results = await mediator.Send(searchRequest, cancellationToken).ConfigureAwait(false);
+            var searchResults = await mediator.Send(searchRequest, cancellationToken).ConfigureAwait(false);
 
-            return FromQueryResult(results);
+            if (searchResults == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(searchResults);
         }
 
         [HttpGet]

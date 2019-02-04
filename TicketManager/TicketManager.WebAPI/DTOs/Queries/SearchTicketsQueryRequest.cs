@@ -1,11 +1,10 @@
 ﻿using System;
 using MediatR;
 using TicketManager.Contracts.QueryApi.Models;
-using TicketManager.WebAPI.DTOs.Queries.Abstractions;
 
 namespace TicketManager.WebAPI.DTOs.Queries
 {
-    public class SearchTicketsQueryRequest : IRequest<QueryResult<TicketSearchResultViewModel>>
+    public class SearchTicketsQueryRequest : IRequest<TicketSearchResultViewModel>
     {
         public SearchTicketsQueryRequest(int page, int pageSize, string title, string createdBy, string lastModifiedBy, int? storyPoints, string[] involvedUsers, string[] tags, string dateCreatedFrom, string dateCreatedTo, string dateLastModifiedFrom, string dateLastModifiedTo, string status, string ticketType, string priority, string orderBy, string orderDirection)
         {

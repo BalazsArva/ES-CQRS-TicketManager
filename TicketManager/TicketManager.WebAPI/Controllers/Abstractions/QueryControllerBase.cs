@@ -9,11 +9,12 @@ namespace TicketManager.WebAPI.Controllers.Abstractions
     {
         protected IActionResult FromQueryResult<TResponse>(QueryResult<TResponse> queryResult)
         {
-            if (queryResult.ResultType == QueryResultType.NotFound)
+            if (queryResult == null)
             {
                 return NotFound();
             }
-            else if (queryResult.ResultType == QueryResultType.NotModified)
+
+            if (queryResult.ResultType == QueryResultType.NotModified)
             {
                 return StatusCode(StatusCodes.Status304NotModified);
             }
@@ -28,7 +29,7 @@ namespace TicketManager.WebAPI.Controllers.Abstractions
 
         protected IActionResult FromQueryResult(GetTicketMetadataQueryResult existenceCheckQueryResult)
         {
-            if (existenceCheckQueryResult.ResultType == Existences.NotFound)
+            if (existenceCheckQueryResult == null)
             {
                 return NotFound();
             }
