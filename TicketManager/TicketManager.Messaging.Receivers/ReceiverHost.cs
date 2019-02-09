@@ -19,19 +19,26 @@ namespace TicketManager.Messaging.Receivers
             this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var completion = new TaskCompletionSource<int>();
+            AsyncEventHandler<BasicDeliverEventArgs> handler = async (sender, eventArgs) => await OnMessageReceivedAsync(sender, eventArgs, stoppingToken);
 
             using (var connection = connectionFactory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
                 var consumer = new AsyncEventingBasicConsumer(channel);
 
-                consumer.Received += async (sender, eventArgs) => await OnMessageReceivedAsync(sender, eventArgs, stoppingToken);
-            }
+                consumer.Received += handler;
 
-            return completion.Task;
+                stoppingToken.Register(() =>
+                {
+                    channel.Close();
+
+                    consumer.Received -= handler;
+                });
+
+                await Task.Delay(Timeout.Infinite, stoppingToken);
+            }
         }
 
         protected virtual async Task OnMessageReceivedAsync(object sender, BasicDeliverEventArgs eventArgs, CancellationToken stoppingToken)
