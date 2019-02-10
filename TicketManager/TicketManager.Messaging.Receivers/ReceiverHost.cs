@@ -1,69 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+using TicketManager.Messaging.Configuration;
 
 namespace TicketManager.Messaging.Receivers
 {
     public abstract class ReceiverHost<TMessage> : BackgroundService
     {
-        private readonly IConnectionFactory connectionFactory;
+        private readonly SubscriptionClient subscriptionClient;
 
-        private IConnection connection;
-        private IModel channel;
-
-        public ReceiverHost(IConnectionFactory connectionFactory)
+        public ReceiverHost(ServiceBusSubscriptionConfiguration subscriptionConfiguration)
         {
-            this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            subscriptionClient = new SubscriptionClient(subscriptionConfiguration.ConnectionString, subscriptionConfiguration.Topic, subscriptionConfiguration.Subscription);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            connection = connectionFactory.CreateConnection();
-            channel = connection.CreateModel();
-
-            MessageLoop(stoppingToken);
-
-            //await Task.Delay(Timeout.Infinite, stoppingToken);
-        }
-
-        private async void MessageLoop(CancellationToken stoppingToken)
-        {
-            await Task.Run(() =>
+            // Configure the message handler options in terms of exception handling, number of concurrent messages to deliver, etc.
+            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
             {
-                AsyncEventHandler<BasicDeliverEventArgs> handler = async (sender, eventArgs) => await OnMessageReceivedAsync(sender, eventArgs, stoppingToken);
+                // Maximum number of concurrent calls to the callback ProcessMessagesAsync(), set to 1 for simplicity.
+                // Set it according to how many messages the application wants to process in parallel.
+                MaxConcurrentCalls = 1,
 
-                var consumer = new AsyncEventingBasicConsumer(channel);
+                // Indicates whether MessagePump should automatically complete the messages after returning from User Callback.
+                // False below indicates the Complete will be handled by the User Callback as in `ProcessMessagesAsync` below.
+                AutoComplete = false
+            };
 
-                consumer.Received += handler;
+            // Register the function that processes messages.
+            subscriptionClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
 
-                stoppingToken.Register(() =>
-                {
-                    channel.Close();
-
-                    consumer.Received -= handler;
-                });
-
-                var cnt = channel.MessageCount("TicketManagerPoC2");
-
-                // TODO: Make this configurable
-                channel.BasicConsume("TicketManagerPoC2", true, consumer);
-            });
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
 
-        protected virtual async Task OnMessageReceivedAsync(object sender, BasicDeliverEventArgs eventArgs, CancellationToken stoppingToken)
+        private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
-            var messageJson = Encoding.UTF8.GetString(eventArgs.Body);
-            var message = JsonConvert.DeserializeObject<TMessage>(messageJson);
+            var bodyJson = Encoding.UTF8.GetString(message.Body);
+            var messageContent = JsonConvert.DeserializeObject<TMessage>(bodyJson);
 
-            await HandleMessageAsync(message, eventArgs.BasicProperties.Headers, stoppingToken);
+            await HandleMessageAsync(messageContent, message.CorrelationId, message.UserProperties, token);
+
+            // Complete the message so that it is not received again.
+            // This can be done only if the subscriptionClient is created in ReceiveMode.PeekLock mode (which is the default).
+            await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+
+            // Note: Use the cancellationToken passed as necessary to determine if the subscriptionClient has already been closed.
+            // If subscriptionClient has already been closed, you can choose to not call CompleteAsync() or AbandonAsync() etc.
+            // to avoid unnecessary exceptions.
         }
 
-        protected abstract Task HandleMessageAsync(TMessage message, IDictionary<string, object> headers, CancellationToken cancellationToken);
+        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            // TODO: Implement
+            return Task.CompletedTask;
+        }
+
+        protected abstract Task HandleMessageAsync(TMessage message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken);
     }
 }

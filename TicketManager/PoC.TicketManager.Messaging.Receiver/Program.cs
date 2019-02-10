@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PoC.TicketManager.Messaging.Shared;
-using RabbitMQ.Client;
+using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Receivers;
 
 namespace PoC.TicketManager.Messaging.Receiver
@@ -14,12 +14,20 @@ namespace PoC.TicketManager.Messaging.Receiver
     {
         private static async Task Main(string[] args)
         {
-            var connectionFactory = new ConnectionFactory { HostName = "localhost" };
+            Console.WriteLine("Enter the ServiceBus connection string");
+            var connectionString = Console.ReadLine();
+
+            var subscriptionConfiguration = new ServiceBusSubscriptionConfiguration
+            {
+                ConnectionString = connectionString,
+                Topic = "ticketevents",
+                Subscription = "ticketcreated.querystoresync"
+            };
 
             var host = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddSingleton<IConnectionFactory>(connectionFactory);
+                    services.AddSingleton(subscriptionConfiguration);
                     services.AddHostedService<MessageReceiver>();
                 })
                 .UseConsoleLifetime()
@@ -31,13 +39,13 @@ namespace PoC.TicketManager.Messaging.Receiver
 
     public class MessageReceiver : ReceiverHost<Message>
     {
-        public MessageReceiver(IConnectionFactory connectionFactory) : base(connectionFactory)
+        public MessageReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration) : base(subscriptionConfiguration)
         {
         }
 
-        protected override Task HandleMessageAsync(Message message, IDictionary<string, object> headers, CancellationToken cancellationToken)
+        protected override Task HandleMessageAsync(Message message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
         {
-            Console.WriteLine($"Received a message for ticket with Id={message.TicketId}");
+            Console.WriteLine($"Received a message for ticket with Id={message.TicketId} (Correlation Id: {correlationId})");
 
             return Task.CompletedTask;
         }

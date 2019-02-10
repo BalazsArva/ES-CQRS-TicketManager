@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using PoC.TicketManager.Messaging.Shared;
-using RabbitMQ.Client;
+using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.MessageClients;
-using TicketManager.Messaging.Setup;
 
 namespace PoC.TicketManager.Messaging.Sender
 {
@@ -11,18 +10,22 @@ namespace PoC.TicketManager.Messaging.Sender
     {
         private static async Task Main(string[] args)
         {
-            var connectionFactory = new ConnectionFactory { HostName = "localhost" };
-            var configurator = new RabbitMQConfigurator(connectionFactory);
+            Console.WriteLine("Enter the ServiceBus connection string");
+            var connectionString = Console.ReadLine();
 
-            configurator.EnsureDurableQueueExists("TicketManagerPoC2");
+            var topicConfiguration = new ServiceBusTopicConfiguration
+            {
+                ConnectionString = connectionString,
+                Topic = "ticketevents"
+            };
 
-            var sender = new RabbitMQQueueMessageSender(connectionFactory);
+            var sender = new ServiceBusTopicSender(topicConfiguration);
 
             for (int i = 0; i < 10; ++i)
             {
                 Console.WriteLine($"Sending message {i}");
 
-                await sender.Send(new Message { TicketId = i }, default);
+                await sender.SendAsync(new Message { TicketId = i }, "TicketCreated", Guid.NewGuid().ToString(), null);
 
                 Console.WriteLine($"Done sending message {i}");
             }
