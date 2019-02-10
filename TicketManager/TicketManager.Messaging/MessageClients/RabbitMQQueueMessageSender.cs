@@ -23,6 +23,14 @@ namespace TicketManager.Messaging.MessageClients
             {
                 var messageJson = JsonConvert.SerializeObject(message);
                 var body = Encoding.UTF8.GetBytes(messageJson);
+
+                channel.BasicPublish(
+                    exchange: "",
+
+                    // TODO: Make this configurable
+                    routingKey: "TicketManagerPoC2",
+                    basicProperties: null,
+                    body: body);
             }
 
             return Task.CompletedTask;

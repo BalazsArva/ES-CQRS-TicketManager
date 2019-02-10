@@ -14,6 +14,9 @@ namespace TicketManager.Messaging.Receivers
     {
         private readonly IConnectionFactory connectionFactory;
 
+        private IConnection connection;
+        private IModel channel;
+
         public ReceiverHost(IConnectionFactory connectionFactory)
         {
             this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
@@ -21,11 +24,20 @@ namespace TicketManager.Messaging.Receivers
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            AsyncEventHandler<BasicDeliverEventArgs> handler = async (sender, eventArgs) => await OnMessageReceivedAsync(sender, eventArgs, stoppingToken);
+            connection = connectionFactory.CreateConnection();
+            channel = connection.CreateModel();
 
-            using (var connection = connectionFactory.CreateConnection())
-            using (var channel = connection.CreateModel())
+            MessageLoop(stoppingToken);
+
+            //await Task.Delay(Timeout.Infinite, stoppingToken);
+        }
+
+        private async void MessageLoop(CancellationToken stoppingToken)
+        {
+            await Task.Run(() =>
             {
+                AsyncEventHandler<BasicDeliverEventArgs> handler = async (sender, eventArgs) => await OnMessageReceivedAsync(sender, eventArgs, stoppingToken);
+
                 var consumer = new AsyncEventingBasicConsumer(channel);
 
                 consumer.Received += handler;
@@ -37,8 +49,11 @@ namespace TicketManager.Messaging.Receivers
                     consumer.Received -= handler;
                 });
 
-                await Task.Delay(Timeout.Infinite, stoppingToken);
-            }
+                var cnt = channel.MessageCount("TicketManagerPoC2");
+
+                // TODO: Make this configurable
+                channel.BasicConsume("TicketManagerPoC2", true, consumer);
+            });
         }
 
         protected virtual async Task OnMessageReceivedAsync(object sender, BasicDeliverEventArgs eventArgs, CancellationToken stoppingToken)

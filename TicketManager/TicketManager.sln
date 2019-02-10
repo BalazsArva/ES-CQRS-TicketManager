@@ -31,7 +31,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Contracts.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Messaging", "TicketManager.Messaging\TicketManager.Messaging.csproj", "{BA36B2C3-D2C8-4183-AE7F-7B164A0BAEF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Messaging.Receivers", "TicketManager.Messaging.Receivers\TicketManager.Messaging.Receivers.csproj", "{D251E441-0919-4AEE-93E2-317F50CCA3D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Messaging.Receivers", "TicketManager.Messaging.Receivers\TicketManager.Messaging.Receivers.csproj", "{D251E441-0919-4AEE-93E2-317F50CCA3D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PoCs", "PoCs", "{1A6256BD-7C92-4598-97E4-ACC5AC13B07C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoC.TicketManager.Messaging.Receiver", "PoC.TicketManager.Messaging.Receiver\PoC.TicketManager.Messaging.Receiver.csproj", "{38998E7F-EA78-4A5D-BE7C-01C29CCFFBBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoC.TicketManager.Messaging.Shared", "PoC.TicketManager.Messaging.Shared\PoC.TicketManager.Messaging.Shared.csproj", "{752949A4-85FA-4058-99F0-4DA92835B5EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoC.TicketManager.Messaging.Sender", "PoC.TicketManager.Messaging.Sender\PoC.TicketManager.Messaging.Sender.csproj", "{686FE870-AF61-4D9E-86D7-ABEE618F6DDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +87,18 @@ Global
 		{D251E441-0919-4AEE-93E2-317F50CCA3D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D251E441-0919-4AEE-93E2-317F50CCA3D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D251E441-0919-4AEE-93E2-317F50CCA3D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38998E7F-EA78-4A5D-BE7C-01C29CCFFBBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38998E7F-EA78-4A5D-BE7C-01C29CCFFBBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38998E7F-EA78-4A5D-BE7C-01C29CCFFBBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38998E7F-EA78-4A5D-BE7C-01C29CCFFBBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{752949A4-85FA-4058-99F0-4DA92835B5EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{752949A4-85FA-4058-99F0-4DA92835B5EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{752949A4-85FA-4058-99F0-4DA92835B5EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{752949A4-85FA-4058-99F0-4DA92835B5EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{686FE870-AF61-4D9E-86D7-ABEE618F6DDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{686FE870-AF61-4D9E-86D7-ABEE618F6DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{686FE870-AF61-4D9E-86D7-ABEE618F6DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{686FE870-AF61-4D9E-86D7-ABEE618F6DDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +114,9 @@ Global
 		{5C50CE42-5CC2-4FC5-864D-1334B76C4168} = {ECAFD88E-E879-4165-B09E-C7D8323FB674}
 		{BA36B2C3-D2C8-4183-AE7F-7B164A0BAEF8} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
 		{D251E441-0919-4AEE-93E2-317F50CCA3D2} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
+		{38998E7F-EA78-4A5D-BE7C-01C29CCFFBBA} = {1A6256BD-7C92-4598-97E4-ACC5AC13B07C}
+		{752949A4-85FA-4058-99F0-4DA92835B5EE} = {1A6256BD-7C92-4598-97E4-ACC5AC13B07C}
+		{686FE870-AF61-4D9E-86D7-ABEE618F6DDB} = {1A6256BD-7C92-4598-97E4-ACC5AC13B07C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05F4388B-9026-4AC2-BF48-6D615D2CECBA}
