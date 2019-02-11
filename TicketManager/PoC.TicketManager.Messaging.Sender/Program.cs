@@ -25,7 +25,7 @@ namespace PoC.TicketManager.Messaging.Sender
             {
                 Console.WriteLine($"Sending message {i}");
 
-                await sender.SendAsync(new Message { TicketId = i }, "TicketCreated", Guid.NewGuid().ToString(), null);
+                await sender.SendAsync(new Message { TicketId = i }, Guid.NewGuid().ToString(), null);
 
                 Console.WriteLine($"Done sending message {i}");
             }

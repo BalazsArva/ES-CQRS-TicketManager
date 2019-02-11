@@ -7,11 +7,17 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using TicketManager.Messaging.Configuration;
+using TicketManager.Messaging.Receivers.DataStructures;
 
 namespace TicketManager.Messaging.Receivers
 {
     public abstract class SubscriptionReceiverHostBase<TMessage> : IHostedService
     {
+        // Refer to https://github.com/aspnet/AspNetCore/blob/712c992ca827576c05923e6a134ca0bec87af4df/src/Microsoft.Extensions.Hosting.Abstractions/BackgroundService.cs
+        // how long-running background jobs can be implemented. This is based on that but a bit different as there can be many concurrently running tasks depending on the
+        // concurrency factor of the subscription client.
+
+        private readonly string MessageTypeFullName = typeof(TMessage).FullName;
         private readonly SubscriptionClient subscriptionClient;
         private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
 
@@ -27,15 +33,9 @@ namespace TicketManager.Messaging.Receivers
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            // Configure the message handler options in terms of exception handling, number of concurrent messages to deliver, etc.
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
             {
-                // Maximum number of concurrent calls to the callback ProcessMessagesAsync(), set to 1 for simplicity.
-                // Set it according to how many messages the application wants to process in parallel.
                 MaxConcurrentCalls = 1,
-
-                // Indicates whether MessagePump should automatically complete the messages after returning from User Callback.
-                // False below indicates the Complete will be handled by the User Callback as in `ProcessMessagesAsync` below.
                 AutoComplete = false
             };
 
@@ -56,26 +56,55 @@ namespace TicketManager.Messaging.Receivers
             finally
             {
                 // Wait until either the client is successfully shut down or a nongraceful shutdown should be initiated.
+                // The nongraceful shutdown is initiated when the passed CancellationToken signals cancel.
                 await Task.WhenAny(
                     subscriptionClient.CloseAsync(),
                     Task.Delay(Timeout.Infinite, cancellationToken));
             }
         }
 
+        protected virtual bool CanHandleMessage(Message rawMessage)
+        {
+            return MessageTypeFullName == rawMessage.Label;
+        }
+
+        protected abstract Task<ProcessMessageResult> HandleMessageAsync(TMessage message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken);
+
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
+            if (!CanHandleMessage(message))
+            {
+                var deadLetterReason = $"Receiver '{GetType().FullName}' could not process the message.";
+
+                await subscriptionClient.DeadLetterAsync(message.SystemProperties.LockToken, deadLetterReason).ConfigureAwait(false);
+
+                return;
+            }
+
             var bodyJson = Encoding.UTF8.GetString(message.Body);
             var messageContent = JsonConvert.DeserializeObject<TMessage>(bodyJson);
 
-            await HandleMessageAsync(messageContent, message.CorrelationId, message.UserProperties ?? new Dictionary<string, object>(), token).ConfigureAwait(false);
+            var result = await HandleMessageAsync(messageContent, message.CorrelationId, message.UserProperties ?? new Dictionary<string, object>(), token).ConfigureAwait(false);
 
-            // Complete the message so that it is not received again.
-            // This can be done only if the subscriptionClient is created in ReceiveMode.PeekLock mode (which is the default).
-            await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+            // If Cancel is signaled, that means the subscription client is closed.
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
 
-            // Note: Use the cancellationToken passed as necessary to determine if the subscriptionClient has already been closed.
-            // If subscriptionClient has already been closed, you can choose to not call CompleteAsync() or AbandonAsync() etc.
-            // to avoid unnecessary exceptions.
+            // TODO: Log unsuccessful cases
+            if (result.ResultType == ProcessMessageResultType.Success)
+            {
+                await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+            }
+            else if (result.ResultType == ProcessMessageResultType.PermanentError)
+            {
+                await subscriptionClient.DeadLetterAsync(message.SystemProperties.LockToken, result.Reason).ConfigureAwait(false);
+            }
+            else
+            {
+                await subscriptionClient.AbandonAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+            }
         }
 
         private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
@@ -83,7 +112,5 @@ namespace TicketManager.Messaging.Receivers
             // TODO: Implement
             return Task.CompletedTask;
         }
-
-        protected abstract Task HandleMessageAsync(TMessage message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken);
     }
 }

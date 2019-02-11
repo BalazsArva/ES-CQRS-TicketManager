@@ -17,7 +17,7 @@ namespace TicketManager.Messaging.MessageClients
             client = new TopicClient(configuration.ConnectionString, configuration.Topic);
         }
 
-        public async Task SendAsync<TMessage>(TMessage message, string messageType, string correlationId, Dictionary<string, object> headers = null)
+        public async Task SendAsync<TMessage>(TMessage message, string correlationId, Dictionary<string, object> headers = null)
         {
             var bodyJson = JsonConvert.SerializeObject(message);
             var body = Encoding.UTF8.GetBytes(bodyJson);
@@ -26,10 +26,10 @@ namespace TicketManager.Messaging.MessageClients
             {
                 ContentType = StandardContentTypes.Json,
                 CorrelationId = correlationId,
-                Label = messageType
+                Label = typeof(TMessage).FullName
             };
 
-            if (headers != null)
+            if (headers != null && headers.Count > 0)
             {
                 foreach (var header in headers)
                 {

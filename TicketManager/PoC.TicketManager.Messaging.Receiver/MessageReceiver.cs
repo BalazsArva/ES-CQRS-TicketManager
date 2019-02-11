@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using PoC.TicketManager.Messaging.Shared;
 using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Receivers;
+using TicketManager.Messaging.Receivers.DataStructures;
 
 namespace PoC.TicketManager.Messaging.Receiver
 {
@@ -14,11 +15,11 @@ namespace PoC.TicketManager.Messaging.Receiver
         {
         }
 
-        protected override Task HandleMessageAsync(Message message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
+        protected override Task<ProcessMessageResult> HandleMessageAsync(Message message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
         {
             Console.WriteLine($"Received a message for ticket with Id={message.TicketId} (Correlation Id: {correlationId})");
 
-            return Task.CompletedTask;
+            return Task.FromResult(ProcessMessageResult.Success());
         }
     }
 }
