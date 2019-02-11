@@ -4,14 +4,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Receivers.DataStructures;
 
 namespace TicketManager.Messaging.Receivers
 {
-    public abstract class SubscriptionReceiverHostBase<TMessage> : IHostedService
+    public abstract class SubscriptionReceiverHostBase<TMessage> : ISubscriptionReceiver
     {
         // Refer to https://github.com/aspnet/AspNetCore/blob/712c992ca827576c05923e6a134ca0bec87af4df/src/Microsoft.Extensions.Hosting.Abstractions/BackgroundService.cs
         // how long-running background jobs can be implemented. This is based on that but a bit different as there can be many concurrently running tasks depending on the
