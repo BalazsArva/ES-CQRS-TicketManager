@@ -37,7 +37,7 @@ namespace TicketManager.Messaging.MessageClients
                 }
             }
 
-            await client.SendAsync(topicMessage);
+            await client.SendAsync(topicMessage).ConfigureAwait(false);
         }
     }
 }

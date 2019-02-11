@@ -30,7 +30,7 @@ namespace TicketManager.WebAPI
 
             services.AddValidators();
             services.AddEventAggregators();
-            services.AddApplicationServices();
+            services.AddApplicationServices(Configuration);
             services.AddMediatR(typeof(Startup).Assembly);
 
             services

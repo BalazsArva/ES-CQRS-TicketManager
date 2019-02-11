@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <UserSecretsId>2c315e9d-e3eb-413c-9532-08d85672f99d</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -39,6 +40,7 @@
     <ProjectReference Include="..\TicketManager.DataAccess.Documents\TicketManager.DataAccess.Documents.csproj" />
     <ProjectReference Include="..\TicketManager.DataAccess.Events\TicketManager.DataAccess.Events.csproj" />
     <ProjectReference Include="..\TicketManager.Domain.Common\TicketManager.Domain.Common.csproj" />
+    <ProjectReference Include="..\TicketManager.Messaging\TicketManager.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

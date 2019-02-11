@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Utilities;
 using TicketManager.DataAccess.Events;
+using TicketManager.Messaging.Configuration;
+using TicketManager.Messaging.MessageClients;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.Services.EventAggregators;
@@ -98,10 +100,21 @@ namespace TicketManager.WebAPI.Extensions
             return services;
         }
 
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
+            var topicConfiguration = new ServiceBusTopicConfiguration
+            {
+                // The ConnectionString is stored as a user secret. Set it on the machine before using by navigating to the project location
+                // from PowerShell and running
+                //     dotnet user-secrets set "ServiceBus:ConnectionString" "<connection-string>"
+                ConnectionString = configuration.GetValue<string>("ServiceBus:ConnectionString"),
+                Topic = "ticketevents"
+            };
+
             return services
                 .AddHttpContextAccessor()
+                .AddSingleton(topicConfiguration)
+                .AddSingleton<IServiceBusTopicSender, ServiceBusTopicSender>()
                 .AddSingleton<IETagProvider, ETagProvider>()
                 .AddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
         }
