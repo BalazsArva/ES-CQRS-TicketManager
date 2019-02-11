@@ -7,11 +7,10 @@ using Raven.Client.Exceptions;
 using Raven.Client.Exceptions.Database;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
-using TicketManager.DataAccess.Documents;
 
-namespace TicketManager.WebAPI.Extensions
+namespace TicketManager.DataAccess.Documents.Extensions
 {
-    public static class ServiceCollectionExtensions_RavenDb
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddRavenDb(this IServiceCollection services, IConfiguration configuration)
         {

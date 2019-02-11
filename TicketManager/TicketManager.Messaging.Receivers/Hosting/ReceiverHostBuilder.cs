@@ -18,7 +18,13 @@ namespace TicketManager.Messaging.Receivers.Hosting
                 })
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
-                    if (context.HostingEnvironment.IsDevelopment())
+                    var env = context.HostingEnvironment;
+
+                    configBuilder
+                        .AddJsonFile("appsettings.json")
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true);
+
+                    if (env.IsDevelopment())
                     {
                         configBuilder.AddUserSecrets(Assembly.GetEntryAssembly());
                     }

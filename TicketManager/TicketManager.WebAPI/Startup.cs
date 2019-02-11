@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using TicketManager.BusinessServices.EventAggregators.Extensions;
 using TicketManager.Common.Http;
+using TicketManager.DataAccess.Documents.Extensions;
+using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.Extensions;
 using TicketManager.WebAPI.Filters;
 
