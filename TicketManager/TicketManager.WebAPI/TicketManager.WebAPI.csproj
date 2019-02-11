@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TicketManager.BusinessServices.EventAggregators\TicketManager.BusinessServices.EventAggregators.csproj" />
     <ProjectReference Include="..\TicketManager.Common\TicketManager.Common.csproj" />
     <ProjectReference Include="..\TicketManager.Contracts.CommandApi\TicketManager.Contracts.CommandApi.csproj" />
     <ProjectReference Include="..\TicketManager.Contracts.QueryApi\TicketManager.Contracts.QueryApi.csproj" />

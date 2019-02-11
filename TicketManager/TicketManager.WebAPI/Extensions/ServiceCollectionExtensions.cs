@@ -2,14 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Utilities;
 using TicketManager.DataAccess.Events;
 using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.MessageClients;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Queries;
-using TicketManager.WebAPI.Services.EventAggregators;
 using TicketManager.WebAPI.Services.Providers;
 using TicketManager.WebAPI.Validation.CommandValidators;
 using TicketManager.WebAPI.Validation.QueryValidators;
@@ -78,24 +76,6 @@ namespace TicketManager.WebAPI.Extensions
             services
                 .AddSingleton<IValidator<SearchTicketsQueryRequest>, SearchTicketsQueryRequestValidator>()
                 .AddSingleton<IValidator<GetTicketHistoryQueryRequest>, GetTicketHistoryQueryRequestValidator>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddEventAggregators(this IServiceCollection services)
-        {
-            services
-                .AddTransient<IEventAggregator<Assignment>, TicketAssignedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketInvolvement>, TicketUserInvolvementEventAggregator>()
-                .AddTransient<IEventAggregator<TicketDescription>, TicketDescriptionChangedEventAggregator>()
-                .AddTransient<IEventAggregator<Links>, TicketLinksChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketPriority>, TicketPriorityChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketStatus>, TicketStatusChangedEventAggregator>()
-                .AddTransient<IEventAggregator<Tags>, TicketTagsChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketTitle>, TicketTitleChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketType>, TicketTypeChangedEventAggregator>()
-                .AddTransient<IEventAggregator<StoryPoints>, TicketStoryPointsChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketInvolvement>, TicketUserInvolvementEventAggregator>();
 
             return services;
         }

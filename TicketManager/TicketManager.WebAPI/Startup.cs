@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using TicketManager.BusinessServices.EventAggregators.Extensions;
 using TicketManager.Common.Http;
 using TicketManager.WebAPI.Extensions;
 using TicketManager.WebAPI.Filters;
@@ -29,6 +30,8 @@ namespace TicketManager.WebAPI
             services.AddEventsContext(Configuration);
 
             services.AddValidators();
+
+            // TODO: Delete (project reference as well) when everything is moved to the separate query store synchronizer apps.
             services.AddEventAggregators();
             services.AddApplicationServices(Configuration);
             services.AddMediatR(typeof(Startup).Assembly);

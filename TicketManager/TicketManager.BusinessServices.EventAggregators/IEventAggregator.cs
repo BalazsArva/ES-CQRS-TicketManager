@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TicketManager.WebAPI.Services.EventAggregators
+namespace TicketManager.BusinessServices.EventAggregators
 {
     /// <summary>
     /// Defines the contract for a class which can be used to aggregate domain events to constuct an event aggregate of type <typeparamref name="TAggregate"/>.

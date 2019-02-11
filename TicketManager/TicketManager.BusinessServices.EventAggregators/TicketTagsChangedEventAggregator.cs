@@ -8,7 +8,7 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.Extensions;
 
-namespace TicketManager.WebAPI.Services.EventAggregators
+namespace TicketManager.BusinessServices.EventAggregators
 {
     public class TicketTagsChangedEventAggregator : IEventAggregator<Tags>
     {

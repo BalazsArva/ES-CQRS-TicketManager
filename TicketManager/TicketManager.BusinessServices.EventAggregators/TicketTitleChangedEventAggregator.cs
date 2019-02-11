@@ -6,40 +6,39 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.Extensions;
 
-namespace TicketManager.WebAPI.Services.EventAggregators
+namespace TicketManager.BusinessServices.EventAggregators
 {
-    public class TicketTypeChangedEventAggregator : IEventAggregator<TicketType>
+    public class TicketTitleChangedEventAggregator : IEventAggregator<TicketTitle>
     {
         private readonly IEventsContextFactory eventsContextFactory;
 
-        public TicketTypeChangedEventAggregator(IEventsContextFactory eventsContextFactory)
+        public TicketTitleChangedEventAggregator(IEventsContextFactory eventsContextFactory)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
         }
 
-        public Task<TicketType> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketType currentAggregateState, CancellationToken cancellationToken)
+        public Task<TicketTitle> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketTitle currentAggregateState, CancellationToken cancellationToken)
         {
             return AggregateSubsequentEventsAsync(ticketCreatedEventId, currentAggregateState, DateTime.MaxValue, cancellationToken);
         }
 
-        public async Task<TicketType> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketType currentAggregateState, DateTime eventTimeUpperLimit, CancellationToken cancellationToken)
+        public async Task<TicketTitle> AggregateSubsequentEventsAsync(long ticketCreatedEventId, TicketTitle currentAggregateState, DateTime eventTimeUpperLimit, CancellationToken cancellationToken)
         {
             using (var context = eventsContextFactory.CreateContext())
             {
-                var ticketTypeChangedEvent = await context
-                    .TicketTypeChangedEvents
+                var ticketTitleChangedEvent = await context.TicketTitleChangedEvents
                     .AsNoTracking()
                     .OfTicket(ticketCreatedEventId)
                     .NotLaterThan(eventTimeUpperLimit)
                     .LatestAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                return new TicketType
+                return new TicketTitle
                 {
-                    LastChangedBy = ticketTypeChangedEvent.CausedBy,
-                    UtcDateLastUpdated = ticketTypeChangedEvent.UtcDateRecorded,
-                    Type = ticketTypeChangedEvent.TicketType,
-                    LastKnownChangeId = ticketTypeChangedEvent.Id
+                    LastChangedBy = ticketTitleChangedEvent.CausedBy,
+                    Title = ticketTitleChangedEvent.Title,
+                    UtcDateLastUpdated = ticketTitleChangedEvent.UtcDateRecorded,
+                    LastKnownChangeId = ticketTitleChangedEvent.Id
                 };
             }
         }

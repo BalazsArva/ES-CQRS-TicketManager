@@ -10,7 +10,7 @@ using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.Extensions;
 using IDocumentStore = Raven.Client.Documents.IDocumentStore;
 
-namespace TicketManager.WebAPI.Services.EventAggregators
+namespace TicketManager.BusinessServices.EventAggregators
 {
     public class TicketLinksChangedEventAggregator : IEventAggregator<Links>
     {
