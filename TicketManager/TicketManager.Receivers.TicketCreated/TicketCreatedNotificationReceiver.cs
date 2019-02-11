@@ -62,7 +62,7 @@ namespace TicketManager.Receivers.TicketCreated
             this.involvementEventAggregator = involvementEventAggregator ?? throw new ArgumentNullException(nameof(involvementEventAggregator));
         }
 
-        protected override async Task<ProcessMessageResult> HandleMessageAsync(TicketCreatedNotification message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
+        public override async Task<ProcessMessageResult> HandleMessageAsync(TicketCreatedNotification message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {

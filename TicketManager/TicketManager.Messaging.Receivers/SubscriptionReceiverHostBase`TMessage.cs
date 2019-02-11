@@ -67,12 +67,12 @@ namespace TicketManager.Messaging.Receivers
             }
         }
 
+        public abstract Task<ProcessMessageResult> HandleMessageAsync(TMessage message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken);
+
         protected virtual bool CanHandleMessage(Message rawMessage)
         {
             return MessageTypeFullName == rawMessage.Label;
         }
-
-        protected abstract Task<ProcessMessageResult> HandleMessageAsync(TMessage message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken);
 
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {

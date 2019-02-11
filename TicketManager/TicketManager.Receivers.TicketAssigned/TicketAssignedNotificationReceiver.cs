@@ -27,7 +27,7 @@ namespace TicketManager.Receivers.TicketAssigned
             this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
         }
 
-        protected override async Task<ProcessMessageResult> HandleMessageAsync(TicketAssignedNotification notification, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
+        public override async Task<ProcessMessageResult> HandleMessageAsync(TicketAssignedNotification notification, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {
