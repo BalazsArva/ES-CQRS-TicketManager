@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Raven.Client.Documents;
 using TicketManager.BusinessServices.EventAggregators;
+using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
@@ -12,11 +13,9 @@ using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Receivers;
 using TicketManager.Messaging.Receivers.DataStructures;
-using TicketManager.WebAPI.DTOs.Notifications;
 
 namespace TicketManager.Receivers.TicketCreated
 {
-    // TODO: Refactor TicketCreatedNotification and other notifications to a shared lib between the Command API and receivers. Remove assembly reference from here to WebAPI.
     public class TicketCreatedNotificationReceiver : SubscriptionReceiverHostBase<TicketCreatedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;

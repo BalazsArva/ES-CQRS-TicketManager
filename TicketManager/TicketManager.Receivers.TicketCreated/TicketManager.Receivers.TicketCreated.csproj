@@ -14,11 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TicketManager.BusinessServices.EventAggregators\TicketManager.BusinessServices.EventAggregators.csproj" />
+    <ProjectReference Include="..\TicketManager.Contracts.Notifications\TicketManager.Contracts.Notifications.csproj" />
     <ProjectReference Include="..\TicketManager.DataAccess.Documents\TicketManager.DataAccess.Documents.csproj" />
     <ProjectReference Include="..\TicketManager.DataAccess.Events\TicketManager.DataAccess.Events.csproj" />
     <ProjectReference Include="..\TicketManager.Messaging.Receivers\TicketManager.Messaging.Receivers.csproj" />
     <ProjectReference Include="..\TicketManager.Messaging\TicketManager.Messaging.csproj" />
-    <ProjectReference Include="..\TicketManager.WebAPI\TicketManager.WebAPI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

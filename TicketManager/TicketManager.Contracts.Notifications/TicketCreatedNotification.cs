@@ -1,8 +1,6 @@
-﻿using MediatR;
-
-namespace TicketManager.WebAPI.DTOs.Notifications
+﻿namespace TicketManager.Contracts.Notifications
 {
-    public class TicketCreatedNotification : INotification
+    public class TicketCreatedNotification
     {
         public TicketCreatedNotification(long ticketId)
         {
