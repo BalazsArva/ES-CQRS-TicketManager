@@ -1,28 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Raven.Client.Documents;
 using TicketManager.BusinessServices.EventAggregators;
+using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
-using TicketManager.WebAPI.DTOs.Notifications;
+using TicketManager.Messaging.Configuration;
+using TicketManager.Messaging.Receivers;
+using TicketManager.Messaging.Receivers.DataStructures;
+using TicketManager.Messaging.Setup;
 
-namespace TicketManager.WebAPI.Services.NotificationHandlers
+namespace TicketManager.Receivers.TicketAssigned
 {
-    public class TicketAssignedNotificationHandler : INotificationHandler<TicketAssignedNotification>
+    public class TicketAssignedNotificationReceiver : SubscriptionReceiverHostBase<TicketAssignedNotification>
     {
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<Assignment> eventAggregator;
 
-        public TicketAssignedNotificationHandler(IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
+        public TicketAssignedNotificationReceiver(IServiceBusConfigurer serviceBusConfigurer, ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
+            : base(subscriptionConfiguration, serviceBusConfigurer)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
         }
 
-        public async Task Handle(TicketAssignedNotification notification, CancellationToken cancellationToken)
+        protected override async Task<ProcessMessageResult> HandleMessageAsync(TicketAssignedNotification notification, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {
@@ -45,6 +50,8 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
 
                 await session.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
+
+            return ProcessMessageResult.Success();
         }
     }
 }

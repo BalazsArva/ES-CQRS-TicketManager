@@ -7,6 +7,7 @@ using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Receivers.DataStructures;
+using TicketManager.Messaging.Setup;
 
 namespace TicketManager.Messaging.Receivers
 {
@@ -17,21 +18,27 @@ namespace TicketManager.Messaging.Receivers
         // concurrency factor of the subscription client.
 
         private readonly string MessageTypeFullName = typeof(TMessage).FullName;
-        private readonly SubscriptionClient subscriptionClient;
         private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
+        private readonly ServiceBusSubscriptionConfiguration configuration;
+        private readonly IServiceBusConfigurer serviceBusConfigurer;
 
-        public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration)
+        private SubscriptionClient subscriptionClient;
+
+        public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration, IServiceBusConfigurer serviceBusConfigurer)
         {
-            if (configuration == null)
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.serviceBusConfigurer = serviceBusConfigurer ?? throw new ArgumentNullException(nameof(serviceBusConfigurer));
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            if (configuration.RunSubscriptionSetupOnStart)
             {
-                throw new ArgumentNullException(nameof(configuration));
+                await serviceBusConfigurer.SetupSubscriptionAsync<TMessage>(cancellationToken);
             }
 
             subscriptionClient = new SubscriptionClient(configuration.ConnectionString, configuration.Topic, configuration.Subscription);
-        }
 
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
             {
                 MaxConcurrentCalls = 1,
@@ -42,8 +49,6 @@ namespace TicketManager.Messaging.Receivers
             subscriptionClient.RegisterMessageHandler(
                 (msg, token) => ProcessMessagesAsync(msg, CancellationTokenSource.CreateLinkedTokenSource(token, stoppingCts.Token).Token),
                 messageHandlerOptions);
-
-            return Task.CompletedTask;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

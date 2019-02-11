@@ -17,7 +17,6 @@
     <ProjectReference Include="..\TicketManager.DataAccess.Documents\TicketManager.DataAccess.Documents.csproj" />
     <ProjectReference Include="..\TicketManager.DataAccess.Events\TicketManager.DataAccess.Events.csproj" />
     <ProjectReference Include="..\TicketManager.Messaging.Receivers\TicketManager.Messaging.Receivers.csproj" />
-    <ProjectReference Include="..\TicketManager.Messaging\TicketManager.Messaging.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TicketManager.Messaging.Configuration;
+using TicketManager.Messaging.Setup;
 
 namespace TicketManager.Messaging.Receivers.Hosting
 {
@@ -40,6 +41,7 @@ namespace TicketManager.Messaging.Receivers.Hosting
 
                     services
                         .AddSingleton(subscriptionConfiguration)
+                        .AddSingleton<IServiceBusConfigurer, ServiceBusConfigurer>()
                         .AddHostedService<TReceiver>();
                 })
                 .UseConsoleLifetime();

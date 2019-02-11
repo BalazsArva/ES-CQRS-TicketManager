@@ -5,17 +5,17 @@ using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.Messaging.Receivers.Hosting;
 
-namespace TicketManager.Receivers.TicketCreated
+namespace TicketManager.Receivers.TicketAssigned
 {
     internal class Program
     {
         private const string Topic = "ticketevents";
-        private const string Subscription = "ticketcreated.querystoresync";
+        private const string Subscription = "ticketassigned.querystoresync";
 
         private static async Task Main(string[] args)
         {
             var host = new ReceiverHostBuilder()
-                .CreateDefaultBuilder<TicketCreatedNotificationReceiver>(Topic, Subscription)
+                .CreateDefaultBuilder<TicketAssignedNotificationReceiver>(Topic, Subscription)
                 .ConfigureServices((hostingContext, services) =>
                 {
                     var configuration = hostingContext.Configuration;

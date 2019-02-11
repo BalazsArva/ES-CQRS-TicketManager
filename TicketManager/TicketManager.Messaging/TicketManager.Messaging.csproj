@@ -16,8 +16,4 @@
     <ProjectReference Include="..\TicketManager.Common\TicketManager.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Setup\" />
-  </ItemGroup>
-
 </Project>
