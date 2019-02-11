@@ -10,9 +10,10 @@ using TicketManager.Messaging.Configuration;
 
 namespace TicketManager.Messaging.Receivers
 {
-    public abstract class SubscriptionReceiverHostBase<TMessage> : BackgroundService
+    public abstract class SubscriptionReceiverHostBase<TMessage> : IHostedService
     {
         private readonly SubscriptionClient subscriptionClient;
+        private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
 
         public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration)
         {
@@ -24,7 +25,7 @@ namespace TicketManager.Messaging.Receivers
             subscriptionClient = new SubscriptionClient(configuration.ConnectionString, configuration.Topic, configuration.Subscription);
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             // Configure the message handler options in terms of exception handling, number of concurrent messages to deliver, etc.
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
@@ -39,9 +40,26 @@ namespace TicketManager.Messaging.Receivers
             };
 
             // Register the function that processes messages.
-            subscriptionClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+            subscriptionClient.RegisterMessageHandler(
+                (msg, token) => ProcessMessagesAsync(msg, CancellationTokenSource.CreateLinkedTokenSource(token, stoppingCts.Token).Token),
+                messageHandlerOptions);
 
-            await Task.Delay(Timeout.Infinite, stoppingToken);
+            return Task.CompletedTask;
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                stoppingCts.Cancel();
+            }
+            finally
+            {
+                // Wait until either the client is successfully shut down or a nongraceful shutdown should be initiated.
+                await Task.WhenAny(
+                    subscriptionClient.CloseAsync(),
+                    Task.Delay(Timeout.Infinite, cancellationToken));
+            }
         }
 
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
@@ -49,11 +67,11 @@ namespace TicketManager.Messaging.Receivers
             var bodyJson = Encoding.UTF8.GetString(message.Body);
             var messageContent = JsonConvert.DeserializeObject<TMessage>(bodyJson);
 
-            await HandleMessageAsync(messageContent, message.CorrelationId, message.UserProperties, token);
+            await HandleMessageAsync(messageContent, message.CorrelationId, message.UserProperties ?? new Dictionary<string, object>(), token).ConfigureAwait(false);
 
             // Complete the message so that it is not received again.
             // This can be done only if the subscriptionClient is created in ReceiveMode.PeekLock mode (which is the default).
-            await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+            await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
 
             // Note: Use the cancellationToken passed as necessary to determine if the subscriptionClient has already been closed.
             // If subscriptionClient has already been closed, you can choose to not call CompleteAsync() or AbandonAsync() etc.
