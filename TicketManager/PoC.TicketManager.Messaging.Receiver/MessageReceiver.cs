@@ -8,7 +8,7 @@ using TicketManager.Messaging.Receivers;
 
 namespace PoC.TicketManager.Messaging.Receiver
 {
-    public class MessageReceiver : ReceiverHost<Message>
+    public class MessageReceiver : SubscriptionReceiverHostBase<Message>
     {
         public MessageReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration) : base(subscriptionConfiguration)
         {

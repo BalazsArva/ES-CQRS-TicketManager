@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,13 +10,18 @@ using TicketManager.Messaging.Configuration;
 
 namespace TicketManager.Messaging.Receivers
 {
-    public abstract class ReceiverHost<TMessage> : BackgroundService
+    public abstract class SubscriptionReceiverHostBase<TMessage> : BackgroundService
     {
         private readonly SubscriptionClient subscriptionClient;
 
-        public ReceiverHost(ServiceBusSubscriptionConfiguration subscriptionConfiguration)
+        public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration)
         {
-            subscriptionClient = new SubscriptionClient(subscriptionConfiguration.ConnectionString, subscriptionConfiguration.Topic, subscriptionConfiguration.Subscription);
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            subscriptionClient = new SubscriptionClient(configuration.ConnectionString, configuration.Topic, configuration.Subscription);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
