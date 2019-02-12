@@ -5,8 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
-using TicketManager.Messaging.Configuration;
-using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.Configuration;
 using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers
@@ -20,23 +19,16 @@ namespace TicketManager.Receivers
         private readonly string MessageTypeFullName = typeof(TMessage).FullName;
         private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
         private readonly ServiceBusSubscriptionConfiguration configuration;
-        private readonly IServiceBusConfigurer serviceBusConfigurer;
 
         private SubscriptionClient subscriptionClient;
 
-        public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration, IServiceBusConfigurer serviceBusConfigurer)
+        public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.serviceBusConfigurer = serviceBusConfigurer ?? throw new ArgumentNullException(nameof(serviceBusConfigurer));
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            if (configuration.RunSubscriptionSetupOnStart)
-            {
-                await serviceBusConfigurer.SetupSubscriptionAsync<TMessage>(cancellationToken);
-            }
-
             subscriptionClient = new SubscriptionClient(configuration.ConnectionString, configuration.Topic, configuration.Subscription);
 
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
@@ -45,10 +37,11 @@ namespace TicketManager.Receivers
                 AutoComplete = false
             };
 
-            // Register the function that processes messages.
             subscriptionClient.RegisterMessageHandler(
                 (msg, token) => ProcessMessagesAsync(msg, CancellationTokenSource.CreateLinkedTokenSource(token, stoppingCts.Token).Token),
                 messageHandlerOptions);
+
+            return Task.CompletedTask;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

@@ -8,8 +8,7 @@ using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
-using TicketManager.Messaging.Configuration;
-using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.Configuration;
 using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers.TicketAssigned
@@ -19,8 +18,8 @@ namespace TicketManager.Receivers.TicketAssigned
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<Assignment> eventAggregator;
 
-        public TicketAssignedNotificationReceiver(IServiceBusConfigurer serviceBusConfigurer, ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
-            : base(subscriptionConfiguration, serviceBusConfigurer)
+        public TicketAssignedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
+            : base(subscriptionConfiguration)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));

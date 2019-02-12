@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using TicketManager.BusinessServices.EventAggregators.Extensions;
+using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events.Extensions;
+using TicketManager.Receivers.Extensions;
 using TicketManager.Receivers.Hosting;
 
 namespace TicketManager.Receivers.TicketAssigned
@@ -26,6 +28,8 @@ namespace TicketManager.Receivers.TicketAssigned
                         .AddEventsContext(configuration);
                 })
                 .Build();
+
+            await host.SetupSubscriptionAsync<TicketAssignedNotification>();
 
             await host.RunAsync();
         }

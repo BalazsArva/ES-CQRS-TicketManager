@@ -1,30 +1,15 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
-using TicketManager.Messaging.Configuration;
 
 namespace TicketManager.Messaging.Setup
 {
     public class ServiceBusConfigurer : IServiceBusConfigurer
     {
         private const string EventTypeRuleName = "EventType";
-        private readonly ServiceBusSubscriptionConfiguration sbConfiguration;
 
-        public ServiceBusConfigurer(ServiceBusSubscriptionConfiguration sbConfiguration)
-        {
-            this.sbConfiguration = sbConfiguration ?? throw new ArgumentNullException(nameof(sbConfiguration));
-        }
-
-        public Task SetupSubscriptionAsync<TNotification>(CancellationToken cancellationToken)
-        {
-            var eventType = typeof(TNotification).FullName;
-
-            return SetupSubscriptionAsync(sbConfiguration.ConnectionString, sbConfiguration.Topic, sbConfiguration.Subscription, eventType, cancellationToken);
-        }
-
-        private async Task SetupSubscriptionAsync(string connectionString, string topic, string subscription, string eventType, CancellationToken cancellationToken)
+        public async Task SetupSubscriptionAsync(string connectionString, string topic, string subscription, string eventType, CancellationToken cancellationToken)
         {
             var managementClient = new ManagementClient(connectionString);
 

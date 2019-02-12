@@ -5,6 +5,6 @@ namespace TicketManager.Messaging.Setup
 {
     public interface IServiceBusConfigurer
     {
-        Task SetupSubscriptionAsync<TNotification>(CancellationToken cancellationToken);
+        Task SetupSubscriptionAsync(string connectionString, string topic, string subscription, string eventType, CancellationToken cancellationToken);
     }
 }

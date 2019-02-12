@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.Configuration;
 
 namespace TicketManager.Receivers.Hosting
 {
