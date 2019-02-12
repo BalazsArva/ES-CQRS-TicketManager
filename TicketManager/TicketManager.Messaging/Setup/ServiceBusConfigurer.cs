@@ -1,30 +1,22 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
-using TicketManager.Messaging.Configuration;
 
 namespace TicketManager.Messaging.Setup
 {
     public class ServiceBusConfigurer : IServiceBusConfigurer
     {
         private const string EventTypeRuleName = "EventType";
-        private readonly ServiceBusSubscriptionConfiguration sbConfiguration;
 
-        public ServiceBusConfigurer(ServiceBusSubscriptionConfiguration sbConfiguration)
-        {
-            this.sbConfiguration = sbConfiguration ?? throw new ArgumentNullException(nameof(sbConfiguration));
-        }
-
-        public Task SetupSubscriptionAsync<TNotification>(CancellationToken cancellationToken)
+        public Task SetupSubscriptionAsync<TNotification>(ServiceBusSubscriptionSetup setupInfo, CancellationToken cancellationToken)
         {
             var eventType = typeof(TNotification).FullName;
 
-            return SetupSubscriptionAsync(sbConfiguration.ConnectionString, sbConfiguration.Topic, sbConfiguration.Subscription, eventType, cancellationToken);
+            return SetupSubscriptionAsync(setupInfo.ConnectionString, setupInfo.Topic, setupInfo.Subscription, eventType, setupInfo.UseSessions, cancellationToken);
         }
 
-        private async Task SetupSubscriptionAsync(string connectionString, string topic, string subscription, string eventType, CancellationToken cancellationToken)
+        private async Task SetupSubscriptionAsync(string connectionString, string topic, string subscription, string eventType, bool useSessions, CancellationToken cancellationToken)
         {
             var managementClient = new ManagementClient(connectionString);
 
@@ -42,7 +34,8 @@ namespace TicketManager.Messaging.Setup
                 var subscriptionDescription = new SubscriptionDescription(topic, subscription)
                 {
                     EnableDeadLetteringOnFilterEvaluationExceptions = false,
-                    EnableDeadLetteringOnMessageExpiration = true
+                    EnableDeadLetteringOnMessageExpiration = true,
+                    RequiresSession = useSessions
                 };
 
                 await managementClient.CreateSubscriptionAsync(subscriptionDescription, ruleDescription, cancellationToken);

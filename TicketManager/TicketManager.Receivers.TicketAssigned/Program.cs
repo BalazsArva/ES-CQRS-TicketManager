@@ -15,7 +15,7 @@ namespace TicketManager.Receivers.TicketAssigned
         private static async Task Main(string[] args)
         {
             var host = new ReceiverHostBuilder()
-                .CreateDefaultBuilder<TicketAssignedNotificationReceiver>(Topic, Subscription)
+                .CreateDefaultSessionedSubscriptionHostBuilder<TicketAssignedNotificationReceiver>(Topic, Subscription)
                 .ConfigureServices((hostingContext, services) =>
                 {
                     var configuration = hostingContext.Configuration;

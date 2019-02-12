@@ -2,15 +2,70 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.Configuration;
 
 namespace TicketManager.Receivers.Hosting
 {
     public class ReceiverHostBuilder
     {
-        public IHostBuilder CreateDefaultBuilder<TReceiver>(string topic, string subscription)
+        public IHostBuilder CreateDefaultSubscriptionHostBuilder<TReceiver>(string topic, string subscription)
             where TReceiver : class, ISubscriptionReceiver
+        {
+            return CreateDefaultCommonHostBuilder()
+                .ConfigureServices((hostingContext, services) =>
+                {
+                    var subscriptionConfiguration = new ServiceBusSubscriptionConfiguration
+                    {
+                        ConnectionString = hostingContext.Configuration["ServiceBus:ConnectionString"],
+                        Topic = topic,
+                        Subscription = subscription
+                    };
+
+                    var subscriptionSetupInfo = new ServiceBusSubscriptionSetup
+                    {
+                        ConnectionString = hostingContext.Configuration["ServiceBus:ConnectionString"],
+                        Topic = topic,
+                        Subscription = subscription,
+                        UseSessions = false
+                    };
+
+                    services
+                        .AddSingleton(subscriptionConfiguration)
+                        .AddSingleton(subscriptionSetupInfo)
+                        .AddHostedService<TReceiver>();
+                });
+        }
+
+        public IHostBuilder CreateDefaultSessionedSubscriptionHostBuilder<TReceiver>(string topic, string subscription)
+            where TReceiver : class, ISessionedSubscriptionReceiver
+        {
+            return CreateDefaultCommonHostBuilder()
+                .ConfigureServices((hostingContext, services) =>
+                {
+                    var subscriptionConfiguration = new ServiceBusSubscriptionConfiguration
+                    {
+                        ConnectionString = hostingContext.Configuration["ServiceBus:ConnectionString"],
+                        Topic = topic,
+                        Subscription = subscription
+                    };
+
+                    var subscriptionSetupInfo = new ServiceBusSubscriptionSetup
+                    {
+                        ConnectionString = hostingContext.Configuration["ServiceBus:ConnectionString"],
+                        Topic = topic,
+                        Subscription = subscription,
+                        UseSessions = true
+                    };
+
+                    services
+                        .AddSingleton(subscriptionConfiguration)
+                        .AddSingleton(subscriptionSetupInfo)
+                        .AddHostedService<TReceiver>();
+                });
+        }
+
+        private IHostBuilder CreateDefaultCommonHostBuilder()
         {
             return new HostBuilder()
                 .ConfigureHostConfiguration(cfg =>
@@ -32,17 +87,7 @@ namespace TicketManager.Receivers.Hosting
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    var subscriptionConfiguration = new ServiceBusSubscriptionConfiguration
-                    {
-                        ConnectionString = hostingContext.Configuration["ServiceBus:ConnectionString"],
-                        Topic = topic,
-                        Subscription = subscription
-                    };
-
-                    services
-                        .AddSingleton(subscriptionConfiguration)
-                        .AddSingleton<IServiceBusConfigurer, ServiceBusConfigurer>()
-                        .AddHostedService<TReceiver>();
+                    services.AddSingleton<IServiceBusConfigurer, ServiceBusConfigurer>();
                 })
                 .UseConsoleLifetime();
         }

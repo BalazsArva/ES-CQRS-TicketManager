@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
-using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.Configuration;
 using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers
@@ -20,21 +20,23 @@ namespace TicketManager.Receivers
         private readonly string MessageTypeFullName = typeof(TMessage).FullName;
         private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
         private readonly ServiceBusSubscriptionConfiguration configuration;
+        private readonly ServiceBusSubscriptionSetup setupInfo;
         private readonly IServiceBusConfigurer serviceBusConfigurer;
 
         private SubscriptionClient subscriptionClient;
 
-        public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration, IServiceBusConfigurer serviceBusConfigurer)
+        public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration, ServiceBusSubscriptionSetup setupInfo, IServiceBusConfigurer serviceBusConfigurer)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.setupInfo = setupInfo ?? throw new ArgumentNullException(nameof(setupInfo));
             this.serviceBusConfigurer = serviceBusConfigurer ?? throw new ArgumentNullException(nameof(serviceBusConfigurer));
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            if (configuration.RunSubscriptionSetupOnStart)
+            if (setupInfo.RunSubscriptionSetupOnStart)
             {
-                await serviceBusConfigurer.SetupSubscriptionAsync<TMessage>(cancellationToken);
+                await serviceBusConfigurer.SetupSubscriptionAsync<TMessage>(setupInfo, cancellationToken);
             }
 
             subscriptionClient = new SubscriptionClient(configuration.ConnectionString, configuration.Topic, configuration.Subscription);

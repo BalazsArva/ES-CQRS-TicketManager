@@ -10,8 +10,8 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
-using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.Configuration;
 using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers.TicketCreated
@@ -34,6 +34,7 @@ namespace TicketManager.Receivers.TicketCreated
         public TicketCreatedNotificationReceiver(
             IServiceBusConfigurer serviceBusConfigurer,
             ServiceBusSubscriptionConfiguration subscriptionConfiguration,
+            ServiceBusSubscriptionSetup setupInfo,
             IEventsContextFactory eventsContextFactory,
             IDocumentStore documentStore,
             IEventAggregator<Assignment> assignmentEventAggregator,
@@ -45,7 +46,7 @@ namespace TicketManager.Receivers.TicketCreated
             IEventAggregator<Tags> tagsEventAggregator,
             IEventAggregator<Links> linksEventAggregator,
             IEventAggregator<StoryPoints> storyPointsEventAggregator,
-            IEventAggregator<TicketInvolvement> involvementEventAggregator) : base(subscriptionConfiguration, serviceBusConfigurer)
+            IEventAggregator<TicketInvolvement> involvementEventAggregator) : base(subscriptionConfiguration, setupInfo, serviceBusConfigurer)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
