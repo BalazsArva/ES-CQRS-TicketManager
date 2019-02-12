@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.Setup;
 
-namespace TicketManager.Messaging.Receivers.Hosting
+namespace TicketManager.Receivers.Hosting
 {
     public class ReceiverHostBuilder
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-namespace TicketManager.Messaging.Receivers
+namespace TicketManager.Receivers
 {
     public interface ISubscriptionReceiver : IHostedService
     {

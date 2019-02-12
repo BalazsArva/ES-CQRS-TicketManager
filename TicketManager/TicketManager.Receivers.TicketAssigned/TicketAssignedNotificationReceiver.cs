@@ -9,9 +9,8 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.Messaging.Configuration;
-using TicketManager.Messaging.Receivers;
-using TicketManager.Messaging.Receivers.DataStructures;
 using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers.TicketAssigned
 {

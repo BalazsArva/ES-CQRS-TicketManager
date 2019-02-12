@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using TicketManager.BusinessServices.EventAggregators.Extensions;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events.Extensions;
-using TicketManager.Messaging.Receivers.Hosting;
+using TicketManager.Receivers.Hosting;
 
 namespace TicketManager.Receivers.TicketCreated
 {

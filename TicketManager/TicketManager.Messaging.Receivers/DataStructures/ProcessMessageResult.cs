@@ -1,4 +1,4 @@
-﻿namespace TicketManager.Messaging.Receivers.DataStructures
+﻿namespace TicketManager.Receivers.DataStructures
 {
     public class ProcessMessageResult
     {

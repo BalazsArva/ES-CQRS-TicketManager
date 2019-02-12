@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 using TicketManager.Messaging.Configuration;
-using TicketManager.Messaging.Receivers.DataStructures;
 using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.DataStructures;
 
-namespace TicketManager.Messaging.Receivers
+namespace TicketManager.Receivers
 {
     public abstract class SubscriptionReceiverHostBase<TMessage> : ISubscriptionReceiver
     {

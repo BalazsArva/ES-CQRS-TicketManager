@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>TicketManager.Receivers</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <PackageId>TicketManager.Receivers</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

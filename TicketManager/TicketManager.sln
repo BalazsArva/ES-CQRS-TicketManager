@@ -31,19 +31,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Contracts.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Messaging", "TicketManager.Messaging\TicketManager.Messaging.csproj", "{BA36B2C3-D2C8-4183-AE7F-7B164A0BAEF8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Messaging.Receivers", "TicketManager.Messaging.Receivers\TicketManager.Messaging.Receivers.csproj", "{D251E441-0919-4AEE-93E2-317F50CCA3D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers", "TicketManager.Messaging.Receivers\TicketManager.Receivers.csproj", "{D251E441-0919-4AEE-93E2-317F50CCA3D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Receivers", "Receivers", "{4134F2B9-D143-449D-BDCA-5400F6BCC01E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketCreated", "TicketManager.Receivers.TicketCreated\TicketManager.Receivers.TicketCreated.csproj", "{815B2C9D-F9AF-42BD-8A3C-E3DC9B5DD33F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketCreated", "TicketManager.Receivers.TicketCreated\TicketManager.Receivers.TicketCreated.csproj", "{815B2C9D-F9AF-42BD-8A3C-E3DC9B5DD33F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinessServices", "BusinessServices", "{00494A4A-D12E-4B73-9DE8-B6A4B6CBB9F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.BusinessServices.EventAggregators", "TicketManager.BusinessServices.EventAggregators\TicketManager.BusinessServices.EventAggregators.csproj", "{F731763A-0984-4A63-911A-C3BBB87972F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.BusinessServices.EventAggregators", "TicketManager.BusinessServices.EventAggregators\TicketManager.BusinessServices.EventAggregators.csproj", "{F731763A-0984-4A63-911A-C3BBB87972F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Contracts.Notifications", "TicketManager.Contracts.Notifications\TicketManager.Contracts.Notifications.csproj", "{E7EA1F6F-2995-4F2C-9210-739066C6594F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Contracts.Notifications", "TicketManager.Contracts.Notifications\TicketManager.Contracts.Notifications.csproj", "{E7EA1F6F-2995-4F2C-9210-739066C6594F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketAssigned", "TicketManager.Receivers.TicketAssigned\TicketManager.Receivers.TicketAssigned.csproj", "{3043FE14-5BE5-423C-B59F-13750AA1C188}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketAssigned", "TicketManager.Receivers.TicketAssigned\TicketManager.Receivers.TicketAssigned.csproj", "{3043FE14-5BE5-423C-B59F-13750AA1C188}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,7 +121,7 @@ Global
 		{AD8A7585-61AB-493F-8A05-B11E534F6656} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
 		{5C50CE42-5CC2-4FC5-864D-1334B76C4168} = {ECAFD88E-E879-4165-B09E-C7D8323FB674}
 		{BA36B2C3-D2C8-4183-AE7F-7B164A0BAEF8} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
-		{D251E441-0919-4AEE-93E2-317F50CCA3D2} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
+		{D251E441-0919-4AEE-93E2-317F50CCA3D2} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
 		{815B2C9D-F9AF-42BD-8A3C-E3DC9B5DD33F} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
 		{F731763A-0984-4A63-911A-C3BBB87972F3} = {00494A4A-D12E-4B73-9DE8-B6A4B6CBB9F6}
 		{E7EA1F6F-2995-4F2C-9210-739066C6594F} = {ECAFD88E-E879-4165-B09E-C7D8323FB674}

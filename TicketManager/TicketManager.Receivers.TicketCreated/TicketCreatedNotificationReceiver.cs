@@ -11,9 +11,8 @@ using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.Messaging.Configuration;
-using TicketManager.Messaging.Receivers;
-using TicketManager.Messaging.Receivers.DataStructures;
 using TicketManager.Messaging.Setup;
+using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers.TicketCreated
 {
