@@ -31,7 +31,6 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var ticketId = request.TicketId;
             var correlationId = correlationIdProvider.GetCorrelationId();
 
             using (var context = eventsContextFactory.CreateContext())
@@ -41,13 +40,13 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                     CorrelationId = correlationId,
                     AssignedTo = request.AssignTo,
                     CausedBy = request.RaisedByUser,
-                    TicketCreatedEventId = ticketId
+                    TicketCreatedEventId = request.TicketId
                 });
 
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await serviceBusTopicSender.SendUsingSessionAsync(new TicketAssignedNotification(ticketId), correlationId, ticketId.ToString()).ConfigureAwait(false);
+            await serviceBusTopicSender.SendAsync(new TicketAssignedNotification(request.TicketId), correlationId).ConfigureAwait(false);
 
             return Unit.Value;
         }
