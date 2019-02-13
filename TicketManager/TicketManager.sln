@@ -47,6 +47,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.Tic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.QueryStoreSync", "TicketManager.Receivers.QueryStoreSync\TicketManager.Receivers.QueryStoreSync.csproj", "{38F1878B-F647-47FA-8E38-16BAB7223181}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketLinksChanged", "TicketManager.Receivers.TicketLinksChanged\TicketManager.Receivers.TicketLinksChanged.csproj", "{EA926DE3-2D50-4A64-BC5A-D0B28F60C538}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketTagsChanged", "TicketManager.Receivers.TicketTagsChanged\TicketManager.Receivers.TicketTagsChanged.csproj", "{88EC88CB-4BE7-4BD9-BE8C-6860DF90FE82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketStatusChanged", "TicketManager.Receivers.TicketStatusChanged\TicketManager.Receivers.TicketStatusChanged.csproj", "{9379B66D-94B3-4064-96A2-732247D065EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketStoryPointsChanged", "TicketManager.Receivers.TicketStoryPointsChanged\TicketManager.Receivers.TicketStoryPointsChanged.csproj", "{002E638E-6074-4665-AE8D-201FB76698CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketPriorityChanged", "TicketManager.Receivers.TicketPriorityChanged\TicketManager.Receivers.TicketPriorityChanged.csproj", "{2DB39D0D-BDF7-459C-94C9-FC80DEA3A126}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketTypeChanged", "TicketManager.Receivers.TicketTypeChanged\TicketManager.Receivers.TicketTypeChanged.csproj", "{B64FC481-4C15-40FD-B278-011293B7C6F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketTitleChanged", "TicketManager.Receivers.TicketTitleChanged\TicketManager.Receivers.TicketTitleChanged.csproj", "{C2771E17-B5BE-4A4F-AF2D-7ED767DAB51D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketDescriptionChanged", "TicketManager.Receivers.TicketDescriptionChanged\TicketManager.Receivers.TicketDescriptionChanged.csproj", "{E03C3A8C-FE30-4FB1-A6C2-14ECE217B986}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +129,38 @@ Global
 		{38F1878B-F647-47FA-8E38-16BAB7223181}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38F1878B-F647-47FA-8E38-16BAB7223181}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38F1878B-F647-47FA-8E38-16BAB7223181}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA926DE3-2D50-4A64-BC5A-D0B28F60C538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA926DE3-2D50-4A64-BC5A-D0B28F60C538}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA926DE3-2D50-4A64-BC5A-D0B28F60C538}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA926DE3-2D50-4A64-BC5A-D0B28F60C538}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88EC88CB-4BE7-4BD9-BE8C-6860DF90FE82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88EC88CB-4BE7-4BD9-BE8C-6860DF90FE82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88EC88CB-4BE7-4BD9-BE8C-6860DF90FE82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88EC88CB-4BE7-4BD9-BE8C-6860DF90FE82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9379B66D-94B3-4064-96A2-732247D065EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9379B66D-94B3-4064-96A2-732247D065EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9379B66D-94B3-4064-96A2-732247D065EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9379B66D-94B3-4064-96A2-732247D065EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{002E638E-6074-4665-AE8D-201FB76698CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{002E638E-6074-4665-AE8D-201FB76698CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{002E638E-6074-4665-AE8D-201FB76698CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{002E638E-6074-4665-AE8D-201FB76698CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DB39D0D-BDF7-459C-94C9-FC80DEA3A126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DB39D0D-BDF7-459C-94C9-FC80DEA3A126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DB39D0D-BDF7-459C-94C9-FC80DEA3A126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DB39D0D-BDF7-459C-94C9-FC80DEA3A126}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B64FC481-4C15-40FD-B278-011293B7C6F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B64FC481-4C15-40FD-B278-011293B7C6F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B64FC481-4C15-40FD-B278-011293B7C6F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B64FC481-4C15-40FD-B278-011293B7C6F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2771E17-B5BE-4A4F-AF2D-7ED767DAB51D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2771E17-B5BE-4A4F-AF2D-7ED767DAB51D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2771E17-B5BE-4A4F-AF2D-7ED767DAB51D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2771E17-B5BE-4A4F-AF2D-7ED767DAB51D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E03C3A8C-FE30-4FB1-A6C2-14ECE217B986}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E03C3A8C-FE30-4FB1-A6C2-14ECE217B986}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E03C3A8C-FE30-4FB1-A6C2-14ECE217B986}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E03C3A8C-FE30-4FB1-A6C2-14ECE217B986}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -133,6 +181,14 @@ Global
 		{E7EA1F6F-2995-4F2C-9210-739066C6594F} = {ECAFD88E-E879-4165-B09E-C7D8323FB674}
 		{3043FE14-5BE5-423C-B59F-13750AA1C188} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
 		{38F1878B-F647-47FA-8E38-16BAB7223181} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
+		{EA926DE3-2D50-4A64-BC5A-D0B28F60C538} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
+		{88EC88CB-4BE7-4BD9-BE8C-6860DF90FE82} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
+		{9379B66D-94B3-4064-96A2-732247D065EA} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
+		{002E638E-6074-4665-AE8D-201FB76698CF} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
+		{2DB39D0D-BDF7-459C-94C9-FC80DEA3A126} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
+		{B64FC481-4C15-40FD-B278-011293B7C6F9} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
+		{C2771E17-B5BE-4A4F-AF2D-7ED767DAB51D} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
+		{E03C3A8C-FE30-4FB1-A6C2-14ECE217B986} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05F4388B-9026-4AC2-BF48-6D615D2CECBA}
