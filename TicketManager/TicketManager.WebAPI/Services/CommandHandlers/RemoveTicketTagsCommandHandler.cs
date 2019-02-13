@@ -3,10 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
+using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
+using TicketManager.Messaging.MessageClients;
 using TicketManager.WebAPI.DTOs.Commands;
-using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Services.Providers;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
@@ -14,14 +15,14 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
     // TODO: Consider implementing a resiliency base class (e.g. mediator.Publish fails, or a constraint violation happens after validation but before insert)
     public class RemoveTicketTagsCommandHandler : IRequestHandler<RemoveTicketTagsCommand>
     {
-        private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<RemoveTicketTagsCommand> validator;
         private readonly ICorrelationIdProvider correlationIdProvider;
+        private readonly IServiceBusTopicSender serviceBusTopicSender;
 
-        public RemoveTicketTagsCommandHandler(ICorrelationIdProvider correlationIdProvider, IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<RemoveTicketTagsCommand> validator)
+        public RemoveTicketTagsCommandHandler(ICorrelationIdProvider correlationIdProvider, IServiceBusTopicSender serviceBusTopicSender, IEventsContextFactory eventsContextFactory, IValidator<RemoveTicketTagsCommand> validator)
         {
-            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.serviceBusTopicSender = serviceBusTopicSender ?? throw new ArgumentNullException(nameof(serviceBusTopicSender));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
             this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
@@ -32,6 +33,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             await validator.ValidateAndThrowAsync(request, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             var correlationId = correlationIdProvider.GetCorrelationId();
+            var ticketId = request.TicketId;
 
             using (var context = eventsContextFactory.CreateContext())
             {
@@ -44,14 +46,14 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                         CausedBy = request.RaisedByUser,
                         Tag = tag,
                         TagAdded = false,
-                        TicketCreatedEventId = request.TicketId
+                        TicketCreatedEventId = ticketId
                     });
                 }
 
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await mediator.Publish(new TicketTagsRemovedNotification(request.TicketId), cancellationToken).ConfigureAwait(false);
+            await serviceBusTopicSender.SendAsync(new TicketTagsChangedNotification(ticketId), correlationId).ConfigureAwait(false);
 
             return Unit.Value;
         }

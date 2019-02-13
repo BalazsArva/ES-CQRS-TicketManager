@@ -20,16 +20,6 @@
         public long TicketId { get; }
     }
 
-    public class TicketTagsChangedNotification
-    {
-        public TicketTagsChangedNotification(long ticketId)
-        {
-            TicketId = ticketId;
-        }
-
-        public long TicketId { get; }
-    }
-
     public class TicketUserInvolvementCancelledNotification
     {
         public TicketUserInvolvementCancelledNotification(long ticketId)
