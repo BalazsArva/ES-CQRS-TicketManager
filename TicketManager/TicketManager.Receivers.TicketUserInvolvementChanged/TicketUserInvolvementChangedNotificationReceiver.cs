@@ -54,6 +54,7 @@ namespace TicketManager.Receivers.TicketUserInvolvementChanged
                         .Add(t => t.Involvement.LastKnownTagChangeId, updatedInvolvements.LastKnownTagChangeId)
                         .Add(t => t.Involvement.LastKnownTitleChangeId, updatedInvolvements.LastKnownTitleChangeId)
                         .Add(t => t.Involvement.LastKnownTypeChangeId, updatedInvolvements.LastKnownTypeChangeId)
+                        .Add(t => t.Involvement.LastKnownStoryPointsChangeId, updatedInvolvements.LastKnownStoryPointsChangeId)
                         .Add(t => t.Involvement.ConcurrencyStamp, newConcurrencyStamp);
 
                     session.PatchIfEquals(ticketDocumentId, updates, t => t.Involvement.ConcurrencyStamp, oldConcurrencyStamp);
