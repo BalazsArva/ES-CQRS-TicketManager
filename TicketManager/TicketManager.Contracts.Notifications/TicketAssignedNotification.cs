@@ -20,16 +20,6 @@
         public long TicketId { get; }
     }
 
-    public class TicketStoryPointsChangedNotification
-    {
-        public TicketStoryPointsChangedNotification(long ticketId)
-        {
-            TicketId = ticketId;
-        }
-
-        public long TicketId { get; }
-    }
-
     public class TicketTagsChangedNotification
     {
         public TicketTagsChangedNotification(long ticketId)
