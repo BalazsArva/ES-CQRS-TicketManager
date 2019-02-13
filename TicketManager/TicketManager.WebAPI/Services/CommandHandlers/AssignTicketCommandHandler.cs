@@ -47,7 +47,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await serviceBusTopicSender.SendAsync(new TicketAssignedNotification(ticketId), correlationId).ConfigureAwait(false);
+            await serviceBusTopicSender.SendAsync(new TicketAssignmentChangedNotification(ticketId), correlationId).ConfigureAwait(false);
 
             return Unit.Value;
         }

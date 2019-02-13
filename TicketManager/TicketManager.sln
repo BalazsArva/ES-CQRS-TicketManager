@@ -43,25 +43,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.BusinessServi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Contracts.Notifications", "TicketManager.Contracts.Notifications\TicketManager.Contracts.Notifications.csproj", "{E7EA1F6F-2995-4F2C-9210-739066C6594F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketAssigned", "TicketManager.Receivers.TicketAssigned\TicketManager.Receivers.TicketAssigned.csproj", "{3043FE14-5BE5-423C-B59F-13750AA1C188}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketAssignmentChanged", "TicketManager.Receivers.TicketAssigned\TicketManager.Receivers.TicketAssignmentChanged.csproj", "{3043FE14-5BE5-423C-B59F-13750AA1C188}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketLinksChanged", "TicketManager.Receivers.TicketLinksChanged\TicketManager.Receivers.TicketLinksChanged.csproj", "{EA926DE3-2D50-4A64-BC5A-D0B28F60C538}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketLinksChanged", "TicketManager.Receivers.TicketLinksChanged\TicketManager.Receivers.TicketLinksChanged.csproj", "{EA926DE3-2D50-4A64-BC5A-D0B28F60C538}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketTagsChanged", "TicketManager.Receivers.TicketTagsChanged\TicketManager.Receivers.TicketTagsChanged.csproj", "{88EC88CB-4BE7-4BD9-BE8C-6860DF90FE82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketTagsChanged", "TicketManager.Receivers.TicketTagsChanged\TicketManager.Receivers.TicketTagsChanged.csproj", "{88EC88CB-4BE7-4BD9-BE8C-6860DF90FE82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketStatusChanged", "TicketManager.Receivers.TicketStatusChanged\TicketManager.Receivers.TicketStatusChanged.csproj", "{9379B66D-94B3-4064-96A2-732247D065EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketStatusChanged", "TicketManager.Receivers.TicketStatusChanged\TicketManager.Receivers.TicketStatusChanged.csproj", "{9379B66D-94B3-4064-96A2-732247D065EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketStoryPointsChanged", "TicketManager.Receivers.TicketStoryPointsChanged\TicketManager.Receivers.TicketStoryPointsChanged.csproj", "{002E638E-6074-4665-AE8D-201FB76698CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketStoryPointsChanged", "TicketManager.Receivers.TicketStoryPointsChanged\TicketManager.Receivers.TicketStoryPointsChanged.csproj", "{002E638E-6074-4665-AE8D-201FB76698CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketPriorityChanged", "TicketManager.Receivers.TicketPriorityChanged\TicketManager.Receivers.TicketPriorityChanged.csproj", "{2DB39D0D-BDF7-459C-94C9-FC80DEA3A126}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketPriorityChanged", "TicketManager.Receivers.TicketPriorityChanged\TicketManager.Receivers.TicketPriorityChanged.csproj", "{2DB39D0D-BDF7-459C-94C9-FC80DEA3A126}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketTypeChanged", "TicketManager.Receivers.TicketTypeChanged\TicketManager.Receivers.TicketTypeChanged.csproj", "{B64FC481-4C15-40FD-B278-011293B7C6F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketTypeChanged", "TicketManager.Receivers.TicketTypeChanged\TicketManager.Receivers.TicketTypeChanged.csproj", "{B64FC481-4C15-40FD-B278-011293B7C6F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketTitleChanged", "TicketManager.Receivers.TicketTitleChanged\TicketManager.Receivers.TicketTitleChanged.csproj", "{C2771E17-B5BE-4A4F-AF2D-7ED767DAB51D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketTitleChanged", "TicketManager.Receivers.TicketTitleChanged\TicketManager.Receivers.TicketTitleChanged.csproj", "{C2771E17-B5BE-4A4F-AF2D-7ED767DAB51D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketDescriptionChanged", "TicketManager.Receivers.TicketDescriptionChanged\TicketManager.Receivers.TicketDescriptionChanged.csproj", "{E03C3A8C-FE30-4FB1-A6C2-14ECE217B986}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketDescriptionChanged", "TicketManager.Receivers.TicketDescriptionChanged\TicketManager.Receivers.TicketDescriptionChanged.csproj", "{E03C3A8C-FE30-4FB1-A6C2-14ECE217B986}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Receivers.TicketUserInvolvementChanged", "TicketManager.Receivers.TicketUserInvolvementChanged\TicketManager.Receivers.TicketUserInvolvementChanged.csproj", "{A3866FE6-D7FC-4B46-892F-8C8664454AD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Receivers.TicketUserInvolvementChanged", "TicketManager.Receivers.TicketUserInvolvementChanged\TicketManager.Receivers.TicketUserInvolvementChanged.csproj", "{A3866FE6-D7FC-4B46-892F-8C8664454AD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

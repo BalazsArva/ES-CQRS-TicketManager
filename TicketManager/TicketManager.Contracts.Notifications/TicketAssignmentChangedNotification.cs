@@ -1,8 +1,8 @@
 ﻿namespace TicketManager.Contracts.Notifications
 {
-    public class TicketAssignedNotification
+    public class TicketAssignmentChangedNotification
     {
-        public TicketAssignedNotification(long ticketId)
+        public TicketAssignmentChangedNotification(long ticketId)
         {
             TicketId = ticketId;
         }

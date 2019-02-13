@@ -7,17 +7,17 @@ using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.Receivers.Extensions;
 using TicketManager.Receivers.Hosting;
 
-namespace TicketManager.Receivers.TicketAssigned
+namespace TicketManager.Receivers.TicketAssignmentChanged
 {
     internal class Program
     {
         private const string Topic = "ticketevents";
-        private const string Subscription = "ticketassigned.querystoresync";
+        private const string Subscription = "ticketassignmentchanged.querystoresync";
 
         private static async Task Main(string[] args)
         {
             var host = new ReceiverHostBuilder()
-                .CreateDefaultBuilder<TicketAssignedNotificationReceiver>(Topic, Subscription)
+                .CreateDefaultBuilder<TicketAssignmentChangedNotificationReceiver>(Topic, Subscription)
                 .ConfigureServices((hostingContext, services) =>
                 {
                     var configuration = hostingContext.Configuration;
@@ -29,7 +29,7 @@ namespace TicketManager.Receivers.TicketAssigned
                 })
                 .Build();
 
-            await host.SetupSubscriptionAsync<TicketAssignedNotification>();
+            await host.SetupSubscriptionAsync<TicketAssignmentChangedNotification>();
 
             await host.RunAsync();
         }

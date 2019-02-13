@@ -11,21 +11,21 @@ using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.Receivers.Configuration;
 using TicketManager.Receivers.DataStructures;
 
-namespace TicketManager.Receivers.TicketAssigned
+namespace TicketManager.Receivers.TicketAssignmentChanged
 {
-    public class TicketAssignedNotificationReceiver : SubscriptionReceiverHostBase<TicketAssignedNotification>
+    public class TicketAssignmentChangedNotificationReceiver : SubscriptionReceiverHostBase<TicketAssignmentChangedNotification>
     {
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<Assignment> eventAggregator;
 
-        public TicketAssignedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
+        public TicketAssignmentChangedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
             : base(subscriptionConfiguration)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
         }
 
-        public override async Task<ProcessMessageResult> HandleMessageAsync(TicketAssignedNotification notification, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
+        public override async Task<ProcessMessageResult> HandleMessageAsync(TicketAssignmentChangedNotification notification, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {
