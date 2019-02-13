@@ -30,16 +30,6 @@
         public long TicketId { get; }
     }
 
-    public class TicketDescriptionChangedNotification
-    {
-        public TicketDescriptionChangedNotification(long ticketId)
-        {
-            TicketId = ticketId;
-        }
-
-        public long TicketId { get; }
-    }
-
     public class TicketStatusChangedNotification
     {
         public TicketStatusChangedNotification(long ticketId)
