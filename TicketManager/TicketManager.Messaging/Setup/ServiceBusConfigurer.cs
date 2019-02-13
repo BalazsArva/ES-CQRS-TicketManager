@@ -9,6 +9,31 @@ namespace TicketManager.Messaging.Setup
     {
         private const string EventTypeRuleName = "EventType";
 
+        public async Task SetupSubscriptionAsync(string connectionString, string topic, string subscription, CancellationToken cancellationToken)
+        {
+            var managementClient = new ManagementClient(connectionString);
+
+            var topicExists = await managementClient.TopicExistsAsync(topic, cancellationToken);
+            if (!topicExists)
+            {
+                await managementClient.CreateTopicAsync(topic, cancellationToken);
+            }
+
+            var subscriptionExists = await managementClient.SubscriptionExistsAsync(topic, subscription, cancellationToken);
+            if (!subscriptionExists)
+            {
+                var subscriptionDescription = new SubscriptionDescription(topic, subscription)
+                {
+                    EnableDeadLetteringOnFilterEvaluationExceptions = false,
+                    EnableDeadLetteringOnMessageExpiration = true
+                };
+
+                await managementClient.CreateSubscriptionAsync(subscriptionDescription, cancellationToken);
+
+                return;
+            }
+        }
+
         public async Task SetupSubscriptionAsync(string connectionString, string topic, string subscription, string eventType, CancellationToken cancellationToken)
         {
             var managementClient = new ManagementClient(connectionString);

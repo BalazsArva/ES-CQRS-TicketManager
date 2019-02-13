@@ -8,6 +8,14 @@ namespace TicketManager.Receivers.Extensions
 {
     public static class IHostExtensions
     {
+        public static Task SetupSubscriptionAsync(this IHost host)
+        {
+            var configurer = host.Services.GetRequiredService<IServiceBusConfigurer>();
+            var sbConfig = host.Services.GetRequiredService<ServiceBusSubscriptionConfiguration>();
+
+            return configurer.SetupSubscriptionAsync(sbConfig.ConnectionString, sbConfig.Topic, sbConfig.Subscription, default);
+        }
+
         public static Task SetupSubscriptionAsync<TNotification>(this IHost host)
         {
             var configurer = host.Services.GetRequiredService<IServiceBusConfigurer>();

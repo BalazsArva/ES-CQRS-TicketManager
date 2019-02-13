@@ -1,34 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Microsoft.Azure.ServiceBus;
+using Newtonsoft.Json;
 using Raven.Client.Documents;
 using TicketManager.BusinessServices.EventAggregators;
+using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.DataStructures;
 using TicketManager.DataAccess.Documents.Extensions;
-using TicketManager.WebAPI.DTOs.Notifications;
-using TicketManager.WebAPI.DTOs.Notifications.Abstractions;
+using TicketManager.Receivers.Configuration;
+using TicketManager.Receivers.DataStructures;
 
-namespace TicketManager.WebAPI.Services.NotificationHandlers
+namespace TicketManager.Receivers.TicketUserInvolvementChanged
 {
-    public class TicketInvolvementSynchronizer : INotificationHandler<ITicketNotification>, INotificationHandler<TicketUserInvolvementCancelledNotification>
+    public class TicketUserInvolvementChangedNotificationReceiver : SubscriptionReceiverHostBase<GenericTicketNotification>
     {
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<TicketInvolvement> eventAggregator;
 
-        public TicketInvolvementSynchronizer(IDocumentStore documentStore, IEventAggregator<TicketInvolvement> eventAggregator)
+        public TicketUserInvolvementChangedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<TicketInvolvement> eventAggregator)
+            : base(subscriptionConfiguration)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             this.eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
         }
 
-        public Task Handle(TicketUserInvolvementCancelledNotification notification, CancellationToken cancellationToken)
-        {
-            return Handle((ITicketNotification)notification, cancellationToken);
-        }
-
-        public async Task Handle(ITicketNotification notification, CancellationToken cancellationToken)
+        public override async Task<ProcessMessageResult> HandleMessageAsync(GenericTicketNotification notification, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
         {
             while (true)
             {
@@ -65,10 +65,19 @@ namespace TicketManager.WebAPI.Services.NotificationHandlers
                     // so we need to try again.
                     if (ticketDocument.Involvement.ConcurrencyStamp == newConcurrencyStamp)
                     {
-                        return;
+                        return ProcessMessageResult.Success();
                     }
                 }
             }
+        }
+
+        protected override bool CanHandleMessage(Message rawMessage)
+        {
+            // This receiver should react to several different events, so if we can find a TicketId in the message, it is meaningful to this handler.
+            var bodyJson = Encoding.UTF8.GetString(rawMessage.Body);
+            var body = JsonConvert.DeserializeObject<GenericTicketNotification>(bodyJson);
+
+            return body.TicketId != 0;
         }
     }
 }
