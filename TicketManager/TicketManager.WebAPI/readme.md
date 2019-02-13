@@ -21,3 +21,4 @@ To determine whether the app is running in development environment, an environme
       }
     }
 
+There is a PowerShell script to prepare these if the do not exist. It can be found at `repo root\Environment-Setup\restore-devenv.ps1`.
