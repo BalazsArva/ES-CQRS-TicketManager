@@ -10,16 +10,6 @@
         public long TicketId { get; }
     }
 
-    public class TicketPriorityChangedNotification
-    {
-        public TicketPriorityChangedNotification(long ticketId)
-        {
-            TicketId = ticketId;
-        }
-
-        public long TicketId { get; }
-    }
-
     public class TicketUserInvolvementCancelledNotification
     {
         public TicketUserInvolvementCancelledNotification(long ticketId)
