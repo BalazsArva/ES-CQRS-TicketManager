@@ -10,29 +10,9 @@
         public long TicketId { get; }
     }
 
-    public class TicketLinksChangedNotification
-    {
-        public TicketLinksChangedNotification(long ticketId)
-        {
-            TicketId = ticketId;
-        }
-
-        public long TicketId { get; }
-    }
-
     public class TicketPriorityChangedNotification
     {
         public TicketPriorityChangedNotification(long ticketId)
-        {
-            TicketId = ticketId;
-        }
-
-        public long TicketId { get; }
-    }
-
-    public class TicketStatusChangedNotification
-    {
-        public TicketStatusChangedNotification(long ticketId)
         {
             TicketId = ticketId;
         }
