@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,10 +33,19 @@ namespace TicketManager.Receivers.Hosting
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
+                    var sbTopic = topic;
+
+                    // Suffix topic name with machine name for development so multiple workstations (e.g. my home and
+                    // workplace machine) don't mess with each other's messages.
+                    if (hostingContext.HostingEnvironment.IsDevelopment())
+                    {
+                        sbTopic = $"{sbTopic}.{Environment.MachineName}";
+                    }
+
                     var subscriptionConfiguration = new ServiceBusSubscriptionConfiguration
                     {
                         ConnectionString = hostingContext.Configuration["ServiceBus:ConnectionString"],
-                        Topic = topic,
+                        Topic = sbTopic,
                         Subscription = subscription
                     };
 
