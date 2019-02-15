@@ -6,6 +6,7 @@ using MediatR;
 using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
+using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.Messaging.MessageClients;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Services.Providers;
@@ -34,22 +35,44 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
             var correlationId = correlationIdProvider.GetCorrelationId();
             var ticketId = request.TicketId;
 
+            var recordedEvent = new TicketAssignedEvent
+            {
+                CorrelationId = correlationId,
+                AssignedTo = request.AssignTo,
+                CausedBy = request.RaisedByUser,
+                TicketCreatedEventId = ticketId
+            };
+
             using (var context = eventsContextFactory.CreateContext())
             {
-                context.TicketAssignedEvents.Add(new TicketAssignedEvent
-                {
-                    CorrelationId = correlationId,
-                    AssignedTo = request.AssignTo,
-                    CausedBy = request.RaisedByUser,
-                    TicketCreatedEventId = ticketId
-                });
+                context.TicketAssignedEvents.Add(recordedEvent);
 
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await serviceBusTopicSender.SendAsync(new TicketAssignmentChangedNotification(ticketId), correlationId).ConfigureAwait(false);
+            await RaiseNotificationAsync(recordedEvent, correlationId, cancellationToken).ConfigureAwait(false);
 
             return Unit.Value;
+        }
+
+        private async Task RaiseNotificationAsync(TicketAssignedEvent newAssignmentEvent, string correlationId, CancellationToken cancellationToken)
+        {
+            TicketAssignmentChangedNotification notification;
+            var ticketId = newAssignmentEvent.TicketCreatedEventId;
+            var newAssignmentEventId = newAssignmentEvent.Id;
+
+            using (var context = eventsContextFactory.CreateContext())
+            {
+                var previousEvent = await context.TicketAssignedEvents
+                    .OfTicket(ticketId)
+                    .Before(newAssignmentEventId)
+                    .LatestAsync(cancellationToken)
+                    .ConfigureAwait(false);
+
+                notification = new TicketAssignmentChangedNotification(ticketId, newAssignmentEventId, newAssignmentEvent.AssignedTo, previousEvent?.AssignedTo, newAssignmentEvent.CausedBy, newAssignmentEvent.UtcDateRecorded);
+            }
+
+            await serviceBusTopicSender.SendAsync(notification, correlationId).ConfigureAwait(false);
         }
     }
 }
