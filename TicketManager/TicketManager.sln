@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.DataAccess.No
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.DataAccess.EntityFramework", "TicketManager.DataAccess.EntityFramework\TicketManager.DataAccess.EntityFramework.csproj", "{4FEBBC7E-1D8B-4920-903D-AF2050575213}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Notifications", "TicketManager.Notifications\TicketManager.Notifications.csproj", "{D7184084-F0F6-49DB-A38B-4B4E86C5C66B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +181,10 @@ Global
 		{4FEBBC7E-1D8B-4920-903D-AF2050575213}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FEBBC7E-1D8B-4920-903D-AF2050575213}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FEBBC7E-1D8B-4920-903D-AF2050575213}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7184084-F0F6-49DB-A38B-4B4E86C5C66B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7184084-F0F6-49DB-A38B-4B4E86C5C66B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7184084-F0F6-49DB-A38B-4B4E86C5C66B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7184084-F0F6-49DB-A38B-4B4E86C5C66B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -210,6 +216,7 @@ Global
 		{5689CD08-F461-4440-B787-D96072D4F087} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
 		{D257EAE3-B26D-41E8-BD47-BA19EFC5FDC7} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
 		{4FEBBC7E-1D8B-4920-903D-AF2050575213} = {22E5614E-14B2-439D-BB54-1557527DA8E5}
+		{D7184084-F0F6-49DB-A38B-4B4E86C5C66B} = {4134F2B9-D143-449D-BDCA-5400F6BCC01E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05F4388B-9026-4AC2-BF48-6D615D2CECBA}

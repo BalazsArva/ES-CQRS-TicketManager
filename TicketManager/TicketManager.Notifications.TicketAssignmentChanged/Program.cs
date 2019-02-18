@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Notifications.Extensions;
+using TicketManager.Notifications.Configuration;
+using TicketManager.Notifications.Extensions;
 using TicketManager.Receivers.Extensions;
 using TicketManager.Receivers.Hosting;
 
@@ -20,14 +22,12 @@ namespace TicketManager.Notifications.TicketAssignmentChanged
                 .ConfigureServices((hostingContext, services) =>
                 {
                     var configuration = hostingContext.Configuration;
-
-                    var notificationConfiguration = new NotificationConfiguration(configuration["Notification:IconUrl"]);
-                    var ticketUrlProvider = new TicketUrlProvider(configuration["Notification:TicketBrowserUrlTemplate"], configuration["Notification:TicketResourceUrlTemplate"]);
+                    var notificationConfiguration = new NotificationConfiguration(configuration["Notifications:IconUrl"]);
 
                     services
-                        .AddSingleton(notificationConfiguration)
-                        .AddSingleton<ITicketUrlProvider>(ticketUrlProvider)
-                        .AddNotificationsContext(configuration);
+                        .AddProviders(configuration)
+                        .AddNotificationsContext(configuration)
+                        .AddSingleton(notificationConfiguration);
                 })
                 .Build();
 
