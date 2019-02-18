@@ -15,8 +15,6 @@ namespace TicketManager.DataAccess.Notifications
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // TODO: Configure entities
         }
     }
 }

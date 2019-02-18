@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TicketManager.DataAccess.Events.Extensions
 {
+    // TODO: Move to shared EF class so that it is common to all EF-using projects
     public static class IQueryableExtensions
     {
         public static async Task<HashSet<T>> ToSetAsync<T>(this IQueryable<T> queryable, CancellationToken cancellationToken)
