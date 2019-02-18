@@ -6,7 +6,7 @@ namespace TicketManager.DataAccess.Notifications.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddEventsContext(this IServiceCollection services, IConfiguration Configuration)
+        public static IServiceCollection AddNotificationsContext(this IServiceCollection services, IConfiguration Configuration)
         {
             var database = Configuration["DBNAME"] ?? "Notifications";
 
