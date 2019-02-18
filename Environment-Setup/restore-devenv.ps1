@@ -2,7 +2,10 @@ $OriginalLocation = Get-Location
 
 Set-Location ..\TicketManager
 
-$ReceiverFolders = Get-ChildItem -Directory TicketManager.Receivers.*
+$ReceiverFolders1 = Get-ChildItem -Directory TicketManager.Receivers.*
+$ReceiverFolders2 = Get-ChildItem -Directory TicketManager.Notifications.*
+
+$ReceiverFolders = $ReceiverFolders1 + $ReceiverFolders2
 
 Write-Host $ReceiverFolders
 

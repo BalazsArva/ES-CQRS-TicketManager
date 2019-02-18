@@ -17,12 +17,15 @@ namespace TicketManager.WebAPI
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             Configuration = configuration;
+            HostingEnvironment = hostingEnvironment;
         }
 
         public IConfiguration Configuration { get; }
+
+        public IHostingEnvironment HostingEnvironment { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -35,7 +38,7 @@ namespace TicketManager.WebAPI
 
             // TODO: Delete (project reference as well) when everything is moved to the separate query store synchronizer apps.
             services.AddEventAggregators();
-            services.AddApplicationServices(Configuration);
+            services.AddApplicationServices(Configuration, HostingEnvironment);
             services.AddMediatR(typeof(Startup).Assembly);
 
             services

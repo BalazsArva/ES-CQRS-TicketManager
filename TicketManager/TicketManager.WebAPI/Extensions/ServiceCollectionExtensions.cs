@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TicketManager.DataAccess.Documents.Utilities;
@@ -44,15 +46,24 @@ namespace TicketManager.WebAPI.Extensions
             return services;
         }
 
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
+            var sbTopic = "ticketevents";
+
+            // Suffix topic name with machine name for development so multiple workstations (e.g. my home and
+            // workplace machine) don't mess with each other's messages.
+            if (hostingEnvironment.IsDevelopment())
+            {
+                sbTopic = $"{sbTopic}.{Environment.MachineName}";
+            }
+
             var topicConfiguration = new ServiceBusTopicConfiguration
             {
                 // The ConnectionString is stored as a user secret. Set it on the machine before using by navigating to the project location
                 // from PowerShell and running
                 //     dotnet user-secrets set "ServiceBus:ConnectionString" "<connection-string>"
                 ConnectionString = configuration.GetValue<string>("ServiceBus:ConnectionString"),
-                Topic = "ticketevents"
+                Topic = sbTopic
             };
 
             return services
