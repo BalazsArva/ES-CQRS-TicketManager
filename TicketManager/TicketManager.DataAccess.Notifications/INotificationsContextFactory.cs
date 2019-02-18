@@ -1,7 +1,8 @@
-﻿namespace TicketManager.DataAccess.Notifications
+﻿using TicketManager.DataAccess.EntityFramework;
+
+namespace TicketManager.DataAccess.Notifications
 {
-    public interface INotificationsContextFactory
+    public interface INotificationsContextFactory : IDbContextFactory<NotificationsContext>
     {
-        NotificationsContext CreateContext();
     }
 }

@@ -4,9 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace TicketManager.DataAccess.Events.Extensions
+namespace TicketManager.DataAccess.EntityFramework.Extensions
 {
-    // TODO: Move to shared EF class so that it is common to all EF-using projects
     public static class IQueryableExtensions
     {
         public static async Task<HashSet<T>> ToSetAsync<T>(this IQueryable<T> queryable, CancellationToken cancellationToken)
@@ -14,6 +13,11 @@ namespace TicketManager.DataAccess.Events.Extensions
             var resultsList = await queryable.ToListAsync(cancellationToken).ConfigureAwait(false);
 
             return new HashSet<T>(resultsList);
+        }
+
+        public static IQueryable<T> FromPage<T>(this IQueryable<T> queryable, int page, int pageSize)
+        {
+            return queryable.Skip((page - 1) * pageSize).Take(pageSize);
         }
     }
 }

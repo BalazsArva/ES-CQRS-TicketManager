@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using FluentValidation.Validators;
+using TicketManager.DataAccess.EntityFramework.Extensions;
 using TicketManager.DataAccess.Events;
-using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.DTOs.Commands.Abstractions;
 
 namespace TicketManager.WebAPI.Validation.CommandValidators.Abstractions

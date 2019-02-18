@@ -7,8 +7,8 @@ using FluentValidation;
 using FluentValidation.Results;
 using Raven.Client.Documents;
 using TicketManager.Contracts.Common;
+using TicketManager.DataAccess.EntityFramework.Extensions;
 using TicketManager.DataAccess.Events;
-using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Validation.CommandValidators.ValidationHelpers;
 
