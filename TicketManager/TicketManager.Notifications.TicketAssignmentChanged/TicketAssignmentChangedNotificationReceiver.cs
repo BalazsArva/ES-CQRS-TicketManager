@@ -41,22 +41,6 @@ namespace TicketManager.Notifications.TicketAssignmentChanged
 
             using (var context = notificationsContextFactory.CreateContext())
             {
-                if (assignedTo != null)
-                {
-                    context.Notifications.Add(new Notification
-                    {
-                        SourceSystem = SourceSystem,
-                        UtcDateTimeCreated = notificationTimestamp,
-                        Type = AssignedToNotificationType,
-                        User = assignedTo,
-                        Title = $"{causedBy} has assigned a ticket to you",
-                        BrowserHref = ticketUrlProvider.GetBrowserUrl(ticketId),
-                        ResourceHref = ticketUrlProvider.GetResourceUrl(ticketId),
-                        IsRead = false,
-                        IconUri = configuration.IconUrl
-                    });
-                }
-
                 if (previouslyAssignedTo != null)
                 {
                     context.Notifications.Add(new Notification
@@ -66,6 +50,22 @@ namespace TicketManager.Notifications.TicketAssignmentChanged
                         Type = DeassignedFromNotificationType,
                         User = previouslyAssignedTo,
                         Title = $"{causedBy} has deassigned a ticket from you",
+                        BrowserHref = ticketUrlProvider.GetBrowserUrl(ticketId),
+                        ResourceHref = ticketUrlProvider.GetResourceUrl(ticketId),
+                        IsRead = false,
+                        IconUri = configuration.IconUrl
+                    });
+                }
+
+                if (assignedTo != null)
+                {
+                    context.Notifications.Add(new Notification
+                    {
+                        SourceSystem = SourceSystem,
+                        UtcDateTimeCreated = notificationTimestamp,
+                        Type = AssignedToNotificationType,
+                        User = assignedTo,
+                        Title = $"{causedBy} has assigned a ticket to you",
                         BrowserHref = ticketUrlProvider.GetBrowserUrl(ticketId),
                         ResourceHref = ticketUrlProvider.GetResourceUrl(ticketId),
                         IsRead = false,
