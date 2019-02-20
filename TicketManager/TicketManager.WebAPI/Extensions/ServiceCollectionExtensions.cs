@@ -1,13 +1,13 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using FluentValidation;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Utilities;
-using TicketManager.DataAccess.Events;
+using TicketManager.Messaging.Configuration;
+using TicketManager.Messaging.MessageClients;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Queries;
-using TicketManager.WebAPI.Services.EventAggregators;
 using TicketManager.WebAPI.Services.Providers;
 using TicketManager.WebAPI.Validation.CommandValidators;
 using TicketManager.WebAPI.Validation.QueryValidators;
@@ -16,40 +16,6 @@ namespace TicketManager.WebAPI.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddEventsContext(this IServiceCollection services, IConfiguration Configuration)
-        {
-            var database = Configuration["DBNAME"] ?? "CQRSTicketManager";
-
-            var dbHost = Configuration["DBHOST"];
-            var dbPort = Configuration["DBPORT"];
-
-            var userId = Configuration["DBUSERID"];
-            var password = Configuration["SA_PASSWORD"];
-
-            var hostSegment = string.IsNullOrEmpty(dbHost)
-                ? "(localdb)\\MSSQLLocalDb"
-                : $"{dbHost},{dbPort}";
-
-            var authorizationSegment = string.IsNullOrEmpty(userId) && string.IsNullOrEmpty(password)
-                ? "Integrated Security=true"
-                : $"User Id={userId};Password={password}";
-
-            var sqlConnectionString = $"Data Source={hostSegment};Initial Catalog={database};{authorizationSegment}";
-
-            var options = new DbContextOptionsBuilder<EventsContext>()
-                .UseSqlServer(sqlConnectionString)
-                .Options;
-
-            services.AddSingleton(options);
-            services.AddDbContext<EventsContext>(opts => opts.UseSqlServer(sqlConnectionString));
-            services.AddSingleton<IEventsContextFactory>(svcProvider =>
-            {
-                return new EventsContextFactory(options);
-            });
-
-            return services;
-        }
-
         public static IServiceCollection AddValidators(this IServiceCollection services)
         {
             services
@@ -80,28 +46,30 @@ namespace TicketManager.WebAPI.Extensions
             return services;
         }
 
-        public static IServiceCollection AddEventAggregators(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
-            services
-                .AddTransient<IEventAggregator<Assignment>, TicketAssignedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketInvolvement>, TicketUserInvolvementEventAggregator>()
-                .AddTransient<IEventAggregator<TicketDescription>, TicketDescriptionChangedEventAggregator>()
-                .AddTransient<IEventAggregator<Links>, TicketLinksChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketPriority>, TicketPriorityChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketStatus>, TicketStatusChangedEventAggregator>()
-                .AddTransient<IEventAggregator<Tags>, TicketTagsChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketTitle>, TicketTitleChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketType>, TicketTypeChangedEventAggregator>()
-                .AddTransient<IEventAggregator<StoryPoints>, TicketStoryPointsChangedEventAggregator>()
-                .AddTransient<IEventAggregator<TicketInvolvement>, TicketUserInvolvementEventAggregator>();
+            var sbTopic = "ticketevents";
 
-            return services;
-        }
+            // Suffix topic name with machine name for development so multiple workstations (e.g. my home and
+            // workplace machine) don't mess with each other's messages.
+            if (hostingEnvironment.IsDevelopment())
+            {
+                sbTopic = $"{sbTopic}.{Environment.MachineName}";
+            }
 
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
-        {
+            var topicConfiguration = new ServiceBusTopicConfiguration
+            {
+                // The ConnectionString is stored as a user secret. Set it on the machine before using by navigating to the project location
+                // from PowerShell and running
+                //     dotnet user-secrets set "ServiceBus:ConnectionString" "<connection-string>"
+                ConnectionString = configuration.GetValue<string>("ServiceBus:ConnectionString"),
+                Topic = sbTopic
+            };
+
             return services
                 .AddHttpContextAccessor()
+                .AddSingleton(topicConfiguration)
+                .AddSingleton<IServiceBusTopicSender, ServiceBusTopicSender>()
                 .AddSingleton<IETagProvider, ETagProvider>()
                 .AddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
         }

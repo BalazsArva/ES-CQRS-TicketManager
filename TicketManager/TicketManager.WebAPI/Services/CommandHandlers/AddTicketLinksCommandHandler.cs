@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using TicketManager.Contracts.Common;
+using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
+using TicketManager.Messaging.MessageClients;
 using TicketManager.WebAPI.DTOs.Commands;
-using TicketManager.WebAPI.DTOs.Notifications;
 using TicketManager.WebAPI.Services.Providers;
 
 namespace TicketManager.WebAPI.Services.CommandHandlers
@@ -15,14 +16,14 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
     public class AddTicketLinksCommandHandler : IRequestHandler<AddTicketLinksCommand>
     {
         private readonly ICorrelationIdProvider correlationIdProvider;
-        private readonly IMediator mediator;
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<AddTicketLinksCommand> validator;
+        private readonly IServiceBusTopicSender serviceBusTopicSender;
 
-        public AddTicketLinksCommandHandler(ICorrelationIdProvider correlationIdProvider, IMediator mediator, IEventsContextFactory eventsContextFactory, IValidator<AddTicketLinksCommand> validator)
+        public AddTicketLinksCommandHandler(ICorrelationIdProvider correlationIdProvider, IServiceBusTopicSender serviceBusTopicSender, IEventsContextFactory eventsContextFactory, IValidator<AddTicketLinksCommand> validator)
         {
             this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
-            this.mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            this.serviceBusTopicSender = serviceBusTopicSender ?? throw new ArgumentNullException(nameof(serviceBusTopicSender));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
@@ -68,11 +69,11 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await mediator.Publish(new TicketLinksAddedNotification(ticketId), cancellationToken).ConfigureAwait(false);
+            await serviceBusTopicSender.SendAsync(new TicketLinksChangedNotification(ticketId), correlationId).ConfigureAwait(false);
 
             if (statusUpdated)
             {
-                await mediator.Publish(new TicketStatusChangedNotification(ticketId), cancellationToken).ConfigureAwait(false);
+                await serviceBusTopicSender.SendAsync(new TicketStatusChangedNotification(ticketId), correlationId).ConfigureAwait(false);
             }
 
             return Unit.Value;

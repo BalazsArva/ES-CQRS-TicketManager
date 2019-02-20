@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TicketManager.DataAccess.Events.DataModel
 {
+    // TODO: Rewrite annotations to fluent API
     public abstract class EventBase
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

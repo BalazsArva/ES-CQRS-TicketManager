@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using MediatR;
 using Raven.Client.Documents;
+using TicketManager.BusinessServices.EventAggregators;
 using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Events;
 using TicketManager.WebAPI.DTOs.Notifications;
-using TicketManager.WebAPI.Services.EventAggregators;
 
 namespace TicketManager.WebAPI.Services.NotificationHandlers
 {

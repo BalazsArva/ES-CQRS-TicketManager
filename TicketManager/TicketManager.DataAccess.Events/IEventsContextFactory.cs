@@ -1,7 +1,8 @@
-﻿namespace TicketManager.DataAccess.Events
+﻿using TicketManager.DataAccess.EntityFramework;
+
+namespace TicketManager.DataAccess.Events
 {
-    public interface IEventsContextFactory
+    public interface IEventsContextFactory : IDbContextFactory<EventsContext>
     {
-        EventsContext CreateContext();
     }
 }

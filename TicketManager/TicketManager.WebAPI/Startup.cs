@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using TicketManager.BusinessServices.EventAggregators.Extensions;
 using TicketManager.Common.Http;
+using TicketManager.DataAccess.Documents.Extensions;
+using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.Extensions;
 using TicketManager.WebAPI.Filters;
 
@@ -14,12 +17,15 @@ namespace TicketManager.WebAPI
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             Configuration = configuration;
+            HostingEnvironment = hostingEnvironment;
         }
 
         public IConfiguration Configuration { get; }
+
+        public IHostingEnvironment HostingEnvironment { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -29,8 +35,10 @@ namespace TicketManager.WebAPI
             services.AddEventsContext(Configuration);
 
             services.AddValidators();
+
+            // TODO: Delete (project reference as well) when everything is moved to the separate query store synchronizer apps.
             services.AddEventAggregators();
-            services.AddApplicationServices();
+            services.AddApplicationServices(Configuration, HostingEnvironment);
             services.AddMediatR(typeof(Startup).Assembly);
 
             services

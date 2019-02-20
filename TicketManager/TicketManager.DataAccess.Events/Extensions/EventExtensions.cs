@@ -44,6 +44,12 @@ namespace TicketManager.DataAccess.Events.Extensions
             return events.Where(x => x.Id > lastKnownEventId);
         }
 
+        public static IQueryable<TEvent> Before<TEvent>(this IQueryable<TEvent> events, long lastKnownEventId)
+             where TEvent : EventBase
+        {
+            return events.Where(x => x.Id < lastKnownEventId);
+        }
+
         public static IQueryable<TEvent> NotLaterThan<TEvent>(this IQueryable<TEvent> events, DateTime eventTimeUpperLimit)
              where TEvent : EventBase
         {
