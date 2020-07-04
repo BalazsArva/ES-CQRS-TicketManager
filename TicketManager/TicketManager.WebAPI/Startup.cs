@@ -17,7 +17,7 @@ namespace TicketManager.WebAPI
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
         {
             Configuration = configuration;
             HostingEnvironment = hostingEnvironment;
@@ -25,7 +25,7 @@ namespace TicketManager.WebAPI
 
         public IConfiguration Configuration { get; }
 
-        public IHostingEnvironment HostingEnvironment { get; }
+        public IWebHostEnvironment HostingEnvironment { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -46,7 +46,7 @@ namespace TicketManager.WebAPI
                 {
                     opts.Filters.Add<ValidationExceptionFilterAttribute>();
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddSwaggerGen(c =>
             {
@@ -54,7 +54,7 @@ namespace TicketManager.WebAPI
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCorrelationId(new CorrelationIdOptions
             {
@@ -67,14 +67,8 @@ namespace TicketManager.WebAPI
                 UpdateTraceIdentifier = false
             });
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
+            app.UseHsts();
+            app.UseHttpsRedirection();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -82,8 +76,12 @@ namespace TicketManager.WebAPI
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "TicketManager API v1");
             });
 
-            app.UseHttpsRedirection();
-            app.UseMvc();
+            app
+                .UseRouting()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
 
             if (bool.TryParse(Configuration["DBMIGRATE"], out var migrate) && migrate)
             {

@@ -1,8 +1,9 @@
-﻿using System;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
 using TicketManager.DataAccess.Documents.Utilities;
 using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.MessageClients;
@@ -46,7 +47,7 @@ namespace TicketManager.WebAPI.Extensions
             return services;
         }
 
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
         {
             var sbTopic = "ticketevents";
 
