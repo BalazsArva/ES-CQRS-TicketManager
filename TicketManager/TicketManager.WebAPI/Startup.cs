@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
 using TicketManager.BusinessServices.EventAggregators.Extensions;
 using TicketManager.Common.Http;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.Extensions;
 using TicketManager.WebAPI.Filters;
+using TicketManager.WebAPI.StartupTasks;
+using TicketManager.WebAPI.StartupTasks.Abstractions;
 
 namespace TicketManager.WebAPI
 {
@@ -50,8 +51,20 @@ namespace TicketManager.WebAPI
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "TicketManager", Version = "v1" });
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "TicketManager",
+                    Version = "v1",
+                    Description = "The API for the CQRS TicketManager application",
+                });
             });
+
+            services.AddSingleton<IApplicationStartupTask, SetupDocumentsDatabase>();
+
+            if (bool.TryParse(Configuration["DBMIGRATE"], out var migrate) && migrate)
+            {
+                services.AddSingleton<IApplicationStartupTask, MigrateEventsDatabase>();
+            }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -82,11 +95,6 @@ namespace TicketManager.WebAPI
                 {
                     endpoints.MapControllers();
                 });
-
-            if (bool.TryParse(Configuration["DBMIGRATE"], out var migrate) && migrate)
-            {
-                app.MigrateDatabase();
-            }
         }
     }
 }
