@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2048
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{43DF022E-0FF3-47D3-A43B-269F02C3115B}"
 EndProject
@@ -67,11 +67,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Notifications
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.DataAccess.Notifications", "TicketManager.DataAccess.Notifications\TicketManager.DataAccess.Notifications.csproj", "{D257EAE3-B26D-41E8-BD47-BA19EFC5FDC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.DataAccess.EntityFramework", "TicketManager.DataAccess.EntityFramework\TicketManager.DataAccess.EntityFramework.csproj", "{4FEBBC7E-1D8B-4920-903D-AF2050575213}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.DataAccess.EntityFramework", "TicketManager.DataAccess.EntityFramework\TicketManager.DataAccess.EntityFramework.csproj", "{4FEBBC7E-1D8B-4920-903D-AF2050575213}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.Notifications", "TicketManager.Notifications\TicketManager.Notifications.csproj", "{D7184084-F0F6-49DB-A38B-4B4E86C5C66B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.Notifications", "TicketManager.Notifications\TicketManager.Notifications.csproj", "{D7184084-F0F6-49DB-A38B-4B4E86C5C66B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketManager.NotificationsApi", "TicketManager.NotificationsApi\TicketManager.NotificationsApi.csproj", "{1FF344FD-6D16-4437-B2BE-BD6D63CABB8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketManager.NotificationsApi", "TicketManager.NotificationsApi\TicketManager.NotificationsApi.csproj", "{1FF344FD-6D16-4437-B2BE-BD6D63CABB8E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{992E8E56-72C8-4D51-9A46-C1A228C6721A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
