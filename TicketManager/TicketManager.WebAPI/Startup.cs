@@ -11,8 +11,6 @@ using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events.Extensions;
 using TicketManager.WebAPI.Extensions;
 using TicketManager.WebAPI.Filters;
-using TicketManager.WebAPI.StartupTasks;
-using TicketManager.WebAPI.StartupTasks.Abstractions;
 
 namespace TicketManager.WebAPI
 {
@@ -35,7 +33,9 @@ namespace TicketManager.WebAPI
             services.AddRavenDb(Configuration);
             services.AddEventsContext(Configuration);
 
-            services.AddValidators();
+            services
+                .AddValidators()
+                .AddStartupTasks();
 
             // TODO: Delete (project reference as well) when everything is moved to the separate query store synchronizer apps.
             services.AddEventAggregators();
@@ -58,13 +58,6 @@ namespace TicketManager.WebAPI
                     Description = "The API for the CQRS TicketManager application",
                 });
             });
-
-            services.AddSingleton<IApplicationStartupTask, SetupDocumentsDatabase>();
-
-            if (bool.TryParse(Configuration["DBMIGRATE"], out var migrate) && migrate)
-            {
-                services.AddSingleton<IApplicationStartupTask, MigrateEventsDatabase>();
-            }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

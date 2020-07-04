@@ -10,6 +10,8 @@ using TicketManager.Messaging.MessageClients;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.Services.Providers;
+using TicketManager.WebAPI.StartupTasks;
+using TicketManager.WebAPI.StartupTasks.Abstractions;
 using TicketManager.WebAPI.Validation.CommandValidators;
 using TicketManager.WebAPI.Validation.QueryValidators;
 
@@ -45,6 +47,13 @@ namespace TicketManager.WebAPI.Extensions
                 .AddSingleton<IValidator<GetTicketHistoryQueryRequest>, GetTicketHistoryQueryRequestValidator>();
 
             return services;
+        }
+
+        public static IServiceCollection AddStartupTasks(this IServiceCollection services)
+        {
+            return services
+                .AddSingleton<IApplicationStartupTask, SetupDocumentsDatabase>()
+                .AddSingleton<IApplicationStartupTask, MigrateEventsDatabase>();
         }
 
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
