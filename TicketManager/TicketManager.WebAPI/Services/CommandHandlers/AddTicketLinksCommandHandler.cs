@@ -7,7 +7,8 @@ using TicketManager.Contracts.Common;
 using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
-using TicketManager.Messaging.MessageClients;
+using TicketManager.Messaging.MessageClients.Abstractions;
+using TicketManager.Messaging.Requests;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Services.Providers;
 
@@ -18,12 +19,16 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
         private readonly ICorrelationIdProvider correlationIdProvider;
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<AddTicketLinksCommand> validator;
-        private readonly IServiceBusTopicSender serviceBusTopicSender;
+        private readonly IMessagePublisher messagePublisher;
 
-        public AddTicketLinksCommandHandler(ICorrelationIdProvider correlationIdProvider, IServiceBusTopicSender serviceBusTopicSender, IEventsContextFactory eventsContextFactory, IValidator<AddTicketLinksCommand> validator)
+        public AddTicketLinksCommandHandler(
+            ICorrelationIdProvider correlationIdProvider,
+            IMessagePublisher messagePublisher,
+            IEventsContextFactory eventsContextFactory,
+            IValidator<AddTicketLinksCommand> validator)
         {
             this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
-            this.serviceBusTopicSender = serviceBusTopicSender ?? throw new ArgumentNullException(nameof(serviceBusTopicSender));
+            this.messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
@@ -48,7 +53,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                         LinkType = ticketLink.LinkType,
                         SourceTicketCreatedEventId = ticketId,
                         TargetTicketCreatedEventId = ticketLink.TargetTicketId,
-                        ConnectionIsActive = true
+                        ConnectionIsActive = true,
                     });
 
                     if (!statusUpdated && ticketLink.LinkType == TicketLinkTypes.BlockedBy)
@@ -61,7 +66,7 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                             CausedBy = causedBy,
                             TicketCreatedEventId = ticketId,
                             TicketStatus = TicketStatuses.Blocked,
-                            Reason = $"Automatically set to blocked because of adding a link with 'Blocked by' type to ticket #{ticketLink.TargetTicketId}"
+                            Reason = $"Automatically set to blocked because of adding a link with 'Blocked by' type to ticket #{ticketLink.TargetTicketId}",
                         });
                     }
                 }
@@ -69,11 +74,15 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await serviceBusTopicSender.SendAsync(new TicketLinksChangedNotification(ticketId), correlationId).ConfigureAwait(false);
+            var linksChangedNotification = new PublishMessageRequest<TicketLinksChangedNotification>(new TicketLinksChangedNotification(ticketId), correlationId);
+
+            await messagePublisher.PublishMessageAsync(linksChangedNotification);
 
             if (statusUpdated)
             {
-                await serviceBusTopicSender.SendAsync(new TicketStatusChangedNotification(ticketId), correlationId).ConfigureAwait(false);
+                var message = new PublishMessageRequest<TicketStatusChangedNotification>(new TicketStatusChangedNotification(ticketId), correlationId);
+
+                await messagePublisher.PublishMessageAsync(message);
             }
 
             return Unit.Value;

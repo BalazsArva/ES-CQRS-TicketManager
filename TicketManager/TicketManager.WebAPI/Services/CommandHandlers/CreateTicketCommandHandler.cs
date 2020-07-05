@@ -6,7 +6,8 @@ using MediatR;
 using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
-using TicketManager.Messaging.MessageClients;
+using TicketManager.Messaging.MessageClients.Abstractions;
+using TicketManager.Messaging.Requests;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Services.Providers;
 
@@ -17,11 +18,11 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
         private readonly ICorrelationIdProvider correlationIdProvider;
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<CreateTicketCommand> validator;
-        private readonly IServiceBusTopicSender serviceBusTopicSender;
+        private readonly IMessagePublisher messagePublisher;
 
-        public CreateTicketCommandHandler(ICorrelationIdProvider correlationIdProvider, IServiceBusTopicSender serviceBusTopicSender, IEventsContextFactory eventsContextFactory, IValidator<CreateTicketCommand> validator)
+        public CreateTicketCommandHandler(ICorrelationIdProvider correlationIdProvider, IMessagePublisher messagePublisher, IEventsContextFactory eventsContextFactory, IValidator<CreateTicketCommand> validator)
         {
-            this.serviceBusTopicSender = serviceBusTopicSender ?? throw new ArgumentNullException(nameof(serviceBusTopicSender));
+            this.messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
             this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
@@ -131,7 +132,9 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 ticketId = ticketCreatedEvent.Id;
             }
 
-            await serviceBusTopicSender.SendAsync(new TicketCreatedNotification(ticketId), correlationId).ConfigureAwait(false);
+            var message = new PublishMessageRequest<TicketCreatedNotification>(new TicketCreatedNotification(ticketId), correlationId);
+
+            await messagePublisher.PublishMessageAsync(message);
 
             return ticketId;
         }

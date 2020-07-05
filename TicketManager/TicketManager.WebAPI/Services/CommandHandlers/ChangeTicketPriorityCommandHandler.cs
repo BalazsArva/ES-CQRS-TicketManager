@@ -6,7 +6,8 @@ using MediatR;
 using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
-using TicketManager.Messaging.MessageClients;
+using TicketManager.Messaging.MessageClients.Abstractions;
+using TicketManager.Messaging.Requests;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Services.Providers;
 
@@ -14,14 +15,14 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 {
     public class ChangeTicketPriorityCommandHandler : IRequestHandler<ChangeTicketPriorityCommand>
     {
-        private readonly IServiceBusTopicSender serviceBusTopicSender;
+        private readonly IMessagePublisher messagePublisher;
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<ChangeTicketPriorityCommand> validator;
         private readonly ICorrelationIdProvider correlationIdProvider;
 
-        public ChangeTicketPriorityCommandHandler(ICorrelationIdProvider correlationIdProvider, IServiceBusTopicSender serviceBusTopicSender, IEventsContextFactory eventsContextFactory, IValidator<ChangeTicketPriorityCommand> validator)
+        public ChangeTicketPriorityCommandHandler(ICorrelationIdProvider correlationIdProvider, IMessagePublisher messagePublisher, IEventsContextFactory eventsContextFactory, IValidator<ChangeTicketPriorityCommand> validator)
         {
-            this.serviceBusTopicSender = serviceBusTopicSender ?? throw new ArgumentNullException(nameof(serviceBusTopicSender));
+            this.messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
             this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
@@ -47,7 +48,9 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await serviceBusTopicSender.SendAsync(new TicketPriorityChangedNotification(ticketId), correlationId).ConfigureAwait(false);
+            var message = new PublishMessageRequest<TicketPriorityChangedNotification>(new TicketPriorityChangedNotification(ticketId), correlationId);
+
+            await messagePublisher.PublishMessageAsync(message);
 
             return Unit.Value;
         }

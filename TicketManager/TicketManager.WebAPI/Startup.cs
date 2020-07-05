@@ -33,13 +33,11 @@ namespace TicketManager.WebAPI
             services.AddRavenDb(Configuration);
             services.AddEventsContext(Configuration);
 
-            services
-                .AddValidators()
-                .AddStartupTasks();
+            services.AddValidators();
 
             // TODO: Delete (project reference as well) when everything is moved to the separate query store synchronizer apps.
             services.AddEventAggregators();
-            services.AddApplicationServices(Configuration, HostingEnvironment);
+            services.AddApplicationServices();
             services.AddMediatR(typeof(Startup).Assembly);
 
             services

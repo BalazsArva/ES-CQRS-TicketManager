@@ -7,7 +7,8 @@ using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
 using TicketManager.DataAccess.Events.Extensions;
-using TicketManager.Messaging.MessageClients;
+using TicketManager.Messaging.MessageClients.Abstractions;
+using TicketManager.Messaging.Requests;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.Services.Providers;
 
@@ -18,12 +19,12 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
         private readonly ICorrelationIdProvider correlationIdProvider;
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IValidator<AssignTicketCommand> validator;
-        private readonly IServiceBusTopicSender serviceBusTopicSender;
+        private readonly IMessagePublisher messagePublisher;
 
-        public AssignTicketCommandHandler(ICorrelationIdProvider correlationIdProvider, IServiceBusTopicSender serviceBusTopicSender, IEventsContextFactory eventsContextFactory, IValidator<AssignTicketCommand> validator)
+        public AssignTicketCommandHandler(ICorrelationIdProvider correlationIdProvider, IMessagePublisher messagePublisher, IEventsContextFactory eventsContextFactory, IValidator<AssignTicketCommand> validator)
         {
             this.correlationIdProvider = correlationIdProvider ?? throw new ArgumentNullException(nameof(correlationIdProvider));
-            this.serviceBusTopicSender = serviceBusTopicSender ?? throw new ArgumentNullException(nameof(serviceBusTopicSender));
+            this.messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
@@ -57,22 +58,28 @@ namespace TicketManager.WebAPI.Services.CommandHandlers
 
         private async Task RaiseNotificationAsync(TicketAssignedEvent newAssignmentEvent, string correlationId, CancellationToken cancellationToken)
         {
-            TicketAssignmentChangedNotification notification;
+            using var context = eventsContextFactory.CreateContext();
+
             var ticketId = newAssignmentEvent.TicketCreatedEventId;
             var newAssignmentEventId = newAssignmentEvent.Id;
 
-            using (var context = eventsContextFactory.CreateContext())
-            {
-                var previousEvent = await context.TicketAssignedEvents
-                    .OfTicket(ticketId)
-                    .Before(newAssignmentEventId)
-                    .LatestAsync(cancellationToken)
-                    .ConfigureAwait(false);
+            var previousEvent = await context.TicketAssignedEvents
+                .OfTicket(ticketId)
+                .Before(newAssignmentEventId)
+                .LatestAsync(cancellationToken)
+                .ConfigureAwait(false);
 
-                notification = new TicketAssignmentChangedNotification(ticketId, newAssignmentEventId, newAssignmentEvent.AssignedTo, previousEvent?.AssignedTo, newAssignmentEvent.CausedBy, newAssignmentEvent.UtcDateRecorded);
-            }
+            var notification = new TicketAssignmentChangedNotification(
+                ticketId,
+                newAssignmentEventId,
+                newAssignmentEvent.AssignedTo,
+                previousEvent?.AssignedTo,
+                newAssignmentEvent.CausedBy,
+                newAssignmentEvent.UtcDateRecorded);
 
-            await serviceBusTopicSender.SendAsync(notification, correlationId).ConfigureAwait(false);
+            var message = new PublishMessageRequest<TicketAssignmentChangedNotification>(notification, correlationId);
+
+            await messagePublisher.PublishMessageAsync(message);
         }
     }
 }

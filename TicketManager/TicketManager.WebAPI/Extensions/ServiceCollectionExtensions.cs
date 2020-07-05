@@ -1,17 +1,11 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
 using TicketManager.DataAccess.Documents.Utilities;
-using TicketManager.Messaging.Configuration;
 using TicketManager.Messaging.MessageClients;
+using TicketManager.Messaging.MessageClients.Abstractions;
 using TicketManager.WebAPI.DTOs.Commands;
 using TicketManager.WebAPI.DTOs.Queries;
 using TicketManager.WebAPI.Services.Providers;
-using TicketManager.WebAPI.StartupTasks;
-using TicketManager.WebAPI.StartupTasks.Abstractions;
 using TicketManager.WebAPI.Validation.CommandValidators;
 using TicketManager.WebAPI.Validation.QueryValidators;
 
@@ -49,37 +43,11 @@ namespace TicketManager.WebAPI.Extensions
             return services;
         }
 
-        public static IServiceCollection AddStartupTasks(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            return services
-                .AddSingleton<IApplicationStartupTask, SetupDocumentsDatabase>()
-                .AddSingleton<IApplicationStartupTask, MigrateEventsDatabase>();
-        }
-
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
-        {
-            var sbTopic = "ticketevents";
-
-            // Suffix topic name with machine name for development so multiple workstations (e.g. my home and
-            // workplace machine) don't mess with each other's messages.
-            if (hostingEnvironment.IsDevelopment())
-            {
-                sbTopic = $"{sbTopic}.{Environment.MachineName}";
-            }
-
-            var topicConfiguration = new ServiceBusTopicConfiguration
-            {
-                // The ConnectionString is stored as a user secret. Set it on the machine before using by navigating to the project location
-                // from PowerShell and running
-                //     dotnet user-secrets set "ServiceBus:ConnectionString" "<connection-string>"
-                ConnectionString = configuration.GetValue<string>("ServiceBus:ConnectionString"),
-                Topic = sbTopic
-            };
-
             return services
                 .AddHttpContextAccessor()
-                .AddSingleton(topicConfiguration)
-                .AddSingleton<IServiceBusTopicSender, ServiceBusTopicSender>()
+                .AddSingleton<IMessagePublisher, RabbitMqMessagePublisher>()
                 .AddSingleton<IETagProvider, ETagProvider>()
                 .AddScoped<ICorrelationIdProvider, CorrelationIdProvider>();
         }

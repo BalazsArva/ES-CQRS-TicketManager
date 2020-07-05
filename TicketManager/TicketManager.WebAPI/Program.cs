@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using TicketManager.WebAPI.StartupTasks.Abstractions;
+using TicketManager.DataAccess.Documents.StartupTasks;
+using TicketManager.DataAccess.Events.StartupTasks;
+using TicketManager.WebAPI.Extensions;
 
 namespace TicketManager.WebAPI
 {
@@ -13,12 +14,8 @@ namespace TicketManager.WebAPI
         {
             var app = CreateWebHostBuilder(args).Build();
 
-            foreach (var startupTask in app.Services.GetServices<IApplicationStartupTask>())
-            {
-                await startupTask.ExecuteAsync(default);
-            }
-
-            app.Run();
+            await app.ExecuteStartupTasksAsync();
+            await app.RunAsync();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
@@ -26,7 +23,9 @@ namespace TicketManager.WebAPI
             return WebHost
                 .CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration(cfg => cfg.AddEnvironmentVariables("MSSQL_"))
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseStartupTask<SetupDocumentsDatabase>()
+                .UseStartupTask<MigrateEventsDatabase>(cfg => bool.TryParse(cfg["DBMIGRATE"], out var migrate) && migrate);
         }
     }
 }
