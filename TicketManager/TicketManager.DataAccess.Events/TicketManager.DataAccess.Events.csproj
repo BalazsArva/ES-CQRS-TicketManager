@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TicketManager.Common\TicketManager.Common.csproj" />
     <ProjectReference Include="..\TicketManager.Contracts.Common\TicketManager.Contracts.Common.csproj" />
     <ProjectReference Include="..\TicketManager.DataAccess.EntityFramework\TicketManager.DataAccess.EntityFramework.csproj" />
     <ProjectReference Include="..\TicketManager.Domain.Common\TicketManager.Domain.Common.csproj" />
