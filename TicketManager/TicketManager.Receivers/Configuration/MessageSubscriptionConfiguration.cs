@@ -1,8 +1,8 @@
 ﻿namespace TicketManager.Receivers.Configuration
 {
-    public class ServiceBusSubscriptionConfiguration
+    public class MessageSubscriptionConfiguration
     {
-        public string ConnectionString { get; set; }
+        public string Endpoint { get; set; }
 
         public string Topic { get; set; }
 

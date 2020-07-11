@@ -4,13 +4,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using RabbitMQ.Client;
 using TicketManager.Receivers.Configuration;
 using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers
 {
-    public abstract class SubscriptionReceiverHostBase<TMessage> : ISubscriptionReceiver
+    public abstract class SubscriptionReceiverHostBase<TMessage> : BackgroundService
     {
         // Refer to https://github.com/aspnet/AspNetCore/blob/712c992ca827576c05923e6a134ca0bec87af4df/src/Microsoft.Extensions.Hosting.Abstractions/BackgroundService.cs
         // how long-running background jobs can be implemented. This is based on that but a bit different as there can be many concurrently running tasks depending on the
@@ -18,13 +20,40 @@ namespace TicketManager.Receivers
 
         private readonly string MessageTypeFullName = typeof(TMessage).FullName;
         private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
-        private readonly ServiceBusSubscriptionConfiguration configuration;
+        private readonly MessageSubscriptionConfiguration configuration;
 
         private SubscriptionClient subscriptionClient;
 
-        public SubscriptionReceiverHostBase(ServiceBusSubscriptionConfiguration configuration)
+        public SubscriptionReceiverHostBase(MessageSubscriptionConfiguration configuration)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            var factory = new ConnectionFactory { HostName = configuration.Endpoint };
+
+
+
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
+
+            channel.
+
+            channel.QueueDeclare(queue: "hello",
+                                 durable: false,
+                                 exclusive: false,
+                                 autoDelete: false,
+                                 arguments: null);
+
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (model, ea) =>
+            {
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                Console.WriteLine(" [x] Received {0}", message);
+            };
+
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

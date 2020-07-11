@@ -42,7 +42,7 @@ namespace TicketManager.Receivers.Hosting
                         sbTopic = $"{sbTopic}.{Environment.MachineName}";
                     }
 
-                    var subscriptionConfiguration = new ServiceBusSubscriptionConfiguration
+                    var subscriptionConfiguration = new MessageSubscriptionConfiguration
                     {
                         ConnectionString = hostingContext.Configuration["ServiceBus:ConnectionString"],
                         Topic = sbTopic,

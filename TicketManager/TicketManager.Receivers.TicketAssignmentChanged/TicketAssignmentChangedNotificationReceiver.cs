@@ -18,7 +18,7 @@ namespace TicketManager.Receivers.TicketAssignmentChanged
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<Assignment> eventAggregator;
 
-        public TicketAssignmentChangedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
+        public TicketAssignmentChangedNotificationReceiver(MessageSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Assignment> eventAggregator)
             : base(subscriptionConfiguration)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));

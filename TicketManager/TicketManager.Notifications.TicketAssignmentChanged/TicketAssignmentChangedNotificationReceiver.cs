@@ -23,7 +23,7 @@ namespace TicketManager.Notifications.TicketAssignmentChanged
         private readonly ITicketUrlProvider ticketUrlProvider;
         private readonly NotificationConfiguration configuration;
 
-        public TicketAssignmentChangedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, INotificationsContextFactory notificationsContextFactory, ITicketUrlProvider ticketUrlProvider, NotificationConfiguration configuration)
+        public TicketAssignmentChangedNotificationReceiver(MessageSubscriptionConfiguration subscriptionConfiguration, INotificationsContextFactory notificationsContextFactory, ITicketUrlProvider ticketUrlProvider, NotificationConfiguration configuration)
             : base(subscriptionConfiguration)
         {
             this.notificationsContextFactory = notificationsContextFactory ?? throw new ArgumentNullException(nameof(notificationsContextFactory));

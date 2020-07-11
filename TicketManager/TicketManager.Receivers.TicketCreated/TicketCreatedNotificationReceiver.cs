@@ -31,7 +31,7 @@ namespace TicketManager.Receivers.TicketCreated
         private readonly IEventAggregator<TicketInvolvement> involvementEventAggregator;
 
         public TicketCreatedNotificationReceiver(
-            ServiceBusSubscriptionConfiguration subscriptionConfiguration,
+            MessageSubscriptionConfiguration subscriptionConfiguration,
             IEventsContextFactory eventsContextFactory,
             IDocumentStore documentStore,
             IEventAggregator<Assignment> assignmentEventAggregator,

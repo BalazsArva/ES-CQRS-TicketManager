@@ -21,7 +21,7 @@ namespace TicketManager.Receivers.TicketUserInvolvementChanged
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<TicketInvolvement> eventAggregator;
 
-        public TicketUserInvolvementChangedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<TicketInvolvement> eventAggregator)
+        public TicketUserInvolvementChangedNotificationReceiver(MessageSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<TicketInvolvement> eventAggregator)
             : base(subscriptionConfiguration)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));

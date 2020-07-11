@@ -18,7 +18,7 @@ namespace TicketManager.Receivers.TicketTagsChanged
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<Tags> eventAggregator;
 
-        public TicketTagsChangedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Tags> eventAggregator)
+        public TicketTagsChangedNotificationReceiver(MessageSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<Tags> eventAggregator)
             : base(subscriptionConfiguration)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));

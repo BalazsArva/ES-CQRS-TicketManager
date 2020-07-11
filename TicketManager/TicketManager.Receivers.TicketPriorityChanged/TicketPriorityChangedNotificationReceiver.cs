@@ -18,7 +18,7 @@ namespace TicketManager.Receivers.TicketPriorityChanged
         private readonly IDocumentStore documentStore;
         private readonly IEventAggregator<TicketPriority> eventAggregator;
 
-        public TicketPriorityChangedNotificationReceiver(ServiceBusSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<TicketPriority> eventAggregator)
+        public TicketPriorityChangedNotificationReceiver(MessageSubscriptionConfiguration subscriptionConfiguration, IDocumentStore documentStore, IEventAggregator<TicketPriority> eventAggregator)
             : base(subscriptionConfiguration)
         {
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
