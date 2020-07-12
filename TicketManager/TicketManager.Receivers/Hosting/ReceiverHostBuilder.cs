@@ -1,22 +1,19 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TicketManager.Messaging.Setup;
-using TicketManager.Receivers.Configuration;
 
 namespace TicketManager.Receivers.Hosting
 {
     public class ReceiverHostBuilder
     {
-        public IHostBuilder CreateDefaultBuilder<TReceiver>(string topic, string subscription)
-            where TReceiver : class, ISubscriptionReceiver
+        public IHostBuilder CreateDefaultBuilder<TReceiver, TMessage>()
+            where TReceiver : MessageReceiverBase<TMessage>
         {
             return new HostBuilder()
                 .ConfigureHostConfiguration(cfg =>
                 {
-                    cfg.AddEnvironmentVariables("RECEIVER_");
+                    cfg.AddEnvironmentVariables("NETCORE_");
                 })
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
@@ -33,26 +30,7 @@ namespace TicketManager.Receivers.Hosting
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    var sbTopic = topic;
-
-                    // Suffix topic name with machine name for development so multiple workstations (e.g. my home and
-                    // workplace machine) don't mess with each other's messages.
-                    if (hostingContext.HostingEnvironment.IsDevelopment())
-                    {
-                        sbTopic = $"{sbTopic}.{Environment.MachineName}";
-                    }
-
-                    var subscriptionConfiguration = new MessageSubscriptionConfiguration
-                    {
-                        ConnectionString = hostingContext.Configuration["ServiceBus:ConnectionString"],
-                        Topic = sbTopic,
-                        Subscription = subscription
-                    };
-
-                    services
-                        .AddSingleton(subscriptionConfiguration)
-                        .AddSingleton<IServiceBusConfigurer, ServiceBusConfigurer>()
-                        .AddHostedService<TReceiver>();
+                    services.AddHostedService<TReceiver>();
                 })
                 .UseConsoleLifetime();
         }
