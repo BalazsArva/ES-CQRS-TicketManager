@@ -10,6 +10,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using TicketManager.Common.Http;
 using TicketManager.Messaging.Configuration;
+using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers
 {
@@ -36,7 +37,33 @@ namespace TicketManager.Receivers
         {
             var consumer = new AsyncEventingBasicConsumer(channel);
 
-            consumer.Received += async (sender, eventArgs) => await MessageReceivedAsync(eventArgs, stoppingToken);
+            consumer.Received += async (sender, eventArgs) =>
+            {
+                var deliveryTag = eventArgs.DeliveryTag;
+                var messageId = eventArgs.BasicProperties.MessageId;
+
+                var result = await MessageReceivedAsync(eventArgs, stoppingToken);
+
+                if (result.ResultType == ProcessMessageResultType.Success)
+                {
+                    logger.LogInformation("Successfully processed message with MessageId='{MessageId}'.", messageId);
+
+                    channel.BasicAck(deliveryTag, false);
+                }
+                else if (result.ResultType == ProcessMessageResultType.TransientError)
+                {
+                    logger.LogWarning("Could not process message with MessageId='{MessageId}'. Reason: '{Reason}'.", messageId, result.Reason);
+
+                    // TODO: Check delivery count and deadletter/reject when exceeded.
+                    channel.BasicNack(deliveryTag, false, true);
+                }
+                else
+                {
+                    logger.LogError("Could not process message with MessageId='{MessageId}'. Reason: '{Reason}'.", messageId, result.Reason);
+
+                    channel.BasicReject(deliveryTag, false);
+                }
+            };
 
             var consumerTag = channel.BasicConsume(options.QueueName, false, consumer);
 
@@ -52,23 +79,25 @@ namespace TicketManager.Receivers
             }
         }
 
-        protected abstract Task ProcessMessageAsync(TMessage message, CancellationToken cancellationToken);
+        protected abstract Task<ProcessMessageResult> ProcessMessageAsync(TMessage message, CancellationToken cancellationToken);
 
-        private async Task MessageReceivedAsync(BasicDeliverEventArgs e, CancellationToken stoppingToken)
+        private async Task<ProcessMessageResult> MessageReceivedAsync(BasicDeliverEventArgs e, CancellationToken stoppingToken)
         {
             try
             {
-                if (!string.Equals(e.BasicProperties.ContentEncoding, Encoding.UTF8.HeaderName, StringComparison.OrdinalIgnoreCase) ||
-                    !string.Equals(e.BasicProperties.ContentType, StandardContentTypes.Json, StringComparison.OrdinalIgnoreCase))
+                var contentEncoding = e.BasicProperties.ContentEncoding;
+                var contentType = e.BasicProperties.ContentType;
+
+                if (!string.Equals(contentEncoding, Encoding.UTF8.HeaderName, StringComparison.OrdinalIgnoreCase) ||
+                    !string.Equals(contentType, StandardContentTypes.Json, StringComparison.OrdinalIgnoreCase))
                 {
-                    // TODO: Signal error
-                    return;
+                    return ProcessMessageResult.PermanentError("Failed to interpret message. The content encoding or the content type could not be understood.");
                 }
 
                 var messageBodyJson = Encoding.UTF8.GetString(e.Body.Span);
                 var messageBody = JsonConvert.DeserializeObject<TMessage>(messageBodyJson);
 
-                await ProcessMessageAsync(messageBody, stoppingToken);
+                return await ProcessMessageAsync(messageBody, stoppingToken);
             }
             catch (Exception ex)
             {
@@ -76,6 +105,8 @@ namespace TicketManager.Receivers
                     ex,
                     "An unhandled error occurred while trying to process message with Id='{MessageId}'.",
                     e.BasicProperties.MessageId);
+
+                return ProcessMessageResult.TransientError("An unhandled error occurred while trying to process the message.");
             }
         }
 
