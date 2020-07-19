@@ -4,7 +4,6 @@ using TicketManager.BusinessServices.EventAggregators.Extensions;
 using TicketManager.Contracts.Notifications;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events.Extensions;
-using TicketManager.Receivers.Extensions;
 using TicketManager.Receivers.Hosting;
 
 namespace TicketManager.Receivers.TicketCreated
@@ -17,7 +16,7 @@ namespace TicketManager.Receivers.TicketCreated
         private static async Task Main(string[] args)
         {
             var host = new ReceiverHostBuilder()
-                .CreateDefaultBuilder<TicketCreatedNotificationReceiver>(Topic, Subscription)
+                .CreateDefaultBuilder<TicketCreatedNotificationReceiver, TicketCreatedNotification>(args)
                 .ConfigureServices((hostingContext, services) =>
                 {
                     var configuration = hostingContext.Configuration;

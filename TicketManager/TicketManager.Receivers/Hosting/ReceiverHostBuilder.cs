@@ -7,13 +7,14 @@ namespace TicketManager.Receivers.Hosting
 {
     public class ReceiverHostBuilder
     {
-        public IHostBuilder CreateDefaultBuilder<TReceiver, TMessage>()
+        public IHostBuilder CreateDefaultBuilder<TReceiver, TMessage>(string[] args)
             where TReceiver : MessageReceiverBase<TMessage>
         {
             return new HostBuilder()
                 .ConfigureHostConfiguration(cfg =>
                 {
                     cfg.AddEnvironmentVariables("NETCORE_");
+                    cfg.AddCommandLine(args);
                 })
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
