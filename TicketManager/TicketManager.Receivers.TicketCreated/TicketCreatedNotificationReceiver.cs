@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Raven.Client.Documents;
 using TicketManager.BusinessServices.EventAggregators;
 using TicketManager.Contracts.Notifications;
@@ -10,12 +11,12 @@ using TicketManager.DataAccess.Documents.DataModel;
 using TicketManager.DataAccess.Documents.Extensions;
 using TicketManager.DataAccess.Events;
 using TicketManager.DataAccess.Events.DataModel;
-using TicketManager.Receivers.Configuration;
+using TicketManager.Messaging.Configuration;
 using TicketManager.Receivers.DataStructures;
 
 namespace TicketManager.Receivers.TicketCreated
 {
-    public class TicketCreatedNotificationReceiver : SubscriptionReceiverHostBase<TicketCreatedNotification>
+    public class TicketCreatedNotificationReceiver : MessageReceiverBase<TicketCreatedNotification>
     {
         private readonly IEventsContextFactory eventsContextFactory;
         private readonly IDocumentStore documentStore;
@@ -31,7 +32,8 @@ namespace TicketManager.Receivers.TicketCreated
         private readonly IEventAggregator<TicketInvolvement> involvementEventAggregator;
 
         public TicketCreatedNotificationReceiver(
-            MessageSubscriptionConfiguration subscriptionConfiguration,
+            ILogger<TicketCreatedNotificationReceiver> logger,
+            IOptions<RabbitMqExchangeBoundQueueConfiguration> options,
             IEventsContextFactory eventsContextFactory,
             IDocumentStore documentStore,
             IEventAggregator<Assignment> assignmentEventAggregator,
@@ -43,7 +45,7 @@ namespace TicketManager.Receivers.TicketCreated
             IEventAggregator<Tags> tagsEventAggregator,
             IEventAggregator<Links> linksEventAggregator,
             IEventAggregator<StoryPoints> storyPointsEventAggregator,
-            IEventAggregator<TicketInvolvement> involvementEventAggregator) : base(subscriptionConfiguration)
+            IEventAggregator<TicketInvolvement> involvementEventAggregator) : base(logger, options)
         {
             this.eventsContextFactory = eventsContextFactory ?? throw new ArgumentNullException(nameof(eventsContextFactory));
             this.documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
@@ -59,7 +61,7 @@ namespace TicketManager.Receivers.TicketCreated
             this.involvementEventAggregator = involvementEventAggregator ?? throw new ArgumentNullException(nameof(involvementEventAggregator));
         }
 
-        public override async Task<ProcessMessageResult> HandleMessageAsync(TicketCreatedNotification message, string correlationId, IDictionary<string, object> headers, CancellationToken cancellationToken)
+        protected override async Task<ProcessMessageResult> ProcessMessageAsync(TicketCreatedNotification message, CancellationToken cancellationToken)
         {
             using (var session = documentStore.OpenAsyncSession())
             {

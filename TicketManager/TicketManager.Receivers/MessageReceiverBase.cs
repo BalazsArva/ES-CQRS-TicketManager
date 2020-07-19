@@ -25,7 +25,7 @@ namespace TicketManager.Receivers
         // TODO: Implement disposal
         private bool disposed;
 
-        protected MessageReceiverBase(ILogger<MessageReceiverBase<TMessage>> logger, IOptions<RabbitMqExchangeBoundQueueConfiguration> options)
+        protected MessageReceiverBase(ILogger logger, IOptions<RabbitMqExchangeBoundQueueConfiguration> options)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
