@@ -17,7 +17,6 @@ namespace TicketManager.Receivers
     public abstract class MessageReceiverBase<TMessage> : BackgroundService
     {
         private readonly RabbitMqExchangeBoundQueueConfiguration options;
-        private readonly ILogger logger;
 
         private IModel channel;
         private IConnection connection;
@@ -27,11 +26,13 @@ namespace TicketManager.Receivers
 
         protected MessageReceiverBase(ILogger logger, IOptions<RabbitMqExchangeBoundQueueConfiguration> options)
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
             Initialize();
         }
+
+        public ILogger Logger { get; }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -46,20 +47,20 @@ namespace TicketManager.Receivers
 
                 if (result.ResultType == ProcessMessageResultType.Success)
                 {
-                    logger.LogInformation("Successfully processed message with MessageId='{MessageId}'.", messageId);
+                    Logger.LogInformation("Successfully processed message with MessageId='{MessageId}'.", messageId);
 
                     channel.BasicAck(deliveryTag, false);
                 }
                 else if (result.ResultType == ProcessMessageResultType.TransientError)
                 {
-                    logger.LogWarning("Could not process message with MessageId='{MessageId}'. Reason: '{Reason}'.", messageId, result.Reason);
+                    Logger.LogWarning("Could not process message with MessageId='{MessageId}'. Reason: '{Reason}'.", messageId, result.Reason);
 
                     // TODO: Check delivery count and deadletter/reject when exceeded.
                     channel.BasicNack(deliveryTag, false, true);
                 }
                 else
                 {
-                    logger.LogError("Could not process message with MessageId='{MessageId}'. Reason: '{Reason}'.", messageId, result.Reason);
+                    Logger.LogError("Could not process message with MessageId='{MessageId}'. Reason: '{Reason}'.", messageId, result.Reason);
 
                     channel.BasicReject(deliveryTag, false);
                 }
@@ -101,7 +102,7 @@ namespace TicketManager.Receivers
             }
             catch (Exception ex)
             {
-                logger.LogError(
+                Logger.LogError(
                     ex,
                     "An unhandled error occurred while trying to process message with Id='{MessageId}'.",
                     e.BasicProperties.MessageId);
